@@ -18,7 +18,7 @@
 // 	fmt.Printf("%q", s) // Stdout: "ABCアイウ"
 package gaga
 
-// TODO support for Katakana_Extの対応
+// TODO support for Katakana_Ext
 
 import (
 	"fmt"

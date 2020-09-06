@@ -136,6 +136,7 @@ type NormalizeTest struct {
 	out string
 }
 
+// TODO benchmark
 // TODO testing of invalid normalization flag
 // TODO testing of whitespace
 // TODO Consider whether to test the following characters
