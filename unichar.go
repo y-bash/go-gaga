@@ -133,6 +133,7 @@ func (c *unichar) toNarrowUnichar() *unichar {
 	return c.getCompatWidthUnichar()
 }
 
+// for voiced or semi-voiced sound mark characters.
 func (c *unichar) toTraditionalMarkUnichar() *unichar {
 	if c.charCase != ccCombining {
 		return c
@@ -140,6 +141,7 @@ func (c *unichar) toTraditionalMarkUnichar() *unichar {
 	return c.getCompatCaseUnichar()
 }
 
+// for voiced or semi-voiced sound mark characters.
 func (c *unichar) toCombiningMark() rune {
 	if c.charCase != ccTraditional {
 		return c.codepoint
@@ -147,6 +149,9 @@ func (c *unichar) toCombiningMark() rune {
 	return c.compatCase
 }
 
+// for Hiragana-Katakana letters.
+// TEST_Vs4Ad89Z knows that this function returns a rune array with
+// 1 or 2 elements and no other number of elements.
 func (c *unichar) toTraditionalVoiced() []rune {
 	switch c.voicing {
 	case vcVoiced:
@@ -179,6 +184,9 @@ func (c *unichar) toTraditionalVoiced() []rune {
 	}
 }
 
+// for Hiragana-Katakana letters.
+// TEST_s8U59Hzf knows that this function returns a rune array with
+// 1 or 2 elements and no other number of elements.
 func (c *unichar) toTraditionalSemivoiced() []rune {
 	switch c.voicing {
 	case vcSemivoiced:
@@ -229,6 +237,9 @@ func (c *unichar) toTraditionalSemivoiced() []rune {
 	}
 }
 
+// for Hiragana-Katakana letters.
+// TEST_R4gNVpGj knows that this function returns a rune array with
+// 1 or 2 elements and no other number of elements.
 func (c *unichar) toCombiningVoiced() []rune {
 	switch c.voicing {
 	case vcUnvoiced, vcUndefined:
@@ -243,6 +254,9 @@ func (c *unichar) toCombiningVoiced() []rune {
 	}
 }
 
+// for Hiragana-Katakana letters.
+// TEST_Pp9gBVj2 knows that this function returns a rune array with
+// 1 or 2 elements and no other number of elements.
 func (c *unichar) toCombiningSemivoiced() []rune {
 	switch c.voicing {
 	case vcUnvoiced, vcUndefined:
