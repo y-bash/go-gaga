@@ -86,13 +86,32 @@ const (
 	// to their full-width.
 	KanaSymToWide
 
-	// KanaVsmToClassical converts the voiced or semi-voiced sound marks of
-	// Hiragana-Katakana to the classical style as much as possible.
-	KanaVsmToClassical
+	// VoicedKanaToTraditional combines voiced or semi-voiced sound marks behind
+	// Hiragana-Katakana in a traditional style.
+	// TODO Voiced character, Semi-voiced character
+	// "か゛" -> "が"
+	// "ｶ゛"  -> "ｶﾞ"
+	// "ヰ゛" -> "ヸ"
+	// "ゐ゛" -> "ゐ゛"
+	VoicedKanaToTraditional
 
-	// KanaVsmToCombining converts the voiced or semi-voiced sound marks of
-	// Hiragana-Katakana to the combining style as much as possible.
-	KanaVsmToCombining
+	// VoicedKanaToCombining combines voiced or semi-voiced sound marks behind
+	// Hiragana-Katakana in a Unicode combining style.
+	// TODO Voiced character, Semi-voiced character
+	// "か゛" -> "か\u3099"
+	// "ｶ゛"  -> "ｶ\u3099"
+	// "ヰ゛" -> "ヰ\u3099"
+	// "ゐ゛" -> "ゐ\u3099"
+	VoicedKanaToCombining
+
+	// TODO comment Isolated
+	IsolatedVsmToNarrow
+
+	// TODO comment
+	IsolatedVsmToWide
+
+	// TODO comment
+	IsolatedVsmToCombining
 
 	normflagMax
 )
@@ -110,33 +129,37 @@ const (
 	// KanaToNarrow is a combination of normalization flags for converting
 	// the full-width Hiragana-Katakana characters to their half-width as
 	// much as possible.
-	KanaToNarrow = HiraganaToNarrow | KatakanaToNarrow | KanaSymToNarrow | KanaVsmToClassical
+	KanaToNarrow = HiraganaToNarrow | KatakanaToNarrow | KanaSymToNarrow |
+		VoicedKanaToTraditional | IsolatedVsmToNarrow
 
 	// KanaToWide is a combination of normalization flags for converting
 	// all the half-width Hiragana-Katakana characters to their full-width.
-	KanaToWide = KatakanaToWide | KanaSymToWide | KanaVsmToClassical
+	KanaToWide = KatakanaToWide | KanaSymToWide | VoicedKanaToTraditional | IsolatedVsmToWide
 )
 
 func (f NormFlag) has(f2 NormFlag) bool { return f&f2 != 0 }
 
 var normflagNames = map[NormFlag]string{
-	AlphaToNarrow:      "AlphaToNarrow",
-	AlphaToWide:        "AlphaToWide",
-	AlphaToUpper:       "AlphaToUpper",
-	AlphaToLower:       "AlphaToLower",
-	DigitToNarrow:      "DigitToNarrow",
-	DigitToWide:        "DigitToWide",
-	SymbolToNarrow:     "SymbolToNarrow",
-	SymbolToWide:       "SymbolToWide",
-	HiraganaToNarrow:   "HiraganaToNarrow",
-	HiraganaToKatakana: "HiraganaToKatakana",
-	KatakanaToNarrow:   "KatakanaToNarrow",
-	KatakanaToWide:     "KatakanaToWide",
-	KatakanaToHiragana: "KatakanaToHiragana",
-	KanaSymToNarrow:    "KanaSymToNarrow",
-	KanaSymToWide:      "KanaSymToWide",
-	KanaVsmToClassical: "KanaVsmToClassical",
-	KanaVsmToCombining: "KanaVsmToCombining",
+	AlphaToNarrow:           "AlphaToNarrow",
+	AlphaToWide:             "AlphaToWide",
+	AlphaToUpper:            "AlphaToUpper",
+	AlphaToLower:            "AlphaToLower",
+	DigitToNarrow:           "DigitToNarrow",
+	DigitToWide:             "DigitToWide",
+	SymbolToNarrow:          "SymbolToNarrow",
+	SymbolToWide:            "SymbolToWide",
+	HiraganaToNarrow:        "HiraganaToNarrow",
+	HiraganaToKatakana:      "HiraganaToKatakana",
+	KatakanaToNarrow:        "KatakanaToNarrow",
+	KatakanaToWide:          "KatakanaToWide",
+	KatakanaToHiragana:      "KatakanaToHiragana",
+	KanaSymToNarrow:         "KanaSymToNarrow",
+	KanaSymToWide:           "KanaSymToWide",
+	VoicedKanaToTraditional: "VoicedKanaToTraditional",
+	VoicedKanaToCombining:   "VoicedKanaToCombining",
+	IsolatedVsmToNarrow:     "IsolatedVsmToNarrow",
+	IsolatedVsmToWide:       "IsolatedVsmToWide",
+	IsolatedVsmToCombining:  "IsolatedVsmToCombining",
 }
 
 func (f NormFlag) String() string {
@@ -172,7 +195,10 @@ var invalidFlagsList = []NormFlag{
 	KatakanaToNarrow | KatakanaToHiragana,
 	HiraganaToNarrow | HiraganaToKatakana,
 	KanaSymToNarrow | KanaSymToWide,
-	KanaVsmToClassical | KanaVsmToCombining,
+	VoicedKanaToTraditional | VoicedKanaToCombining,
+	IsolatedVsmToNarrow | IsolatedVsmToWide,
+	IsolatedVsmToNarrow | IsolatedVsmToCombining,
+	IsolatedVsmToWide | IsolatedVsmToCombining,
 }
 
 func validateNormFlag(flag NormFlag) error {
@@ -187,7 +213,7 @@ func validateNormFlag(flag NormFlag) error {
 	return nil
 }
 
-func (n *Normalizer) maybeJoinClassicalVsm(r1, r2 rune) ([]rune, bool) {
+func (n *Normalizer) maybeCombineVsm(r1, r2 rune) ([]rune, bool) {
 	isVsm := isVoicedSoundMark(r2)
 	isSvsm := isSemivoicedSoundMark(r2)
 	if !isVsm && !isSvsm {
@@ -199,7 +225,7 @@ func (n *Normalizer) maybeJoinClassicalVsm(r1, r2 rune) ([]rune, bool) {
 		return []rune{r1}, false
 	}
 
-	if c.category != ctLatinLetter && c.category != ctLatinDigit && c.category != ctKanaLetter {
+	if c.category != ctKanaLetter {
 		return n.NormalizeRune(r1), false
 	}
 
@@ -209,78 +235,32 @@ func (n *Normalizer) maybeJoinClassicalVsm(r1, r2 rune) ([]rune, bool) {
 
 	rs := n.NormalizeRune(r1)
 	if len(rs) != 1 {
-		neverBeCalled()
+		neverBeCalled() // TODO ebidence
 	}
 	cc, ok := getUnichar(rs[0])
 
 	if isVsm {
-		rs = cc.toClassicalVoiced()
+		switch {
+		case n.flag.has(VoicedKanaToTraditional):
+			rs = cc.toTraditionalVoiced()
+		case n.flag.has(VoicedKanaToCombining):
+			rs = cc.toCombiningVoiced()
+		default:
+			r2s := n.NormalizeRune(r2) // TODO len(r2s)
+			rs = []rune{cc.codepoint, r2s[0]} // TODO review Dontcare
+		}
 	} else {
-		rs = cc.toClassicalSemivoiced()
+		switch {
+		case n.flag.has(VoicedKanaToTraditional):
+			rs = cc.toTraditionalSemivoiced()
+		case n.flag.has(VoicedKanaToCombining):
+			rs = cc.toCombiningSemivoiced()
+		default:
+			r2s := n.NormalizeRune(r2) // TODO len(r2s)
+			rs = []rune{cc.codepoint, r2s[0]} // TODO review Dontcare
+		}
 	}
 	return rs, true
-}
-
-func (n *Normalizer) normalizeDontcareVsm(s string) string {
-	if len(s) == 0 {
-		return ""
-	}
-	var sb strings.Builder
-	sb.Grow(len(s) * 2)
-	rs := []rune(s)
-	for _, r := range rs {
-		nrs := n.NormalizeRune(r)
-		for _, nr := range nrs {
-			sb.WriteRune(nr)
-		}
-	}
-	return sb.String()
-}
-
-func (n *Normalizer) normalizeCombiningVsm(s string) string {
-	if len(s) == 0 {
-		return ""
-	}
-	var sb strings.Builder
-	sb.Grow(len(s) * 2)
-	rs := []rune(s)
-	for _, r := range rs {
-		var nrs []rune
-		switch {
-		case isVoicedSoundMark(r):
-			nrs = []rune{vsmCombining}
-		case isSemivoicedSoundMark(r):
-			nrs = []rune{svsmCombining}
-		default:
-			nrs = n.NormalizeRune(r)
-		}
-		for _, nr := range nrs {
-			sb.WriteRune(nr)
-		}
-	}
-	return sb.String()
-}
-
-func (n *Normalizer) normalizeClassicalVsm(s string) string {
-	rs := []rune(s)
-	var nrs []rune
-	var sb strings.Builder
-	sb.Grow(len(rs) * 2)
-	for i := 0; i < len(rs); i++ {
-		if i < len(rs)-1 {
-			var ok bool
-			if nrs, ok = n.maybeJoinClassicalVsm(rs[i], rs[i+1]); ok {
-				i++
-			}
-		} else {
-			nrs = n.NormalizeRune(rs[i])
-		}
-		for _, nr := range nrs {
-			sb.WriteRune(nr)
-		}
-	}
-
-	return sb.String()
 }
 
 // NewNormalizer creates a new Normalizer with specified flag
@@ -390,22 +370,22 @@ func (n *Normalizer) NormalizeRune(r rune) []rune {
 
 		case vcVoiced:
 			switch {
-			case n.flag.has(KanaVsmToClassical):
-				return cc.toClassicalVoiced()
-			case n.flag.has(KanaVsmToCombining):
+			case n.flag.has(VoicedKanaToTraditional):
+				return cc.toTraditionalVoiced()
+			case n.flag.has(VoicedKanaToCombining):
 				return cc.toCombiningVoiced()
 			default:
-				return cc.toClassicalVoiced() // fix for TEST_L7tADs2z.
+				return cc.toTraditionalVoiced() // fix for TEST_L7tADs2z.
 			}
 
 		case vcSemivoiced:
 			switch {
-			case n.flag.has(KanaVsmToClassical):
-				return cc.toClassicalSemivoiced()
-			case n.flag.has(KanaVsmToCombining):
+			case n.flag.has(VoicedKanaToTraditional):
+				return cc.toTraditionalSemivoiced()
+			case n.flag.has(VoicedKanaToCombining):
 				return cc.toCombiningSemivoiced()
 			default:
-				return cc.toClassicalSemivoiced() // fix for TEST_K6t8hQYp
+				return cc.toTraditionalSemivoiced() // fix for TEST_K6t8hQYp
 			}
 
 		default:
@@ -418,15 +398,43 @@ func (n *Normalizer) NormalizeRune(r rune) []rune {
 		case n.flag.has(KanaSymToNarrow):
 			return []rune{c.toNarrow()}
 		case n.flag.has(KanaSymToWide):
-			// fix for TEST_A9fCxUi6
-			// In this case, it is hard-coded, because it cannot be represented by unichar_table.
-			if c.codepoint == vsmCombining {
-				return []rune{vsmWide}
-			} else if c.codepoint == svsmCombining {
-				return []rune{svsmWide}
-			} else {
-				return []rune{c.toWide()}
+			return []rune{c.toWide()}
+			/*
+				// fix for TEST_A9fCxUi6
+				// In this case, it is hard-coded, because it cannot be represented by unichar_table.
+				if c.codepoint == vsmCombining {
+					return []rune{vsmWide}
+				} else if c.codepoint == svsmCombining {
+					return []rune{svsmWide}
+				} else {
+					return []rune{c.toWide()}
+				}
+			*/
+		default:
+			return []rune{c.codepoint}
+		}
+
+	case ctKanaVsm:
+		/*
+			var cc *unichar
+			switch {
+			case n.flag.has(VoicedKanaToTraditional):
+				cc = c.toTraditionalMarkUnichar()
+			case n.flag.has(VoicedKanaToCombining):
+				cc = c.toCombiningMarkUnichar()
+			default:
+				cc = c
+			//	return []rune{c.codepoint}
 			}
+		*/
+
+		switch {
+		case n.flag.has(IsolatedVsmToNarrow):
+			return []rune{c.toNarrow()}
+		case n.flag.has(IsolatedVsmToWide):
+			return []rune{c.toTraditionalMarkUnichar().toWide()}
+		case n.flag.has(IsolatedVsmToCombining):
+			return []rune{c.toCombiningMark()}
 		default:
 			return []rune{c.codepoint}
 		}
@@ -440,12 +448,23 @@ func (n *Normalizer) NormalizeRune(r rune) []rune {
 // Normalize normalizes the string according to the current
 // normalization mode.
 func (n *Normalizer) Normalize(s string) string {
-	switch {
-	case n.flag.has(KanaVsmToClassical):
-		return n.normalizeClassicalVsm(s)
-	case n.flag.has(KanaVsmToCombining):
-		return n.normalizeCombiningVsm(s)
-	default:
-		return n.normalizeDontcareVsm(s)
+	rs := []rune(s)
+	var nrs []rune
+	var sb strings.Builder
+	sb.Grow(len(rs) * 2)
+	for i := 0; i < len(rs); i++ {
+		if i < len(rs)-1 {
+			var ok bool
+			if nrs, ok = n.maybeCombineVsm(rs[i], rs[i+1]); ok {
+				i++
+			}
+		} else {
+			nrs = n.NormalizeRune(rs[i])
+		}
+		for _, nr := range nrs {
+			sb.WriteRune(nr)
+		}
 	}
+
+	return sb.String()
 }

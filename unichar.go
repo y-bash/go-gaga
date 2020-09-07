@@ -47,97 +47,126 @@ func neverBeCalled() []rune {
 func getUnicharForSure(r rune) *unichar {
 	c, ok := getUnichar(r)
 	if !ok {
-		panic(fmt.Sprintf("Unexpectedly %#U.cmptCase %#U was not found in the table",
-			c.codepoint, c.cmptCase))
+		panic(fmt.Sprintf("Unexpectedly %#U.compatCase %#U was not found in the table",
+			c.codepoint, c.compatCase))
 	}
 	return c
 }
 
-func (c *unichar) getCmptCaseUnichar() *unichar {
-	// TEST_fm8XjZTB ensured that all cmptCases are in the tables.
-	return getUnicharForSure(c.cmptCase)
+func (c *unichar) getCompatCaseUnichar() *unichar {
+	// TEST_fm8XjZTB ensured that all compatCases are in the tables.
+	return getUnicharForSure(c.compatCase)
 }
 
-func (c *unichar) getCmptWidthUnichar() *unichar {
-	// TEST_T3bc4Nh7 ensured that all cmptWidth are in the table.
-	return getUnicharForSure(c.cmptWidth)
+func (c *unichar) getCompatWidthUnichar() *unichar {
+	// TEST_T3bc4Nh7 ensured that all compatWidth are in the table.
+	return getUnicharForSure(c.compatWidth)
 }
 
-func (c *unichar) getCmptVsUnichar() *unichar {
-	// TEST_Cu8iKMxF ensured that all cmptVs are in the tables.
-	return getUnicharForSure(c.cmptVs)
+func (c *unichar) getCompatVsUnichar() *unichar {
+	// TEST_Cu8iKMxF ensured that all compatVs are in the tables.
+	return getUnicharForSure(c.compatVs)
 }
 
-func (c *unichar) getCmptSvsUnichar() *unichar {
-	// TEST_rW4UiNHC ensured that all cmptSvs are in the tables.
-	return getUnicharForSure(c.cmptSvs)
+func (c *unichar) getCompatSvsUnichar() *unichar {
+	// TEST_rW4UiNHC ensured that all compatSvs are in the tables.
+	return getUnicharForSure(c.compatSvs)
 }
 
 func (c *unichar) toUpper() rune {
 	if c.charCase != ccLower {
 		return c.codepoint
 	}
-	return c.cmptCase
+	return c.compatCase
 }
 
 func (c *unichar) toLower() rune {
 	if c.charCase != ccUpper {
 		return c.codepoint
 	}
-	return c.cmptCase
+	return c.compatCase
 }
 
 func (c *unichar) toHiraganaUnichar() *unichar {
 	if c.charCase != ccKatakana {
 		return c
 	}
-	return c.getCmptCaseUnichar()
+	return c.getCompatCaseUnichar()
 }
 
 func (c *unichar) toKatakanaUnichar() *unichar {
 	if c.charCase != ccHiragana {
 		return c
 	}
-	return c.getCmptCaseUnichar()
+	return c.getCompatCaseUnichar()
 }
 
 func (c *unichar) toWide() rune {
 	if c.charWidth != cwNarrow {
 		return c.codepoint
 	}
-	return c.cmptWidth
+	return c.compatWidth
 }
 
 func (c *unichar) toWideUnichar() *unichar {
 	if c.charWidth != cwNarrow {
 		return c
 	}
-	return c.getCmptWidthUnichar()
+	return c.getCompatWidthUnichar()
 }
 
 func (c *unichar) toNarrow() rune {
 	if c.charWidth != cwWide {
 		return c.codepoint
 	}
-	return c.cmptWidth
+	return c.compatWidth
 }
 
 func (c *unichar) toNarrowUnichar() *unichar {
 	if c.charWidth != cwWide {
 		return c
 	}
-	return c.getCmptWidthUnichar()
+	return c.getCompatWidthUnichar()
 }
 
-func (c *unichar) existsCmptVs() bool {
-	return c.codepoint != c.cmptVs
+func (c *unichar) existsCompatVs() bool {
+	return c.codepoint != c.compatVs
 }
 
-func (c *unichar) existsCmptSvs() bool {
-	return c.codepoint != c.cmptSvs
+func (c *unichar) existsCompatSvs() bool {
+	return c.codepoint != c.compatSvs
 }
 
-func (c *unichar) toClassicalVoiced() []rune {
+/* xxx
+// TODO Is this function needed by someone
+func (c *unichar) isVoicedSoundMark() bool {
+	return isVoicedSoundMark(c.codepoint)
+}
+
+// TODO Is this function needed by someone
+func (c *unichar) isSemivoicedSoundMark() bool {
+	return isSemivoicedSoundMark(c.codepoint)
+}
+*/
+
+// TODO need? naming?
+func (c *unichar) toTraditionalMarkUnichar() *unichar {
+	if c.charCase != ccCombining {
+		return c
+	}
+	return c.getCompatCaseUnichar()
+}
+
+// TODO Unichar?
+func (c *unichar) toCombiningMark() rune {
+	if c.charCase != ccTraditional {
+		return c.codepoint
+	}
+	return c.compatCase
+}
+
+// TODO naming?
+func (c *unichar) toTraditionalVoiced() []rune {
 	switch c.voicing {
 	case vcVoiced:
 		return []rune{c.codepoint}
@@ -145,11 +174,11 @@ func (c *unichar) toClassicalVoiced() []rune {
 		// TEST_fW6auXUi knows that every semi-voiced character has
 		// a corresponding unvoiced character, and that unvoiced
 		// character has a corresponding voiced character.
-		return []rune{c.getCmptSvsUnichar().cmptVs}
+		return []rune{c.getCompatSvsUnichar().compatVs}
 	case vcUnvoiced:
 		// TEST_Jt3UaWwr knows that every unvoiced character has a
 		// corresponding voiced character.
-		return []rune{c.cmptVs}
+		return []rune{c.compatVs}
 	case vcUndefined:
 		switch c.charWidth {
 		case cwNarrow:
@@ -169,27 +198,27 @@ func (c *unichar) toClassicalVoiced() []rune {
 	}
 }
 
-func (c *unichar) toClassicalSemivoiced() []rune {
+func (c *unichar) toTraditionalSemivoiced() []rune {
 	switch c.voicing {
 	case vcSemivoiced:
 		return []rune{c.codepoint}
 	case vcVoiced:
-		unvoiced := c.getCmptVsUnichar()
-		if unvoiced.existsCmptSvs() {
-			return []rune{unvoiced.cmptSvs}
+		unvoiced := c.getCompatVsUnichar()
+		if unvoiced.existsCompatSvs() {
+			return []rune{unvoiced.compatSvs}
 		}
 		switch c.charWidth {
 		case cwNarrow:
-			return []rune{c.cmptVs, svsmNarrow}
+			return []rune{c.compatVs, svsmNarrow}
 		case cwWide:
-			return []rune{c.cmptVs, svsmWide}
+			return []rune{c.compatVs, svsmWide}
 		default:
 			// TEST_T2eKd76G knows that the program never passes here
 			return neverBeCalled()
 		}
 	case vcUnvoiced:
-		if c.existsCmptSvs() {
-			return []rune{c.cmptSvs}
+		if c.existsCompatSvs() {
+			return []rune{c.compatSvs}
 		}
 		switch c.charWidth {
 		case cwNarrow:
@@ -224,9 +253,9 @@ func (c *unichar) toCombiningVoiced() []rune {
 	case vcUnvoiced, vcUndefined:
 		return []rune{c.codepoint, vsmCombining}
 	case vcVoiced:
-		return []rune{c.cmptVs, vsmCombining}
+		return []rune{c.compatVs, vsmCombining}
 	case vcSemivoiced:
-		return []rune{c.cmptSvs, vsmCombining}
+		return []rune{c.compatSvs, vsmCombining}
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
 		return neverBeCalled()
@@ -238,9 +267,9 @@ func (c *unichar) toCombiningSemivoiced() []rune {
 	case vcUnvoiced, vcUndefined:
 		return []rune{c.codepoint, svsmCombining}
 	case vcVoiced:
-		return []rune{c.cmptVs, svsmCombining}
+		return []rune{c.compatVs, svsmCombining}
 	case vcSemivoiced:
-		return []rune{c.cmptSvs, svsmCombining}
+		return []rune{c.compatSvs, svsmCombining}
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
 		return neverBeCalled()

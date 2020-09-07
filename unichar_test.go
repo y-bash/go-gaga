@@ -10,7 +10,7 @@ import (
 func (c *unichar) String() string {
 	return fmt.Sprintf("(%x,%x,%x,%x,%x,%x,%x,%x,%x)",
 		c.codepoint, c.category, c.charCase, c.charWidth,
-		c.voicing, c.cmptCase, c.cmptWidth, c.cmptVs, c.cmptSvs)
+		c.voicing, c.compatCase, c.compatWidth, c.compatVs, c.compatSvs)
 }
 
 type tableInfo struct {
@@ -22,8 +22,8 @@ type tableInfo struct {
 
 var tables = []tableInfo{
 	{latinTable, "latinTable", 96, "d90c9a10f72b6c029cb6aba58128f534d1935aa760fd5a073c232e16fc4eca22"},
-	{kanaTable, "kanaTable", 256, "1884391088215e839715d7261c5317b45fca7866ff6ddad4e86536fbffb88f05"},
-	{widthTable, "widthTable", 160, "e036650516323d6c60ffa1ca4c51f82983835a86ef69cd0cdc97e0f9d349118c"},
+	{kanaTable, "kanaTable", 256, "9f30b8ed44761d8667e55a08181f4f9db584e9694db352255291db0102014e54"},
+	{widthTable, "widthTable", 160, "79f5d0526d0696730a8e55526da769628e8280d100e954ea62151ff54699708d"},
 }
 
 func TestTableChecksums(t *testing.T) {
@@ -78,7 +78,8 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 
 		// category
 		switch c.category {
-		case ctUndefined, ctLatinLetter, ctLatinDigit, ctLatinSymbol, ctKanaLetter, ctKanaSymbol:
+		case ctUndefined, ctLatinLetter, ctLatinDigit, ctLatinSymbol,
+			ctKanaLetter, ctKanaSymbol, ctKanaVsm:
 		default: // TEST_P8w4qtsm
 			t.Errorf("%s[%#U].category == %d, want %d <= category < %d",
 				name, c.codepoint, c.category, ctUndefined, ctMax)
@@ -89,30 +90,30 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			t.Errorf("%s[%#U].charCase == %d, want %d <= charCase < %d",
 				name, c.codepoint, c.charCase, ccUndefined, ccMax)
 		}
-		if c.charCase == ccUndefined && c.cmptCase != c.codepoint {
-			t.Errorf("%s[%#U].charCase == %d, but cmptCase == %#U, want cmptCase == %#U",
-				name, c.codepoint, c.charCase, c.cmptCase, c.codepoint)
+		if c.charCase == ccUndefined && c.compatCase != c.codepoint {
+			t.Errorf("%s[%#U].charCase == %d, but compatCase == %#U, want compatCase == %#U",
+				name, c.codepoint, c.charCase, c.compatCase, c.codepoint)
 		}
-		if c.cmptCase != c.codepoint {
-			if cmptCase, ok := getUnichar(c.cmptCase); !ok { // TEST_fm8XjZTB
-				t.Errorf("%s[%#U].cmptCase %#U is not found by getUnichar()",
-					name, c.codepoint, c.cmptCase)
+		if c.compatCase != c.codepoint {
+			if compatCase, ok := getUnichar(c.compatCase); !ok { // TEST_fm8XjZTB
+				t.Errorf("%s[%#U].compatCase %#U is not found by getUnichar()",
+					name, c.codepoint, c.compatCase)
 			} else {
-				if cmptCase.category != c.category {
-					t.Errorf("%s[%#U].category == %d, but cmptCase %#U.category == %d, want same value",
-						name, c.codepoint, c.category, cmptCase.codepoint, cmptCase.category)
+				if compatCase.category != c.category {
+					t.Errorf("%s[%#U].category == %d, but compatCase %#U.category == %d, want same value",
+						name, c.codepoint, c.category, compatCase.codepoint, compatCase.category)
 				}
-				if cmptCase.charCase == c.charCase {
-					t.Errorf("%s[%#U].charCase == %d, but cmptCase %#U.charCase == %d, want another one",
-						name, c.codepoint, c.charCase, cmptCase.codepoint, cmptCase.charCase)
+				if compatCase.charCase == c.charCase {
+					t.Errorf("%s[%#U].charCase == %d, but compatCase %#U.charCase == %d, want another one",
+						name, c.codepoint, c.charCase, compatCase.codepoint, compatCase.charCase)
 				}
 			}
 		}
 		// TODO Check for problems in the following cases
 		/*
-			if c.charCase != ccUndefined && c.cmptCase == c.codepoint {
-				t.Errorf("%s[%#U].charCase is %d and cmptCase is %#U, want another one",
-					name, c.codepoint, c.charCase, c.cmptCase)
+			if c.charCase != ccUndefined && c.compatCase == c.codepoint {
+				t.Errorf("%s[%#U].charCase is %d and compatCase is %#U, want another one",
+					name, c.codepoint, c.charCase, c.compatCase)
 			}
 		*/
 
@@ -128,31 +129,31 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				t.Errorf("%s[%#U].charWidth == %d, want charWidth != %d",
 					name, c.codepoint, c.charWidth, cwUndefined)
 			}
-			if c.cmptWidth != c.codepoint {
-				t.Errorf("%s[%#U].charWidth == %d, but cmptWidth == %#U, want cmptWidth == %#U",
-					name, c.codepoint, c.charWidth, c.cmptWidth, c.codepoint)
+			if c.compatWidth != c.codepoint {
+				t.Errorf("%s[%#U].charWidth == %d, but compatWidth == %#U, want compatWidth == %#U",
+					name, c.codepoint, c.charWidth, c.compatWidth, c.codepoint)
 			}
 		}
-		if c.cmptWidth != c.codepoint {
-			if cmptWidth, ok := getUnichar(c.cmptWidth); !ok { // TEST_T3bc4Nh7
-				t.Errorf("%s[%#U].cmptWidth %#U is not found by getUnichar()",
-					name, c.codepoint, c.cmptWidth)
+		if c.compatWidth != c.codepoint {
+			if compatWidth, ok := getUnichar(c.compatWidth); !ok { // TEST_T3bc4Nh7
+				t.Errorf("%s[%#U].compatWidth %#U is not found by getUnichar()",
+					name, c.codepoint, c.compatWidth)
 			} else {
-				if cmptWidth.category != c.category {
-					t.Errorf("%s[%#U].category == %d, but cmptWidth %#U.category == %d, want same value",
-						name, c.codepoint, c.category, cmptWidth.codepoint, cmptWidth.category)
+				if compatWidth.category != c.category {
+					t.Errorf("%s[%#U].category == %d, but compatWidth %#U.category == %d, want same value",
+						name, c.codepoint, c.category, compatWidth.codepoint, compatWidth.category)
 				}
-				if cmptWidth.charWidth == c.charWidth {
-					t.Errorf("%s[%#U].charWidth is %d, but cmptWidth %#U.charWidth == %d, want another one",
-						name, c.codepoint, c.charWidth, cmptWidth.codepoint, cmptWidth.charWidth)
+				if compatWidth.charWidth == c.charWidth {
+					t.Errorf("%s[%#U].charWidth is %d, but compatWidth %#U.charWidth == %d, want another one",
+						name, c.codepoint, c.charWidth, compatWidth.codepoint, compatWidth.charWidth)
 				}
 			}
 		}
 		// TODO Check for problems in the following cases
 		/*
-			if c.charWidth != cwUndefined && c.cmptWidth == c.codepoint {
-				t.Errorf("%s[%#U].charWidth is %d and cmptWidth is %#U, want another one",
-					name, c.codepoint, c.charWidth, c.cmptWidth)
+			if c.charWidth != cwUndefined && c.compatWidth == c.codepoint {
+				t.Errorf("%s[%#U].charWidth is %d and compatWidth is %#U, want another one",
+					name, c.codepoint, c.charWidth, c.compatWidth)
 			}
 		*/
 
@@ -164,19 +165,19 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				name, c.codepoint, c.voicing, vcUndefined, vcMax)
 		}
 		if c.voicing == vcUndefined {
-			if c.cmptVs != c.codepoint {
-				t.Errorf("%s[%#U].voicing == %d, but cmptVs == %#U, want cmptVs == %#U",
-					name, c.codepoint, c.voicing, c.cmptVs, c.codepoint)
+			if c.compatVs != c.codepoint {
+				t.Errorf("%s[%#U].voicing == %d, but compatVs == %#U, want compatVs == %#U",
+					name, c.codepoint, c.voicing, c.compatVs, c.codepoint)
 			}
-			if c.cmptSvs != c.codepoint {
-				t.Errorf("%s[%#U].voicing == %d, but cmptSvs == %#U, want cmptSvs == %#U",
-					name, c.codepoint, c.voicing, c.cmptSvs, c.codepoint)
+			if c.compatSvs != c.codepoint {
+				t.Errorf("%s[%#U].voicing == %d, but compatSvs == %#U, want compatSvs == %#U",
+					name, c.codepoint, c.voicing, c.compatSvs, c.codepoint)
 			}
 		}
 		if c.voicing == vcUnvoiced {
-			if c.cmptVs == c.codepoint { // TEST_Jt3UaWwr
-				t.Errorf("%s[%#U].voicing == %d, but cmptVs == %#U, want another one",
-					name, c.codepoint, c.voicing, c.cmptVs)
+			if c.compatVs == c.codepoint { // TEST_Jt3UaWwr
+				t.Errorf("%s[%#U].voicing == %d, but compatVs == %#U, want another one",
+					name, c.codepoint, c.voicing, c.compatVs)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide { // TEST_Mw87qjkF
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
@@ -184,9 +185,9 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 		}
 		if c.voicing == vcVoiced {
-			if c.cmptVs == c.codepoint {
-				t.Errorf("%s[%#U].voicing == %d, but cmptVs == %#U, want another one",
-					name, c.codepoint, c.voicing, c.cmptVs)
+			if c.compatVs == c.codepoint {
+				t.Errorf("%s[%#U].voicing == %d, but compatVs == %#U, want another one",
+					name, c.codepoint, c.voicing, c.compatVs)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide { // TEST_T2eKd76G
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
@@ -194,62 +195,62 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 		}
 		if c.voicing == vcSemivoiced {
-			if c.cmptSvs == c.codepoint {
-				t.Errorf("%s[%#U].voicing is %d and cmptSvs is %#U, want another one",
-					name, c.codepoint, c.voicing, c.cmptSvs)
+			if c.compatSvs == c.codepoint {
+				t.Errorf("%s[%#U].voicing is %d and compatSvs is %#U, want another one",
+					name, c.codepoint, c.voicing, c.compatSvs)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide {
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
 					name, c.codepoint, c.voicing, c.charWidth, cwNarrow, cwWide)
 			}
-			unvoiced := c.getCmptSvsUnichar()
-			if !unvoiced.existsCmptVs() { // TEST_fW6auXUi
-				t.Errorf("%s[%#U].voicing == %d, but getCmptSvsUnichar().existsCmptVs() == false, want true",
+			unvoiced := c.getCompatSvsUnichar()
+			if !unvoiced.existsCompatVs() { // TEST_fW6auXUi
+				t.Errorf("%s[%#U].voicing == %d, but getCompatSvsUnichar().existsCompatVs() == false, want true",
 					name, c.codepoint, c.voicing)
 			}
 		}
 
-		if c.cmptVs != c.codepoint {
-			if cmptVs, ok := getUnichar(c.cmptVs); !ok { // TEST_Cu8iKMxF
-				t.Errorf("%s[%#U].cmptVs %#U is not found by getUnichar()", name, c.codepoint, c.cmptVs)
+		if c.compatVs != c.codepoint {
+			if compatVs, ok := getUnichar(c.compatVs); !ok { // TEST_Cu8iKMxF
+				t.Errorf("%s[%#U].compatVs %#U is not found by getUnichar()", name, c.codepoint, c.compatVs)
 			} else {
-				if c.category != cmptVs.category {
-					t.Errorf("%s[%#U].category is %d and cmptVs %#U.category is %d, want same value",
-						name, c.codepoint, c.category, cmptVs.codepoint, cmptVs.category)
+				if c.category != compatVs.category {
+					t.Errorf("%s[%#U].category is %d and compatVs %#U.category is %d, want same value",
+						name, c.codepoint, c.category, compatVs.codepoint, compatVs.category)
 				}
-				if c.charWidth != cmptVs.charWidth {
-					t.Errorf("%s[%#U].charWidth is %d and cmptVs %#U.charWidth is %d, want same value",
-						name, c.codepoint, c.charWidth, cmptVs.codepoint, cmptVs.charWidth)
+				if c.charWidth != compatVs.charWidth {
+					t.Errorf("%s[%#U].charWidth is %d and compatVs %#U.charWidth is %d, want same value",
+						name, c.codepoint, c.charWidth, compatVs.codepoint, compatVs.charWidth)
 				}
-				if c.voicing == vcUnvoiced && cmptVs.voicing != vcVoiced {
-					t.Errorf("%s[%#U].voicing is %d and cmptVs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, cmptVs.codepoint, cmptVs.voicing, vcVoiced)
+				if c.voicing == vcUnvoiced && compatVs.voicing != vcVoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatVs %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatVs.codepoint, compatVs.voicing, vcVoiced)
 				}
-				if c.voicing == vcVoiced && cmptVs.voicing != vcUnvoiced {
-					t.Errorf("%s[%#U].voicing is %d and cmptVs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, cmptVs.codepoint, cmptVs.voicing, vcUnvoiced)
+				if c.voicing == vcVoiced && compatVs.voicing != vcUnvoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatVs %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatVs.codepoint, compatVs.voicing, vcUnvoiced)
 				}
 			}
 		}
-		if c.cmptSvs != c.codepoint {
-			if cmptSvs, ok := getUnichar(c.cmptSvs); !ok { // TEST_rW4UiNHC
-				t.Errorf("%s[%#U].cmptSvs %#U is not found by getUnichar()", name, c.codepoint, c.cmptSvs)
+		if c.compatSvs != c.codepoint {
+			if compatSvs, ok := getUnichar(c.compatSvs); !ok { // TEST_rW4UiNHC
+				t.Errorf("%s[%#U].compatSvs %#U is not found by getUnichar()", name, c.codepoint, c.compatSvs)
 			} else {
-				if c.category != cmptSvs.category {
-					t.Errorf("%s[%#U].category is %d and cmptSvs %#U.category is %d, want same value",
-						name, c.codepoint, c.category, cmptSvs.codepoint, cmptSvs.category)
+				if c.category != compatSvs.category {
+					t.Errorf("%s[%#U].category is %d and compatSvs %#U.category is %d, want same value",
+						name, c.codepoint, c.category, compatSvs.codepoint, compatSvs.category)
 				}
-				if c.charWidth != cmptSvs.charWidth {
-					t.Errorf("%s[%#U].charWidth is %d and cmptSvs %#U.charWidth is %d, want same value",
-						name, c.codepoint, c.charWidth, cmptSvs.codepoint, cmptSvs.charWidth)
+				if c.charWidth != compatSvs.charWidth {
+					t.Errorf("%s[%#U].charWidth is %d and compatSvs %#U.charWidth is %d, want same value",
+						name, c.codepoint, c.charWidth, compatSvs.codepoint, compatSvs.charWidth)
 				}
-				if c.voicing == vcUnvoiced && cmptSvs.voicing != vcSemivoiced {
-					t.Errorf("%s[%#U].voicing is %d and cmptSvs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, cmptSvs.codepoint, cmptSvs.voicing, vcSemivoiced)
+				if c.voicing == vcUnvoiced && compatSvs.voicing != vcSemivoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatSvs %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatSvs.codepoint, compatSvs.voicing, vcSemivoiced)
 				}
-				if c.voicing == vcSemivoiced && cmptSvs.voicing != vcUnvoiced {
-					t.Errorf("%s[%#U].voicing is %d and cmptSvs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, cmptSvs.codepoint, cmptSvs.voicing, vcUnvoiced)
+				if c.voicing == vcSemivoiced && compatSvs.voicing != vcUnvoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatSvs %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatSvs.codepoint, compatSvs.voicing, vcUnvoiced)
 				}
 			}
 		}
@@ -269,11 +270,11 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			if c.voicing != vcUndefined {
 				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
 			}
-			if c.cmptVs != c.codepoint {
-				t.Errorf("len(%s[%#U].cmptVs) = %#U, want: %#U", name, c.codepoint, c.cmptVs, c.codepoint)
+			if c.compatVs != c.codepoint {
+				t.Errorf("len(%s[%#U].compatVs) = %#U, want: %#U", name, c.codepoint, c.compatVs, c.codepoint)
 			}
-			if c.cmptSvs != c.codepoint {
-				t.Errorf("len(%s[%#U].cmptSvs) = %#U, want: %#U", name, c.codepoint, c.cmptSvs, c.codepoint)
+			if c.compatSvs != c.codepoint {
+				t.Errorf("len(%s[%#U].compatSvs) = %#U, want: %#U", name, c.codepoint, c.compatSvs, c.codepoint)
 			}
 		// Kana
 		case ctKanaLetter:
@@ -290,6 +291,11 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			if c.charWidth != cwNarrow && c.charWidth != cwWide {
 				t.Errorf("%s[%#U].charWidth is %d, want 1 or 2", name, c.codepoint, c.charWidth)
 			}
+		case ctKanaVsm:
+			// TODO add testing
+			if !isVoicedSoundMark(c.codepoint) && !isSemivoicedSoundMark(c.codepoint) {
+				t.Errorf("%s[%#U] is not VSM or SVSM, want VSM or SVSM", name, c.codepoint)
+			}
 		// Undefined
 		case ctUndefined:
 			if c.charCase != ccUndefined {
@@ -301,21 +307,21 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			if c.voicing != vcUndefined {
 				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
 			}
-			if c.cmptCase != c.codepoint {
-				t.Errorf("len(%s[%#U].cmptCase) = %#U, want: %#U",
-					name, c.codepoint, c.cmptCase, c.codepoint)
+			if c.compatCase != c.codepoint {
+				t.Errorf("len(%s[%#U].compatCase) = %#U, want: %#U",
+					name, c.codepoint, c.compatCase, c.codepoint)
 			}
-			if c.cmptWidth != c.codepoint {
-				t.Errorf("len(%s[%#U].cmptWidth) = %#U, want: %#U",
-					name, c.codepoint, c.cmptWidth, c.codepoint)
+			if c.compatWidth != c.codepoint {
+				t.Errorf("len(%s[%#U].compatWidth) = %#U, want: %#U",
+					name, c.codepoint, c.compatWidth, c.codepoint)
 			}
-			if c.cmptVs != c.codepoint {
-				t.Errorf("len(%s[%#U].cmptVs) = %#U, want: %#U",
-					name, c.codepoint, c.cmptVs, c.codepoint)
+			if c.compatVs != c.codepoint {
+				t.Errorf("len(%s[%#U].compatVs) = %#U, want: %#U",
+					name, c.codepoint, c.compatVs, c.codepoint)
 			}
-			if c.cmptSvs != c.codepoint {
-				t.Errorf("len(%s[%#U].cmptSvs) = %#U, want: %#U",
-					name, c.codepoint, c.cmptSvs, c.codepoint)
+			if c.compatSvs != c.codepoint {
+				t.Errorf("len(%s[%#U].compatSvs) = %#U, want: %#U",
+					name, c.codepoint, c.compatSvs, c.codepoint)
 			}
 		}
 	}
@@ -328,18 +334,18 @@ func TestUnicharTable(t *testing.T) {
 }
 
 type ToVoicedTest struct {
-	in           rune
-	outClassical string
-	outCombining string
+	in             rune
+	outTraditional string
+	outCombining   string
 }
 
 var tovoicedtests = []ToVoicedTest{
 	// vcUnvoiced
-	0: {'か', "が", "か\u3099"}, // cmptVs is exists, cmptSvs is not exists
-	1: {'は', "ば", "は\u3099"}, // cmptVs is exists, cmptSvs is exists
+	0: {'か', "が", "か\u3099"}, // compatVs is exists, compatSvs is not exists
+	1: {'は', "ば", "は\u3099"}, // compatVs is exists, compatSvs is exists
 	// vcVoiced
-	2: {'が', "が", "か\u3099"}, // cmptVs.cmptSvs is not exists
-	3: {'ば', "ば", "は\u3099"}, // cmptVs.cmptSvs is exists
+	2: {'が', "が", "か\u3099"}, // compatVs.compatSvs is not exists
+	3: {'ば', "ば", "は\u3099"}, // compatVs.compatSvs is exists
 	// vcSemivoiced
 	4: {'ぱ', "ば", "は\u3099"},
 	// vcUndefined, cwWide
@@ -352,8 +358,8 @@ var tovoicedtests = []ToVoicedTest{
 	11: {'＃', "＃゛", "＃\u3099"}, // ctLatinSymbol, ccUndefined
 	// vcUndefined, cwNarrow
 	12: {'ｱ', "ｱﾞ", "ｱ\u3099"}, // ctKanaLetter, ccKatakana
-	13: {'ｶ', "ｶﾞ", "ｶ\u3099"}, // ctKanaLetter, ccKatakana, cmptWidth.cmptVs is exists, cmptWidth.cmptSvs is not exists
-	14: {'ﾊ', "ﾊﾞ", "ﾊ\u3099"}, // ctKanaLetter, ccKatakana, cmptWidth.cmptVs is exists, cmptWidth.cmptSvs is exists
+	13: {'ｶ', "ｶﾞ", "ｶ\u3099"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
+	14: {'ﾊ', "ﾊﾞ", "ﾊ\u3099"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
 	15: {'･', "･ﾞ", "･\u3099"}, // ctKanaSymbol, ccUndefined
 	16: {'A', "Aﾞ", "A\u3099"}, // ctLatinLetter, ccUpper
 	17: {'a', "aﾞ", "a\u3099"}, // ctLatinLetter, ccLower
@@ -379,15 +385,15 @@ func TestToVoiced(t *testing.T) {
 			continue
 		}
 		var got, want []rune
-		got = c.toClassicalVoiced()
-		want = []rune(tt.outClassical)
+		got = c.toTraditionalVoiced()
+		want = []rune(tt.outTraditional)
 		if len(got) != len(want) {
-			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outClassical)
+			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
 			continue
 		}
 		for i := 0; i < len(got); i++ {
 			if got[i] != want[i] {
-				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outClassical)
+				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
 				break
 			}
 		}
@@ -408,18 +414,18 @@ func TestToVoiced(t *testing.T) {
 }
 
 type ToSemivoicedTest struct {
-	in           rune
-	outClassical string
-	outCombining string
+	in             rune
+	outTraditional string
+	outCombining   string
 }
 
 var tosemivoicedtests = []ToSemivoicedTest{
 	// vcUnvoiced
-	0: {'か', "か゜", "か\u309A"}, // cmptVs is exists, cmptSvs is not exists
-	1: {'は', "ぱ", "は\u309A"},  // cmptVs is exists, cmptSvs is exists
+	0: {'か', "か゜", "か\u309A"}, // compatVs is exists, compatSvs is not exists
+	1: {'は', "ぱ", "は\u309A"},  // compatVs is exists, compatSvs is exists
 	// vcVoiced
-	2: {'が', "か゜", "か\u309A"}, // cmptVs.cmptSvs is not exists
-	3: {'ば', "ぱ", "は\u309A"},  // cmptVs.cmptSvs is exists
+	2: {'が', "か゜", "か\u309A"}, // compatVs.compatSvs is not exists
+	3: {'ば', "ぱ", "は\u309A"},  // compatVs.compatSvs is exists
 	// vcSemivoiced
 	4: {'ぱ', "ぱ", "は\u309A"},
 	// vcUndefined, cwWide
@@ -432,8 +438,8 @@ var tosemivoicedtests = []ToSemivoicedTest{
 	11: {'＃', "＃゜", "＃\u309A"}, // ctLatinSymbol, ccUndefined
 	// vcUndefined, cwNarrow
 	12: {'ｱ', "ｱﾟ", "ｱ\u309A"}, // ctKanaLetter, ccKatakana
-	13: {'ｶ', "ｶﾟ", "ｶ\u309A"}, // ctKanaLetter, ccKatakana, cmptWidth.cmptVs is exists, cmptWidth.cmptSvs is not exists
-	14: {'ﾊ', "ﾊﾟ", "ﾊ\u309A"}, // ctKanaLetter, ccKatakana, cmptWidth.cmptVs is exists, cmptWidth.cmptSvs is exists
+	13: {'ｶ', "ｶﾟ", "ｶ\u309A"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
+	14: {'ﾊ', "ﾊﾟ", "ﾊ\u309A"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
 	15: {'･', "･ﾟ", "･\u309A"}, // ctKanaSymbol, ccUndefined
 	16: {'A', "Aﾟ", "A\u309A"}, // ctLatinLetter, ccUpper
 	17: {'a', "aﾟ", "a\u309A"}, // ctLatinLetter, ccLower
@@ -459,15 +465,15 @@ func TestToSemivoiced(t *testing.T) {
 			continue
 		}
 		var got, want []rune
-		got = c.toClassicalSemivoiced()
-		want = []rune(tt.outClassical)
+		got = c.toTraditionalSemivoiced()
+		want = []rune(tt.outTraditional)
 		if len(got) != len(want) {
-			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outClassical)
+			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
 			continue
 		}
 		for i := 0; i < len(got); i++ {
 			if got[i] != want[i] {
-				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outClassical)
+				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
 				break
 			}
 		}
