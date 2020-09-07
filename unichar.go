@@ -75,6 +75,14 @@ func (c *unichar) getCompatSvsUnichar() *unichar {
 	return getUnicharForSure(c.compatSvs)
 }
 
+func (c *unichar) existsCompatVs() bool {
+	return c.codepoint != c.compatVs
+}
+
+func (c *unichar) existsCompatSvs() bool {
+	return c.codepoint != c.compatSvs
+}
+
 func (c *unichar) toUpper() rune {
 	if c.charCase != ccLower {
 		return c.codepoint
@@ -131,27 +139,6 @@ func (c *unichar) toNarrowUnichar() *unichar {
 	return c.getCompatWidthUnichar()
 }
 
-func (c *unichar) existsCompatVs() bool {
-	return c.codepoint != c.compatVs
-}
-
-func (c *unichar) existsCompatSvs() bool {
-	return c.codepoint != c.compatSvs
-}
-
-/* xxx
-// TODO Is this function needed by someone
-func (c *unichar) isVoicedSoundMark() bool {
-	return isVoicedSoundMark(c.codepoint)
-}
-
-// TODO Is this function needed by someone
-func (c *unichar) isSemivoicedSoundMark() bool {
-	return isSemivoicedSoundMark(c.codepoint)
-}
-*/
-
-// TODO need? naming?
 func (c *unichar) toTraditionalMarkUnichar() *unichar {
 	if c.charCase != ccCombining {
 		return c
@@ -159,7 +146,6 @@ func (c *unichar) toTraditionalMarkUnichar() *unichar {
 	return c.getCompatCaseUnichar()
 }
 
-// TODO Unichar?
 func (c *unichar) toCombiningMark() rune {
 	if c.charCase != ccTraditional {
 		return c.codepoint
@@ -167,7 +153,6 @@ func (c *unichar) toCombiningMark() rune {
 	return c.compatCase
 }
 
-// TODO naming?
 func (c *unichar) toTraditionalVoiced() []rune {
 	switch c.voicing {
 	case vcVoiced:

@@ -271,12 +271,6 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			if c.voicing != vcUndefined {
 				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
 			}
-			if c.compatVs != c.codepoint {
-				t.Errorf("len(%s[%#U].compatVs) = %#U, want: %#U", name, c.codepoint, c.compatVs, c.codepoint)
-			}
-			if c.compatSvs != c.codepoint {
-				t.Errorf("len(%s[%#U].compatSvs) = %#U, want: %#U", name, c.codepoint, c.compatSvs, c.codepoint)
-			}
 		// Kana
 		case ctKanaLetter:
 			if c.charCase != ccHiragana && c.charCase != ccKatakana { // TEST_gT8YJdBc
@@ -292,10 +286,21 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			if c.charWidth != cwNarrow && c.charWidth != cwWide {
 				t.Errorf("%s[%#U].charWidth is %d, want 1 or 2", name, c.codepoint, c.charWidth)
 			}
+			if c.voicing != vcUndefined {
+				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
+			}
 		case ctKanaVsm:
-			// TODO add testing
 			if !isVoicedSoundMark(c.codepoint) && !isSemivoicedSoundMark(c.codepoint) {
 				t.Errorf("%s[%#U] is not VSM or SVSM, want VSM or SVSM", name, c.codepoint)
+			}
+			if c.charCase != ccTraditional && c.charCase != ccCombining {
+				t.Errorf("%s[%#U].charCase is %d, want 3 or 4", name, c.codepoint, c.charCase)
+			}
+			if c.charWidth != cwNarrow && c.charWidth != cwWide {
+				t.Errorf("%s[%#U].charWidth is %d, want 1 or 2", name, c.codepoint, c.charWidth)
+			}
+			if c.voicing != vcUndefined {
+				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
 			}
 		// Undefined
 		case ctUndefined:
@@ -307,22 +312,6 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 			if c.voicing != vcUndefined {
 				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
-			}
-			if c.compatCase != c.codepoint {
-				t.Errorf("len(%s[%#U].compatCase) = %#U, want: %#U",
-					name, c.codepoint, c.compatCase, c.codepoint)
-			}
-			if c.compatWidth != c.codepoint {
-				t.Errorf("len(%s[%#U].compatWidth) = %#U, want: %#U",
-					name, c.codepoint, c.compatWidth, c.codepoint)
-			}
-			if c.compatVs != c.codepoint {
-				t.Errorf("len(%s[%#U].compatVs) = %#U, want: %#U",
-					name, c.codepoint, c.compatVs, c.codepoint)
-			}
-			if c.compatSvs != c.codepoint {
-				t.Errorf("len(%s[%#U].compatSvs) = %#U, want: %#U",
-					name, c.codepoint, c.compatSvs, c.codepoint)
 			}
 		}
 	}

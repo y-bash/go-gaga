@@ -397,35 +397,11 @@ func (n *Normalizer) NormalizeRune(r rune) []rune {
 			return []rune{c.toNarrow()}
 		case n.flag.has(KanaSymToWide):
 			return []rune{c.toWide()}
-			/*
-				// fix for TEST_A9fCxUi6
-				// In this case, it is hard-coded, because it cannot be represented by unichar_table.
-				if c.codepoint == vsmCombining {
-					return []rune{vsmWide}
-				} else if c.codepoint == svsmCombining {
-					return []rune{svsmWide}
-				} else {
-					return []rune{c.toWide()}
-				}
-			*/
 		default:
 			return []rune{c.codepoint}
 		}
 
 	case ctKanaVsm:
-		/*
-			var cc *unichar
-			switch {
-			case n.flag.has(VoicedKanaToTraditional):
-				cc = c.toTraditionalMarkUnichar()
-			case n.flag.has(VoicedKanaToCombining):
-				cc = c.toCombiningMarkUnichar()
-			default:
-				cc = c
-			//	return []rune{c.codepoint}
-			}
-		*/
-
 		switch {
 		case n.flag.has(IsolatedVsmToNarrow):
 			return []rune{c.toNarrow()}

@@ -467,7 +467,7 @@ var normalizetests = []NormalizeTest{
 		"AﾞAﾞAﾞ日ﾞ日ﾞ日ﾞäﾞäﾞäﾞ"},
 	108: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToWide,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
-		"ｶﾞｶ゛ｶ゛ｶ゛ｶﾞｶ゛ｶ゛ｶ゛ｶ゛ｶ゛ｶ゛"}, // TODO Consider this specification 
+		"ｶﾞｶ゛ｶ゛ｶ゛ｶﾞｶ゛ｶ゛ｶ゛ｶ゛ｶ゛ｶ゛"}, // TODO Consider this specification
 	109: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToWide,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛"},
@@ -659,7 +659,7 @@ var normalizetests = []NormalizeTest{
 		"日ﾞ本ﾟ語ﾞ平ﾟ仮ﾞ名ﾟ"}, // TEST_N9x6dneg // TODO review source code
 	168: {VoicedKanaToTraditional | IsolatedVsmToWide,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
-		"日゛本゜語゛平゜仮゛名゜"}, // TEST_A9fCxUi6 // TODO review source code
+		"日゛本゜語゛平゜仮゛名゜"},
 	169: {VoicedKanaToTraditional | IsolatedVsmToCombining,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日\u3099本\u309A語\u3099平\u309A仮\u3099名\u309A"},
