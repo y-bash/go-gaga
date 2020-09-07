@@ -30,6 +30,8 @@ func getUnichar(r rune) (c *unichar, ok bool) {
 		return &latinTable[r-latinFirst], true
 	case kanaFirst <= r && r <= kanaLast:
 		return &kanaTable[r-kanaFirst], true
+	case kanaExtFirst <= r && r <= kanaExtLast:
+		return &kanaExtTable[r-kanaExtFirst], true
 	case widthFirst <= r && r <= widthLast:
 		return &widthTable[r-widthFirst], true
 	default:

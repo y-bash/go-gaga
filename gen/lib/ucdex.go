@@ -169,10 +169,10 @@ var hiragana2katakana = []charmap{
 
 // Additional ref directive
 const (
-	arCmptCase = iota
-	arCmptWidth
-	arCmptVs
-	arCmptSvs
+	arCompatCase = iota
+	arCompatWidth
+	arCompatVs
+	arCompatSvs
 )
 
 type additionalRef struct {
@@ -182,60 +182,60 @@ type additionalRef struct {
 }
 
 var additionalRefList = []additionalRef{
-	{'ヮ', arCmptWidth, 'ﾜ'},      // 30EE [ヮ] -> FF9C [ﾜ]
-	{'ヰ', arCmptWidth, 'ｲ'},      // 30F0 [ヰ] -> FF72 [ｲ]
-	{'ヱ', arCmptWidth, 'ｴ'},      // 30F1 [ヱ] -> FF74 [ｴ]
-	{'ヵ', arCmptWidth, 'ｶ'},      // 30F5 [ヵ] -> FF76 [ｶ]
-	{'ヶ', arCmptWidth, 'ｹ'},      // 30F6 [ヶ] -> FF79 [ｹ]
-	{'ゎ', arCmptWidth, 'ﾜ'},      // 308E [ゎ] -> FF9C [ﾜ]
-	{'ゐ', arCmptWidth, 'ｲ'},      // 3090 [ゐ] -> FF72 [ｲ]
-	{'ゑ', arCmptWidth, 'ｴ'},      // 3091 [ゑ] -> FF74 [ｴ]
-	{'ゕ', arCmptWidth, 'ｶ'},      // 3095 [ゕ] -> FF76 [ｶ]
-	{'ゖ', arCmptWidth, 'ｹ'},      // 3096 [ゖ] -> FF79 [ｹ]
-	{'\u3099', arCmptWidth, 'ﾞ'}, // 3099 [゙ ] -> FF9E [ﾞ] // fix for TEST_N9x6dneg
-	{'\u309A', arCmptWidth, 'ﾟ'}, // 309A [゚ ] -> FF9F [ﾟ]
-	{'゛', arCmptWidth, 'ﾞ'},      // 309B [゙゛] -> FF9E [ﾞ] // fix for TEST_N9x6dneg
-	{'゜', arCmptWidth, 'ﾟ'},      // 309C [゚゜] -> FF9F [ﾟ]
-	{'ﾞ', arCmptWidth, '゛'},      // FF9E [ﾞ] -> 309B [゛]
-	{'ﾟ', arCmptWidth, '゜'},      // FF9F [ﾟ] -> 309C [゜]
-	{'\u3099', arCmptCase, '゛'},  // 3099 [ ] -> 309B [゛]
-	{'\u309A', arCmptCase, '゜'},  // 309A [ ] -> 309C [゜]
-	{'゛', arCmptCase, '\u3099'},  // 309B [゛] -> 3099 [ ]
-	{'゜', arCmptCase, '\u309A'},  // 309C [゜ﾟ] -> 309A [ ]
-	{'ﾞ', arCmptCase, '\u3099'},  // FF9E [ﾞ] -> 3099 [ ]
-	{'ﾟ', arCmptCase, '\u309A'},  // FF9F [ﾟ] -> 309A [ ]
-	{'ㇰ', arCmptCase, 'く'},       // 31F0 [ㇰ] -> 304F [く]
-	{'ㇱ', arCmptCase, 'し'},       // 31F1 [ㇱ] -> 3057 [し]
-	{'ㇲ', arCmptCase, 'す'},       // 31F2 [ㇲ] -> 3059 [す]
-	{'ㇳ', arCmptCase, 'と'},       // 31F3 [ㇳ] -> 3068 [と]
-	{'ㇴ', arCmptCase, 'ぬ'},       // 31F4 [ㇴ] -> 306C [ぬ]
-	{'ㇵ', arCmptCase, 'は'},       // 31F5 [ㇵ] -> 306F [は]
-	{'ㇶ', arCmptCase, 'ひ'},       // 31F6 [ㇶ] -> 3072 [ひ]
-	{'ㇷ', arCmptCase, 'ふ'},       // 31F7 [ㇷ] -> 3075 [ふ]
-	{'ㇸ', arCmptCase, 'へ'},       // 31F8 [ㇸ] -> 3078 [へ]
-	{'ㇹ', arCmptCase, 'ほ'},       // 31F9 [ㇹ] -> 307B [ほ]
-	{'ㇺ', arCmptCase, 'む'},       // 31FA [ㇺ] -> 3080 [む]
-	{'ㇻ', arCmptCase, 'ら'},       // 31FB [ㇻ] -> 3089 [ら]
-	{'ㇼ', arCmptCase, 'り'},       // 31FC [ㇼ] -> 308A [り]
-	{'ㇽ', arCmptCase, 'る'},       // 31FD [ㇽ] -> 308B [る]
-	{'ㇾ', arCmptCase, 'れ'},       // 31FE [ㇾ] -> 308C [れ]
-	{'ㇿ', arCmptCase, 'ろ'},       // 31FF [ㇿ] -> 308D [ろ]
-	{'ㇰ', arCmptWidth, 'ｸ'},      // 31F0 [ㇰ] -> FF78 [ｸ]
-	{'ㇱ', arCmptWidth, 'ｼ'},      // 31F1 [ㇱ] -> FF7C [ｼ]
-	{'ㇲ', arCmptWidth, 'ｽ'},      // 31F2 [ㇲ] -> FF7D [ｽ]
-	{'ㇳ', arCmptWidth, 'ﾄ'},      // 31F3 [ㇳ] -> FF84 [ﾄ]
-	{'ㇴ', arCmptWidth, 'ﾇ'},      // 31F4 [ㇴ] -> FF87 [ﾇ]
-	{'ㇵ', arCmptWidth, 'ﾊ'},      // 31F5 [ㇵ] -> FF8A [ﾊ]
-	{'ㇶ', arCmptWidth, 'ﾋ'},      // 31F6 [ㇶ] -> FF8B [ﾋ]
-	{'ㇷ', arCmptWidth, 'ﾌ'},      // 31F7 [ㇷ] -> FF8C [ﾌ]
-	{'ㇸ', arCmptWidth, 'ﾍ'},      // 31F8 [ㇸ] -> FF8D [ﾍ]
-	{'ㇹ', arCmptWidth, 'ﾎ'},      // 31F9 [ㇹ] -> FF8E [ﾎ]
-	{'ㇺ', arCmptWidth, 'ﾑ'},      // 31FA [ㇺ] -> FF91 [ﾑ]
-	{'ㇻ', arCmptWidth, 'ﾗ'},      // 31FB [ㇻ] -> FF97 [ﾗ]
-	{'ㇼ', arCmptWidth, 'ﾘ'},      // 31FC [ㇼ] -> FF98 [ﾘ]
-	{'ㇽ', arCmptWidth, 'ﾙ'},      // 31FD [ㇽ] -> FF99 [ﾙ]
-	{'ㇾ', arCmptWidth, 'ﾚ'},      // 31FE [ㇾ] -> FF9A [ﾚ]
-	{'ㇿ', arCmptWidth, 'ﾛ'},      // 31FF [ㇿ] -> FF9B [ﾛ]
+	{'ヮ', arCompatWidth, 'ﾜ'},      // 30EE [ヮ] -> FF9C [ﾜ]
+	{'ヰ', arCompatWidth, 'ｲ'},      // 30F0 [ヰ] -> FF72 [ｲ]
+	{'ヱ', arCompatWidth, 'ｴ'},      // 30F1 [ヱ] -> FF74 [ｴ]
+	{'ヵ', arCompatWidth, 'ｶ'},      // 30F5 [ヵ] -> FF76 [ｶ]
+	{'ヶ', arCompatWidth, 'ｹ'},      // 30F6 [ヶ] -> FF79 [ｹ]
+	{'ゎ', arCompatWidth, 'ﾜ'},      // 308E [ゎ] -> FF9C [ﾜ]
+	{'ゐ', arCompatWidth, 'ｲ'},      // 3090 [ゐ] -> FF72 [ｲ]
+	{'ゑ', arCompatWidth, 'ｴ'},      // 3091 [ゑ] -> FF74 [ｴ]
+	{'ゕ', arCompatWidth, 'ｶ'},      // 3095 [ゕ] -> FF76 [ｶ]
+	{'ゖ', arCompatWidth, 'ｹ'},      // 3096 [ゖ] -> FF79 [ｹ]
+	{'\u3099', arCompatWidth, 'ﾞ'}, // 3099 [゙ ] -> FF9E [ﾞ] // fix for TEST_N9x6dneg
+	{'\u309A', arCompatWidth, 'ﾟ'}, // 309A [゚ ] -> FF9F [ﾟ]
+	{'゛', arCompatWidth, 'ﾞ'},      // 309B [゙゛] -> FF9E [ﾞ] // fix for TEST_N9x6dneg
+	{'゜', arCompatWidth, 'ﾟ'},      // 309C [゚゜] -> FF9F [ﾟ]
+	{'ﾞ', arCompatWidth, '゛'},      // FF9E [ﾞ] -> 309B [゛]
+	{'ﾟ', arCompatWidth, '゜'},      // FF9F [ﾟ] -> 309C [゜]
+	{'\u3099', arCompatCase, '゛'},  // 3099 [ ] -> 309B [゛]
+	{'\u309A', arCompatCase, '゜'},  // 309A [ ] -> 309C [゜]
+	{'゛', arCompatCase, '\u3099'},  // 309B [゛] -> 3099 [ ]
+	{'゜', arCompatCase, '\u309A'},  // 309C [゜ﾟ] -> 309A [ ]
+	{'ﾞ', arCompatCase, '\u3099'},  // FF9E [ﾞ] -> 3099 [ ]
+	{'ﾟ', arCompatCase, '\u309A'},  // FF9F [ﾟ] -> 309A [ ]
+	{'ㇰ', arCompatCase, 'く'},       // 31F0 [ㇰ] -> 304F [く]
+	{'ㇱ', arCompatCase, 'し'},       // 31F1 [ㇱ] -> 3057 [し]
+	{'ㇲ', arCompatCase, 'す'},       // 31F2 [ㇲ] -> 3059 [す]
+	{'ㇳ', arCompatCase, 'と'},       // 31F3 [ㇳ] -> 3068 [と]
+	{'ㇴ', arCompatCase, 'ぬ'},       // 31F4 [ㇴ] -> 306C [ぬ]
+	{'ㇵ', arCompatCase, 'は'},       // 31F5 [ㇵ] -> 306F [は]
+	{'ㇶ', arCompatCase, 'ひ'},       // 31F6 [ㇶ] -> 3072 [ひ]
+	{'ㇷ', arCompatCase, 'ふ'},       // 31F7 [ㇷ] -> 3075 [ふ]
+	{'ㇸ', arCompatCase, 'へ'},       // 31F8 [ㇸ] -> 3078 [へ]
+	{'ㇹ', arCompatCase, 'ほ'},       // 31F9 [ㇹ] -> 307B [ほ]
+	{'ㇺ', arCompatCase, 'む'},       // 31FA [ㇺ] -> 3080 [む]
+	{'ㇻ', arCompatCase, 'ら'},       // 31FB [ㇻ] -> 3089 [ら]
+	{'ㇼ', arCompatCase, 'り'},       // 31FC [ㇼ] -> 308A [り]
+	{'ㇽ', arCompatCase, 'る'},       // 31FD [ㇽ] -> 308B [る]
+	{'ㇾ', arCompatCase, 'れ'},       // 31FE [ㇾ] -> 308C [れ]
+	{'ㇿ', arCompatCase, 'ろ'},       // 31FF [ㇿ] -> 308D [ろ]
+	{'ㇰ', arCompatWidth, 'ｸ'},      // 31F0 [ㇰ] -> FF78 [ｸ]
+	{'ㇱ', arCompatWidth, 'ｼ'},      // 31F1 [ㇱ] -> FF7C [ｼ]
+	{'ㇲ', arCompatWidth, 'ｽ'},      // 31F2 [ㇲ] -> FF7D [ｽ]
+	{'ㇳ', arCompatWidth, 'ﾄ'},      // 31F3 [ㇳ] -> FF84 [ﾄ]
+	{'ㇴ', arCompatWidth, 'ﾇ'},      // 31F4 [ㇴ] -> FF87 [ﾇ]
+	{'ㇵ', arCompatWidth, 'ﾊ'},      // 31F5 [ㇵ] -> FF8A [ﾊ]
+	{'ㇶ', arCompatWidth, 'ﾋ'},      // 31F6 [ㇶ] -> FF8B [ﾋ]
+	{'ㇷ', arCompatWidth, 'ﾌ'},      // 31F7 [ㇷ] -> FF8C [ﾌ]
+	{'ㇸ', arCompatWidth, 'ﾍ'},      // 31F8 [ㇸ] -> FF8D [ﾍ]
+	{'ㇹ', arCompatWidth, 'ﾎ'},      // 31F9 [ㇹ] -> FF8E [ﾎ]
+	{'ㇺ', arCompatWidth, 'ﾑ'},      // 31FA [ㇺ] -> FF91 [ﾑ]
+	{'ㇻ', arCompatWidth, 'ﾗ'},      // 31FB [ㇻ] -> FF97 [ﾗ]
+	{'ㇼ', arCompatWidth, 'ﾘ'},      // 31FC [ㇼ] -> FF98 [ﾘ]
+	{'ㇽ', arCompatWidth, 'ﾙ'},      // 31FD [ㇽ] -> FF99 [ﾙ]
+	{'ㇾ', arCompatWidth, 'ﾚ'},      // 31FE [ㇾ] -> FF9A [ﾚ]
+	{'ㇿ', arCompatWidth, 'ﾛ'},      // 31FF [ㇿ] -> FF9B [ﾛ]
 }
 
 // Additional attr directive
@@ -837,13 +837,13 @@ func updateAdditionalRefList(m ucdex) error {
 			return fmt.Errorf("updateAdditionalRefList; %#U is not exists in ucdex", ad.codepoint)
 		}
 		switch ad.ref {
-		case arCmptCase:
+		case arCompatCase:
 			c.compatCase = ad.data
-		case arCmptWidth:
+		case arCompatWidth:
 			c.compatWidth = ad.data
-		case arCmptVs:
+		case arCompatVs:
 			c.compatVs = ad.data
-		case arCmptSvs:
+		case arCompatSvs:
 			c.compatSvs = ad.data
 		default:
 			return fmt.Errorf("updateAdditionalRefList; Unexpected ad.ref: %d", ad.ref)
