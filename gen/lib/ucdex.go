@@ -22,12 +22,16 @@ var basicLatinBlock = blockRange{0x0020, 0x007F, "latin"}
 // CJK symbols 3000-303F, Hiragana 3040-309F, Katakana 30A0-30FF
 var jpKanaBlock = blockRange{0x3000, 0x30FF, "kana"}
 
+// Katakana Phonetic Extensions 31F0-31FF
+var jpKanaExtBlock = blockRange{0x31F0, 0x31FF, "kanaExt"}
+
 // Full width latin letter, Half width kana (excepted FFA0-FFEF)
 var widthFormBlock = blockRange{0xFF00, 0xFF9F, "width"}
 
 var blockRanges = []blockRange{
 	basicLatinBlock,
 	jpKanaBlock,
+	jpKanaExtBlock,
 	widthFormBlock,
 }
 
@@ -200,6 +204,38 @@ var additionalRefList = []additionalRef{
 	{'゜', arCmptCase, '\u309A'},  // 309C [゜ﾟ] -> 309A [ ]
 	{'ﾞ', arCmptCase, '\u3099'},  // FF9E [ﾞ] -> 3099 [ ]
 	{'ﾟ', arCmptCase, '\u309A'},  // FF9F [ﾟ] -> 309A [ ]
+	{'ㇰ', arCmptCase, 'く'},       // 31F0 [ㇰ] -> 304F [く]
+	{'ㇱ', arCmptCase, 'し'},       // 31F1 [ㇱ] -> 3057 [し]
+	{'ㇲ', arCmptCase, 'す'},       // 31F2 [ㇲ] -> 3059 [す]
+	{'ㇳ', arCmptCase, 'と'},       // 31F3 [ㇳ] -> 3068 [と]
+	{'ㇴ', arCmptCase, 'ぬ'},       // 31F4 [ㇴ] -> 306C [ぬ]
+	{'ㇵ', arCmptCase, 'は'},       // 31F5 [ㇵ] -> 306F [は]
+	{'ㇶ', arCmptCase, 'ひ'},       // 31F6 [ㇶ] -> 3072 [ひ]
+	{'ㇷ', arCmptCase, 'ふ'},       // 31F7 [ㇷ] -> 3075 [ふ]
+	{'ㇸ', arCmptCase, 'へ'},       // 31F8 [ㇸ] -> 3078 [へ]
+	{'ㇹ', arCmptCase, 'ほ'},       // 31F9 [ㇹ] -> 307B [ほ]
+	{'ㇺ', arCmptCase, 'む'},       // 31FA [ㇺ] -> 3080 [む]
+	{'ㇻ', arCmptCase, 'ら'},       // 31FB [ㇻ] -> 3089 [ら]
+	{'ㇼ', arCmptCase, 'り'},       // 31FC [ㇼ] -> 308A [り]
+	{'ㇽ', arCmptCase, 'る'},       // 31FD [ㇽ] -> 308B [る]
+	{'ㇾ', arCmptCase, 'れ'},       // 31FE [ㇾ] -> 308C [れ]
+	{'ㇿ', arCmptCase, 'ろ'},       // 31FF [ㇿ] -> 308D [ろ]
+	{'ㇰ', arCmptWidth, 'ｸ'},      // 31F0 [ㇰ] -> FF78 [ｸ]
+	{'ㇱ', arCmptWidth, 'ｼ'},      // 31F1 [ㇱ] -> FF7C [ｼ]
+	{'ㇲ', arCmptWidth, 'ｽ'},      // 31F2 [ㇲ] -> FF7D [ｽ]
+	{'ㇳ', arCmptWidth, 'ﾄ'},      // 31F3 [ㇳ] -> FF84 [ﾄ]
+	{'ㇴ', arCmptWidth, 'ﾇ'},      // 31F4 [ㇴ] -> FF87 [ﾇ]
+	{'ㇵ', arCmptWidth, 'ﾊ'},      // 31F5 [ㇵ] -> FF8A [ﾊ]
+	{'ㇶ', arCmptWidth, 'ﾋ'},      // 31F6 [ㇶ] -> FF8B [ﾋ]
+	{'ㇷ', arCmptWidth, 'ﾌ'},      // 31F7 [ㇷ] -> FF8C [ﾌ]
+	{'ㇸ', arCmptWidth, 'ﾍ'},      // 31F8 [ㇸ] -> FF8D [ﾍ]
+	{'ㇹ', arCmptWidth, 'ﾎ'},      // 31F9 [ㇹ] -> FF8E [ﾎ]
+	{'ㇺ', arCmptWidth, 'ﾑ'},      // 31FA [ㇺ] -> FF91 [ﾑ]
+	{'ㇻ', arCmptWidth, 'ﾗ'},      // 31FB [ㇻ] -> FF97 [ﾗ]
+	{'ㇼ', arCmptWidth, 'ﾘ'},      // 31FC [ㇼ] -> FF98 [ﾘ]
+	{'ㇽ', arCmptWidth, 'ﾙ'},      // 31FD [ㇽ] -> FF99 [ﾙ]
+	{'ㇾ', arCmptWidth, 'ﾚ'},      // 31FE [ㇾ] -> FF9A [ﾚ]
+	{'ㇿ', arCmptWidth, 'ﾛ'},      // 31FF [ㇿ] -> FF9B [ﾛ]
 }
 
 // Additional attr directive
@@ -327,6 +363,10 @@ func char2category(char *Char) (int, error) {
 				return ctKanaSymbol, nil
 			}
 		}
+
+	case "Katakana_Ext":
+		return ctKanaLetter, nil
+
 	default:
 		return 0, fmt.Errorf("unexpected char.Blk: %q", char.Blk)
 	}
@@ -379,6 +419,9 @@ func char2charCase(char *Char) (int, error) {
 				return ccUndefined, nil
 			}
 		}
+	case "Katakana_Ext":
+		return ccKatakana, nil
+
 	default:
 		return 0, fmt.Errorf("unexpected char.Blk: %q", char.Blk)
 	}
@@ -390,7 +433,7 @@ func char2charWidth(char *Char) (charWidth int, compatWidth rune, err error) {
 	switch char.Blk {
 	case "ASCII":
 		charWidth = cwNarrow
-	case "CJK_Symbols", "Hiragana", "Katakana":
+	case "CJK_Symbols", "Hiragana", "Katakana", "Katakana_Ext":
 		charWidth = cwWide
 	case "Half_And_Full_Forms":
 		switch char.Dt {
@@ -1010,6 +1053,7 @@ func printConstList(f io.Writer, c constValues) {
 	fmt.Fprint(f, ")\n\n")
 }
 
+// TODO consider implementation in uint8 (category, charCase, charWidth, voicing)
 func printTypes(f io.Writer) {
 	text := `
 type unichar struct {

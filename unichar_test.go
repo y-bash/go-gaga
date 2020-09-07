@@ -23,6 +23,7 @@ type tableInfo struct {
 var tables = []tableInfo{
 	{latinTable, "latinTable", 96, "d90c9a10f72b6c029cb6aba58128f534d1935aa760fd5a073c232e16fc4eca22"},
 	{kanaTable, "kanaTable", 256, "9f30b8ed44761d8667e55a08181f4f9db584e9694db352255291db0102014e54"},
+	{kanaExtTable, "kanaExtTable", 16, "4c23e39933c8312f42c602a7b602041fed92634c8936cd57786c45ebe8df52b2"},
 	{widthTable, "widthTable", 160, "79f5d0526d0696730a8e55526da769628e8280d100e954ea62151ff54699708d"},
 }
 

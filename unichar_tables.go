@@ -420,6 +420,27 @@ var kanaTable = unichars{
 	{0x30FF, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ヿ', 'ヿ', 'ヿ', 'ヿ'},                          // 0x30FF ヿ
 }
 
+var kanaExtFirst rune = 0x31F0
+var kanaExtLast rune = 0x31FF
+var kanaExtTable = unichars{
+	{0x31F0, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'く', 'ｸ', 'ㇰ', 'ㇰ'}, // 0x31F0 ㇰ
+	{0x31F1, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'し', 'ｼ', 'ㇱ', 'ㇱ'}, // 0x31F1 ㇱ
+	{0x31F2, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'す', 'ｽ', 'ㇲ', 'ㇲ'}, // 0x31F2 ㇲ
+	{0x31F3, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'と', 'ﾄ', 'ㇳ', 'ㇳ'}, // 0x31F3 ㇳ
+	{0x31F4, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ぬ', 'ﾇ', 'ㇴ', 'ㇴ'}, // 0x31F4 ㇴ
+	{0x31F5, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'は', 'ﾊ', 'ㇵ', 'ㇵ'}, // 0x31F5 ㇵ
+	{0x31F6, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ひ', 'ﾋ', 'ㇶ', 'ㇶ'}, // 0x31F6 ㇶ
+	{0x31F7, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ふ', 'ﾌ', 'ㇷ', 'ㇷ'}, // 0x31F7 ㇷ
+	{0x31F8, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'へ', 'ﾍ', 'ㇸ', 'ㇸ'}, // 0x31F8 ㇸ
+	{0x31F9, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ほ', 'ﾎ', 'ㇹ', 'ㇹ'}, // 0x31F9 ㇹ
+	{0x31FA, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'む', 'ﾑ', 'ㇺ', 'ㇺ'}, // 0x31FA ㇺ
+	{0x31FB, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ら', 'ﾗ', 'ㇻ', 'ㇻ'}, // 0x31FB ㇻ
+	{0x31FC, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'り', 'ﾘ', 'ㇼ', 'ㇼ'}, // 0x31FC ㇼ
+	{0x31FD, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'る', 'ﾙ', 'ㇽ', 'ㇽ'}, // 0x31FD ㇽ
+	{0x31FE, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'れ', 'ﾚ', 'ㇾ', 'ㇾ'}, // 0x31FE ㇾ
+	{0x31FF, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ろ', 'ﾛ', 'ㇿ', 'ㇿ'}, // 0x31FF ㇿ
+}
+
 var widthFirst rune = 0xFF00
 var widthLast rune = 0xFF9F
 var widthTable = unichars{

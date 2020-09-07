@@ -18,8 +18,6 @@
 // 	fmt.Printf("%q", s) // Stdout: "ABCアイウ"
 package gaga
 
-// TODO support for Katakana_Ext
-
 import (
 	"fmt"
 	//	"github.com/mattn/go-runewidth"
