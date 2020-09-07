@@ -65,6 +65,7 @@ func testTableSequence(t *testing.T, table []unichar, name string) {
 func TestTableSequence(t *testing.T) {
 	testTableSequence(t, latinTable, "latinTable")
 	testTableSequence(t, kanaTable, "kanaTable")
+	testTableSequence(t, kanaExtTable, "kanaExtTable")
 	testTableSequence(t, widthTable, "widthTable")
 }
 
