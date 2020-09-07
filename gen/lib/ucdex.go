@@ -178,28 +178,28 @@ type additionalRef struct {
 }
 
 var additionalRefList = []additionalRef{
-	{'ヮ', arCmptWidth, 'ﾜ'}, // 30EE [ヮ] -> FF9C [ﾜ]
-	{'ヰ', arCmptWidth, 'ｲ'}, // 30F0 [ヰ] -> FF72 [ｲ]
-	{'ヱ', arCmptWidth, 'ｴ'}, // 30F1 [ヱ] -> FF74 [ｴ]
-	{'ヵ', arCmptWidth, 'ｶ'}, // 30F5 [ヵ] -> FF76 [ｶ]
-	{'ヶ', arCmptWidth, 'ｹ'}, // 30F6 [ヶ] -> FF79 [ｹ]
-	{'ゎ', arCmptWidth, 'ﾜ'}, // 308E [ゎ] -> FF9C [ﾜ]
-	{'ゐ', arCmptWidth, 'ｲ'}, // 3090 [ゐ] -> FF72 [ｲ]
-	{'ゑ', arCmptWidth, 'ｴ'}, // 3091 [ゑ] -> FF74 [ｴ]
-	{'ゕ', arCmptWidth, 'ｶ'}, // 3095 [ゕ] -> FF76 [ｶ]
-	{'ゖ', arCmptWidth, 'ｹ'}, // 3096 [ゖ] -> FF79 [ｹ]
+	{'ヮ', arCmptWidth, 'ﾜ'},      // 30EE [ヮ] -> FF9C [ﾜ]
+	{'ヰ', arCmptWidth, 'ｲ'},      // 30F0 [ヰ] -> FF72 [ｲ]
+	{'ヱ', arCmptWidth, 'ｴ'},      // 30F1 [ヱ] -> FF74 [ｴ]
+	{'ヵ', arCmptWidth, 'ｶ'},      // 30F5 [ヵ] -> FF76 [ｶ]
+	{'ヶ', arCmptWidth, 'ｹ'},      // 30F6 [ヶ] -> FF79 [ｹ]
+	{'ゎ', arCmptWidth, 'ﾜ'},      // 308E [ゎ] -> FF9C [ﾜ]
+	{'ゐ', arCmptWidth, 'ｲ'},      // 3090 [ゐ] -> FF72 [ｲ]
+	{'ゑ', arCmptWidth, 'ｴ'},      // 3091 [ゑ] -> FF74 [ｴ]
+	{'ゕ', arCmptWidth, 'ｶ'},      // 3095 [ゕ] -> FF76 [ｶ]
+	{'ゖ', arCmptWidth, 'ｹ'},      // 3096 [ゖ] -> FF79 [ｹ]
 	{'\u3099', arCmptWidth, 'ﾞ'}, // 3099 [゙ ] -> FF9E [ﾞ] // fix for TEST_N9x6dneg
 	{'\u309A', arCmptWidth, 'ﾟ'}, // 309A [゚ ] -> FF9F [ﾟ]
 	{'゛', arCmptWidth, 'ﾞ'},      // 309B [゙゛] -> FF9E [ﾞ] // fix for TEST_N9x6dneg
 	{'゜', arCmptWidth, 'ﾟ'},      // 309C [゚゜] -> FF9F [ﾟ]
 	{'ﾞ', arCmptWidth, '゛'},      // FF9E [ﾞ] -> 309B [゛]
 	{'ﾟ', arCmptWidth, '゜'},      // FF9F [ﾟ] -> 309C [゜]
-	{'\u3099', arCmptCase, '゛'}, // 3099 [ ] -> 309B [゛]
-	{'\u309A', arCmptCase, '゜'}, // 309A [ ] -> 309C [゜]
-	{'゛', arCmptCase, '\u3099'}, // 309B [゛] -> 3099 [ ]
-	{'゜', arCmptCase, '\u309A'}, // 309C [゜ﾟ] -> 309A [ ]
-	{'ﾞ', arCmptCase, '\u3099'}, // FF9E [ﾞ] -> 3099 [ ]
-	{'ﾟ', arCmptCase, '\u309A'}, // FF9F [ﾟ] -> 309A [ ]
+	{'\u3099', arCmptCase, '゛'},  // 3099 [ ] -> 309B [゛]
+	{'\u309A', arCmptCase, '゜'},  // 309A [ ] -> 309C [゜]
+	{'゛', arCmptCase, '\u3099'},  // 309B [゛] -> 3099 [ ]
+	{'゜', arCmptCase, '\u309A'},  // 309C [゜ﾟ] -> 309A [ ]
+	{'ﾞ', arCmptCase, '\u3099'},  // FF9E [ﾞ] -> 3099 [ ]
+	{'ﾟ', arCmptCase, '\u309A'},  // FF9F [ﾟ] -> 309A [ ]
 }
 
 // Additional attr directive
@@ -217,19 +217,19 @@ type additionalAttr struct {
 }
 
 var additionalAttrList = []additionalAttr{
-	{'　', aaCategory, ctLatinSymbol},     // 0x3000 [　] ctKanaSymbol -> ctLatinSymbol
-	{'\u3099', aaCategory, ctKanaVsm},    // 0x3099 [ ◌゙] ctKanaLetter -> ctKanaVsm
-	{'\u309A', aaCategory, ctKanaVsm},    // 0x309A [゚゚ ゚] ctKanaLetter -> ctKanaVsm
-	{'゛', aaCategory, ctKanaVsm},         // 0x309B [゛] ctKanaLetter -> ctKanaVsm
-	{'゜', aaCategory, ctKanaVsm},         // 0x309C [゜] ctKanaLetter -> ctKanaVsm
-	{'ﾞ', aaCategory, ctKanaVsm},         // FF9E [ﾞ] ctKanaLetter -> ctKanaVsm
-	{'ﾟ', aaCategory, ctKanaVsm},         // FF9F [ﾟ] ctKanaLetter -> ctKanaVsm
-	{'\u3099', aaCharCase, ccCombining},  // 0x3099 [ ◌゙] ccHiragana -> ccTraditional
-	{'\u309A', aaCharCase, ccCombining},  // 0x309A [゚゚ ゚] ccHiragana -> ccTraditional
-	{'゛', aaCharCase, ccTraditional},     // 0x309B [゛] ccHiragana -> ccTraditional
-	{'゜', aaCharCase, ccTraditional},     // 0x309C [゜] ccHiragana -> ccTraditional
-	{'ﾞ', aaCharCase, ccTraditional},     // FF9E [ﾞ] ccKatakana -> ccTraditional
-	{'ﾟ', aaCharCase, ccTraditional},     // FF9F [ﾟ] ccKatakana -> ccTraditional
+	{'　', aaCategory, ctLatinSymbol},    // 0x3000 [　] ctKanaSymbol -> ctLatinSymbol
+	{'\u3099', aaCategory, ctKanaVsm},   // 0x3099 [ ◌゙] ctKanaLetter -> ctKanaVsm
+	{'\u309A', aaCategory, ctKanaVsm},   // 0x309A [゚゚ ゚] ctKanaLetter -> ctKanaVsm
+	{'゛', aaCategory, ctKanaVsm},        // 0x309B [゛] ctKanaLetter -> ctKanaVsm
+	{'゜', aaCategory, ctKanaVsm},        // 0x309C [゜] ctKanaLetter -> ctKanaVsm
+	{'ﾞ', aaCategory, ctKanaVsm},        // FF9E [ﾞ] ctKanaLetter -> ctKanaVsm
+	{'ﾟ', aaCategory, ctKanaVsm},        // FF9F [ﾟ] ctKanaLetter -> ctKanaVsm
+	{'\u3099', aaCharCase, ccCombining}, // 0x3099 [ ◌゙] ccHiragana -> ccTraditional
+	{'\u309A', aaCharCase, ccCombining}, // 0x309A [゚゚ ゚] ccHiragana -> ccTraditional
+	{'゛', aaCharCase, ccTraditional},    // 0x309B [゛] ccHiragana -> ccTraditional
+	{'゜', aaCharCase, ccTraditional},    // 0x309C [゜] ccHiragana -> ccTraditional
+	{'ﾞ', aaCharCase, ccTraditional},    // FF9E [ﾞ] ccKatakana -> ccTraditional
+	{'ﾟ', aaCharCase, ccTraditional},    // FF9F [ﾟ] ccKatakana -> ccTraditional
 }
 
 // Get the multiple codepoints from Cp(UCD)

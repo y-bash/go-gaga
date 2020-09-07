@@ -246,7 +246,7 @@ func (n *Normalizer) maybeCombineVsm(r1, r2 rune) ([]rune, bool) {
 		case n.flag.has(VoicedKanaToCombining):
 			rs = cc.toCombiningVoiced()
 		default:
-			r2s := n.NormalizeRune(r2) // TODO len(r2s)
+			r2s := n.NormalizeRune(r2)        // TODO len(r2s)
 			rs = []rune{cc.codepoint, r2s[0]} // TODO review Dontcare
 		}
 	} else {
@@ -256,7 +256,7 @@ func (n *Normalizer) maybeCombineVsm(r1, r2 rune) ([]rune, bool) {
 		case n.flag.has(VoicedKanaToCombining):
 			rs = cc.toCombiningSemivoiced()
 		default:
-			r2s := n.NormalizeRune(r2) // TODO len(r2s)
+			r2s := n.NormalizeRune(r2)        // TODO len(r2s)
 			rs = []rune{cc.codepoint, r2s[0]} // TODO review Dontcare
 		}
 	}

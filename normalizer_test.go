@@ -396,7 +396,7 @@ var normalizetests = []NormalizeTest{
 	86: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToNarrow,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"AﾞAﾞAﾞ日ﾞ日ﾞ日ﾞäﾞäﾞäﾞ"}, // TODO Consider whether this specification (Width of classical VSM) is good
-		*/
+	*/
 
 	// multiple japanese conversion (vsm classic directive) <- Voiced sound character/Voiced sound mark
 	87: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional,
@@ -408,11 +408,11 @@ var normalizetests = []NormalizeTest{
 	89: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099"},
-		/* TODO Add test case of IsolatedVsm
+	/* TODO Add test case of IsolatedVsm
 	89: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToNarrow,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"AﾞAﾞAﾞ日ﾞ日ﾞ日ﾞäﾞäﾞäﾞ"},
-		*/
+	*/
 
 	// simple japanese conversion (vsm combining directive) <- Voiced sound character/Voiced sound mark
 	90: {KatakanaToHiragana | VoicedKanaToCombining,
@@ -424,11 +424,11 @@ var normalizetests = []NormalizeTest{
 	92: {KatakanaToHiragana | VoicedKanaToCombining,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099"},
-		/* TODO Add test case of IsolatedVsm
+	/* TODO Add test case of IsolatedVsm
 	92: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToCombining,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
-		*/
+	*/
 
 	// multiple japanese conversion (vsm combining directive) <- Voiced sound character/Voiced sound mark
 	93: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining,
@@ -440,11 +440,11 @@ var normalizetests = []NormalizeTest{
 	95: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099"},
-		/* TODO Add test case of IsolatedVsm
+	/* TODO Add test case of IsolatedVsm
 	95: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToCombining,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
-		*/
+	*/
 
 	// VSM/SVSM testing that cannot be combined with the previous character
 	96: {VoicedKanaToTraditional,
@@ -546,7 +546,7 @@ var normalizetests = []NormalizeTest{
 	125: {VoicedKanaToTraditional,
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'})},
-		/*  TODO Add test case of IsolatedVsm
+	/*  TODO Add test case of IsolatedVsm
 	125: {VoicedKanaToTraditional | IsolatedVsmToNarrow,
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
 		string([]rune{0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ'})},
@@ -556,11 +556,11 @@ var normalizetests = []NormalizeTest{
 	125: {VoicedKanaToTraditional | IsolatedVsmToCombining,
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
 		string([]rune{0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A'})},
-		*/
+	*/
 	126: {VoicedKanaToCombining,
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'})},
-		/* TODO Add test case of IsolatedVsm
+	/* TODO Add test case of IsolatedVsm
 	126: {VoicedKanaToCombining | IsolatedVsmToNarrow,
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
 		string([]rune{0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ'})},
@@ -570,7 +570,7 @@ var normalizetests = []NormalizeTest{
 	126: {VoicedKanaToCombining | IsolatedVsmToCombining,
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
 		string([]rune{0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A'})},
-		*/
+	*/
 	127: {KanaSymToWide, // TODO Consider whether this specification (Width of classical VSM) is good
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
 		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'})},

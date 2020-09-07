@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"github.com/y-bash/go-gaga"
 	"os"
 	"strings"
-	"github.com/y-bash/go-gaga"
 )
 
-var version ="v0.0.0" // set value by go build -ldflags
+var version = "v0.0.0" // set value by go build -ldflags
 
 func max(n1, n2 int) int {
 	if n1 > n2 {
