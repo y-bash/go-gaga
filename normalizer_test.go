@@ -712,7 +712,7 @@ var normalizetests = []NormalizeTest{
 		"ゴゴゴゴゴゴゴ"},
 	185: {KatakanaToNarrow,
 		"ｺﾞｺ゛ｺ\u3099コﾞコ゛コ\u3099ゴ",
-		"ｺﾞｺ゛ｺ\u3099ｺﾞｺ゛ｺ\u3099ｺﾞ"}, // TEST_L7tADs2z // TODO review
+		"ｺﾞｺ゛ｺ\u3099ｺﾞｺ゛ｺ\u3099ｺﾞ"}, // TEST_L7tADs2z
 	186: {KatakanaToNarrow | VoicedKanaToTraditional,
 		"ｺﾞｺ゛ｺ\u3099コﾞコ゛コ\u3099ゴ",
 		"ｺﾞｺﾞｺﾞｺﾞｺﾞｺﾞｺﾞ"},
@@ -759,7 +759,7 @@ var normalizetests = []NormalizeTest{
 		"ポポポポポポポ"},
 	200: {KatakanaToNarrow,
 		"ﾎﾟﾎ゜ﾎ\u309Aホﾟホ゜ホ\u309Aポ",
-		"ﾎﾟﾎ゜ﾎ\u309Aﾎﾟﾎ゜ﾎ\u309Aﾎﾟ"}, // TEST_K6t8hQYp TODO review
+		"ﾎﾟﾎ゜ﾎ\u309Aﾎﾟﾎ゜ﾎ\u309Aﾎﾟ"}, // TEST_K6t8hQYp
 	201: {KatakanaToNarrow | VoicedKanaToTraditional,
 		"ﾎﾟﾎ゜ﾎ\u309Aホﾟホ゜ホ\u309Aポ",
 		"ﾎﾟﾎﾟﾎﾟﾎﾟﾎﾟﾎﾟﾎﾟ"},
