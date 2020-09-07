@@ -39,12 +39,6 @@ func getUnichar(r rune) (c *unichar, ok bool) {
 	}
 }
 
-func neverBeCalled() []rune {
-	// TODO Consider whether to include panic() in release version
-	// return []rune{}
-	panic("Unexpectedly called neverBeCalled()")
-}
-
 // This function can only be called if r is known to exist in the tables.
 func getUnicharForSure(r rune) *unichar {
 	c, ok := getUnichar(r)
@@ -177,11 +171,11 @@ func (c *unichar) toTraditionalVoiced() []rune {
 			return []rune{c.codepoint}
 		default:
 			// TEST_U2mt8xTY knows that the program never passes here
-			return neverBeCalled()
+			panic("unreachable")
 		}
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
-		return neverBeCalled()
+		panic("unreachable")
 	}
 }
 
@@ -201,7 +195,7 @@ func (c *unichar) toTraditionalSemivoiced() []rune {
 			return []rune{c.compatVs, svsmWide}
 		default:
 			// TEST_T2eKd76G knows that the program never passes here
-			return neverBeCalled()
+			panic("unreachable")
 		}
 	case vcUnvoiced:
 		if c.existsCompatSvs() {
@@ -214,7 +208,7 @@ func (c *unichar) toTraditionalSemivoiced() []rune {
 			return []rune{c.codepoint, svsmWide}
 		default:
 			// TEST_Mw87qjkF knows that the program never passes here
-			return neverBeCalled()
+			panic("unreachable")
 		}
 	case vcUndefined:
 		switch c.charWidth {
@@ -227,11 +221,11 @@ func (c *unichar) toTraditionalSemivoiced() []rune {
 			return []rune{c.codepoint}
 		default:
 			// TEST_U2mt8xTY knows that the program never passes here
-			return neverBeCalled()
+			panic("unreachable")
 		}
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
-		return neverBeCalled()
+		panic("unreachable")
 	}
 }
 
@@ -245,7 +239,7 @@ func (c *unichar) toCombiningVoiced() []rune {
 		return []rune{c.compatSvs, vsmCombining}
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
-		return neverBeCalled()
+		panic("unreachable")
 	}
 }
 
@@ -259,6 +253,6 @@ func (c *unichar) toCombiningSemivoiced() []rune {
 		return []rune{c.compatSvs, svsmCombining}
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
-		return neverBeCalled()
+		panic("unreachable")
 	}
 }

@@ -233,7 +233,7 @@ func (n *Normalizer) maybeCombineVsm(r1, r2 rune) ([]rune, bool) {
 
 	rs := n.NormalizeRune(r1)
 	if len(rs) != 1 {
-		neverBeCalled() // TODO ebidence
+		panic("unreachable") // TODO ebidence
 	}
 	cc, ok := getUnichar(rs[0])
 
@@ -359,7 +359,7 @@ func (n *Normalizer) NormalizeRune(r rune) []rune {
 			}
 		default:
 			// TEST_gT8YJdBc knows that the program never passes here
-			return neverBeCalled()
+			panic("unreachable")
 		}
 
 		switch c.voicing {
@@ -388,7 +388,7 @@ func (n *Normalizer) NormalizeRune(r rune) []rune {
 
 		default:
 			// TEST_R8jrnbCz knows that the program never passes here
-			return neverBeCalled()
+			panic("unreachable")
 		}
 
 	case ctKanaSymbol:
@@ -415,7 +415,7 @@ func (n *Normalizer) NormalizeRune(r rune) []rune {
 
 	default:
 		// TEST_P8w4qtsm knows that the program never passes here
-		return neverBeCalled()
+		panic("unreachable")
 	}
 }
 
