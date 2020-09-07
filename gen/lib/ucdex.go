@@ -230,8 +230,6 @@ var additionalAttrList = []additionalAttr{
 	{'゜', aaCharCase, ccTraditional},     // 0x309C [゜] ccHiragana -> ccTraditional
 	{'ﾞ', aaCharCase, ccTraditional},     // FF9E [ﾞ] ccKatakana -> ccTraditional
 	{'ﾟ', aaCharCase, ccTraditional},     // FF9F [ﾟ] ccKatakana -> ccTraditional
-	// TODO {'\u3099', aaCharWidth, cwUndefined}, // 0x3099 [ ◌゙] cwWide -> cwUndefined
-	// TODO {'\u309A', aaCharWidth, cwUndefined}, // 0x309A [゚゚ ゚] cwWide -> cwUndefined
 }
 
 // Get the multiple codepoints from Cp(UCD)
