@@ -51,7 +51,11 @@ lint: deps
 # Run tests
 .PHONY: test
 test: deps
-	go test -v ./...
+	go test -v -run "^Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])" ./...
+
+.PHONY: alltest
+alltest: deps test
+	go test -v -timeout 20m -run "Heavy"
 
 #Install dependencies
 .PHONY: deps

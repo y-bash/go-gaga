@@ -2,8 +2,15 @@ package gaga
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"testing"
+	"unicode/utf8"
+)
+
+const (
+	maxr = utf8.MaxRune
+	excr = maxr + 1
 )
 
 type NormalizeRuneTest struct {
@@ -137,7 +144,7 @@ type NormalizeTest struct {
 }
 
 // TODO benchmark
-// TODO testing of invalid normalization flag
+// TODO User perspective testing
 // TODO testing of whitespace
 // TODO Consider whether to test the following characters
 //   U+301C  '〜' 1.1 WAVE DASH
@@ -772,29 +779,29 @@ var normalizetests = []NormalizeTest{
 
 	// VSM/SVSM testing illegal rune value
 	204: {VoicedKanaToTraditional,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'})},
 	205: {VoicedKanaToTraditional | IsolatedVsmToNarrow,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, 'ﾞ', excr, 'ﾞ', excr, 'ﾞ', excr, 'ﾟ', excr, 'ﾟ', excr, 'ﾟ'})},
 	206: {VoicedKanaToTraditional | IsolatedVsmToWide,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, '゛', 0x10FFFF + 1, '゛', 0x10FFFF + 1, '゜', 0x10FFFF + 1, '゜', 0x10FFFF + 1, '゜'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, '゛', excr, '゛', excr, '゛', excr, '゜', excr, '゜', excr, '゜'})},
 	207: {VoicedKanaToTraditional | IsolatedVsmToCombining,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, '\u3099', excr, '\u3099', excr, '\u3099', excr, '\u309A', excr, '\u309A', excr, '\u309A'})},
 	208: {VoicedKanaToCombining,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'})},
 	209: {VoicedKanaToCombining | IsolatedVsmToNarrow,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, 'ﾟ'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, 'ﾞ', excr, 'ﾞ', excr, 'ﾞ', excr, 'ﾟ', excr, 'ﾟ', excr, 'ﾟ'})},
 	210: {VoicedKanaToCombining | IsolatedVsmToWide,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, '゛', 0x10FFFF + 1, '゛', 0x10FFFF + 1, '゜', 0x10FFFF + 1, '゜', 0x10FFFF + 1, '゜'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, '゛', excr, '゛', excr, '゛', excr, '゜', excr, '゜', excr, '゜'})},
 	211: {VoicedKanaToCombining | IsolatedVsmToCombining,
-		string([]rune{0x10FFFF + 1, '゛', 0x10FFFF + 1, 'ﾞ', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '゜', 0x10FFFF + 1, 'ﾟ', 0x10FFFF + 1, '\u309A'}),
-		string([]rune{0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u3099', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A', 0x10FFFF + 1, '\u309A'})},
+		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
+		string([]rune{excr, '\u3099', excr, '\u3099', excr, '\u3099', excr, '\u309A', excr, '\u309A', excr, '\u309A'})},
 
 	// special Katakana-Hiragana letters
 	212: {KatakanaToHiragana | VoicedKanaToTraditional,
@@ -855,14 +862,14 @@ var normalizetests = []NormalizeTest{
 
 	// overflow
 	233: {VoicedKanaToTraditional,
-		string([]rune{-1, '\u0000', '\U0010FFFF', 0x10FFFF + 1}),
-		string([]rune{-1, '\u0000', '\U0010ffff', 0x10FFFF + 1})},
+		string([]rune{-1, '\u0000', maxr, excr}),
+		string([]rune{-1, '\u0000', maxr, excr})},
 	234: {VoicedKanaToCombining,
-		string([]rune{-1, '\u0000', '\U0010FFFF', 0x10FFFF + 1}),
-		string([]rune{-1, '\u0000', '\U0010ffff', 0x10FFFF + 1})},
+		string([]rune{-1, '\u0000', maxr, excr}),
+		string([]rune{-1, '\u0000', maxr, excr})},
 	235: {LatinToNarrow | KanaToWide,
-		string([]rune{-1, '\u0000', '\U0010FFFF', 0x10FFFF + 1}),
-		string([]rune{-1, '\u0000', '\U0010ffff', 0x10FFFF + 1})},
+		string([]rune{-1, '\u0000', maxr, excr}),
+		string([]rune{-1, '\u0000', maxr, excr})},
 }
 
 func hexs(s string) string {
@@ -895,6 +902,110 @@ func TestNormalize(t *testing.T) {
 				"\targs16:\t%s\n\thave16:\t%s\n\twant16:\t%s",
 				i, tt.flag, tt.in, out, tt.out,
 				hexs(tt.in), hexs(out), hexs(tt.out))
+		}
+	}
+}
+
+func normflags() []int {
+	flags := make([]int, 0, len(normflagNames))
+	for key := range normflagNames {
+		flags = append(flags, int(key))
+	}
+	return flags
+}
+
+// nCm combinations algorithm
+func comb(arr []int, n int) (result [][]int) {
+	if n <= 0 || n > len(arr) {
+		return result
+	}
+	if n == 1 {
+		for _, e := range arr {
+			result = append(result, []int{e})
+		}
+		return result
+	}
+	if n == len(arr) {
+		return append(result, arr)
+	}
+	for _, a := range comb(arr[1:], n-1) {
+		c := append([]int{arr[0]}, a...)
+		result = append(result, c)
+	}
+	return append(result, comb(arr[1:], n)...)
+}
+
+func comball(arr []int) (result [][]int) {
+	for i := 1; i <= len(arr); i++ {
+		c := comb(arr, i)
+		log.Printf("  %02dC%02d = %7d\n", len(arr), i, len(c))
+		result = append(result, c...)
+	}
+	return result
+}
+
+func normflagcombs() []NormFlag {
+	flags := normflags()
+	flagcombs := comball(flags)
+	result := make([]NormFlag, len(flagcombs))
+	for i, comb := range flagcombs {
+		for _, flag := range comb {
+			result[i] |= NormFlag(flag)
+		}
+	}
+	return result
+}
+
+func parenormflagcombs() (valid, invalid []NormFlag) {
+	flagcombs := normflagcombs()
+	log.Printf("  total : %7d\n", len(flagcombs))
+	valid = make([]NormFlag, 0, len(flagcombs))
+	invalid = make([]NormFlag, 0, len(flagcombs))
+outer:
+	for _, flagcomb := range flagcombs {
+		for _, invalidFlags := range invalidFlagsList {
+			if flagcomb&invalidFlags == invalidFlags {
+				invalid = append(invalid, flagcomb)
+				continue outer
+			}
+		}
+		valid = append(valid, flagcomb)
+	}
+	return valid, invalid
+}
+
+func TestHeavyNormFlags(t *testing.T) {
+	valid, invalid := parenormflagcombs()
+	log.Printf("  valid : %7d\n", len(valid))
+	log.Printf("invalid : %7d\n", len(invalid))
+	// testing invalid flags
+	for _, flag := range invalid {
+		_, err := NewNormalizer(flag)
+		if err == nil {
+			t.Errorf("TestInvalidFlags: %s is valid, want: invalid\n", flag)
+		}
+	}
+	// testing valid flags
+	// testing all runes and all flag combinations
+outer:
+	for i, flag := range valid {
+		n, err := NewNormalizer(flag)
+		if err != nil {
+			t.Errorf("TestInvalidFlags: %s is invalid, want: valid\n", flag)
+			continue
+		}
+		for r := rune(0); r < maxr; r++ {
+			rs := n.NormalizeRune(r)
+			switch len(rs) {
+			case 1, 2:
+			default: // TEST_Fc68JR9i
+				t.Errorf("NormalizaRune(%#U), flags: %s, invalid return %v;"+
+					"want: number of elements is 1 or 2\n", r, flag, rs)
+				break outer
+			}
+		}
+		if i%200 == 0 {
+			log.Printf("%5d/%5d (%3d%% done)", i, len(valid), i*100/len(valid))
 		}
 	}
 }

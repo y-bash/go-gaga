@@ -213,39 +213,35 @@ func (n *Normalizer) maybeCombineVsm(r1, r2 rune) ([]rune, bool) {
 		return n.NormalizeRune(r1), false
 	}
 
-	rs := n.NormalizeRune(r1)
-	if len(rs) != 1 {
-		panic("unreachable") // TODO ebidence
-	}
-	cc, ok := getUnichar(rs[0])
-
-	if isVsm {
+	nr := n.NormalizeRune(r1)[0]
+	cc, ok := getUnichar(nr)
+	switch {
+	case isVsm:
 		switch {
 		case n.flag.has(VoicedKanaToTraditional):
-			rs = cc.toTraditionalVoiced()
+			return cc.toTraditionalVoiced(), true
 		case n.flag.has(VoicedKanaToCombining):
-			rs = cc.toCombiningVoiced()
+			return cc.toCombiningVoiced(), true
 		default:
-			r2s := n.NormalizeRune(r2)        // TODO len(r2s)
-			rs = []rune{cc.codepoint, r2s[0]} // TODO review Dontcare
+			vsm := n.NormalizeRune(r2)[0]
+			return []rune{cc.codepoint, vsm}, true
 		}
-	} else {
+	case isSvsm:
 		switch {
 		case n.flag.has(VoicedKanaToTraditional):
-			rs = cc.toTraditionalSemivoiced()
+			return cc.toTraditionalSemivoiced(), true
 		case n.flag.has(VoicedKanaToCombining):
-			rs = cc.toCombiningSemivoiced()
+			return cc.toCombiningSemivoiced(), true
 		default:
-			r2s := n.NormalizeRune(r2)        // TODO len(r2s)
-			rs = []rune{cc.codepoint, r2s[0]} // TODO review Dontcare
+			svsm := n.NormalizeRune(r2)[0]
+			return []rune{cc.codepoint, svsm}, true
 		}
 	}
-	return rs, true
+	panic("unreachable")
 }
 
-// NewNormalizer creates a new Normalizer with specified flag
-// (LatinToNarrow etc.). If successful, methods on the returned
-// Normalizer can be used for normalization.
+// NewNormalizer creates a new Normalizer with specified flag (LatinToNarrow etc.).
+// If successful, methods on the returned Normalizer can be used for normalization.
 func NewNormalizer(flag NormFlag) (*Normalizer, error) {
 	err := validateNormFlag(flag)
 	if err != nil {
@@ -265,11 +261,14 @@ func (n *Normalizer) SetFlag(flag NormFlag) error {
 	return nil
 }
 
-// NormalizeRune normalizes the rune according to the current
-// normalization mode. Depending on the mode, the voiced or
-// Semi-voiced sound mark may be separated, so it may return
-// multiple runes.
+// NormalizeRune normalizes the rune according to the current normalization
+// mode. Depending on the mode, the voiced or semi-voiced sound mark may be
+// separated, so it may return multiple runes. but, this function allways
+// returns a rune array with 1 or 2 elements, and never returns an array with
+// any other number of elements.
 func (n *Normalizer) NormalizeRune(r rune) []rune {
+	// TEST_Fc68JR9i knows about the number of elements in
+	// the return value of this function
 	c, ok := getUnichar(r)
 	if !ok {
 		return []rune{r}
