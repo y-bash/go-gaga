@@ -374,7 +374,7 @@ var normalizetests = []NormalizeTest{
 	// multiple Japanese conversion (no vsm directive) <- Voiced sound character/Voiced sound mark
 	81: {KatakanaToNarrow | HiraganaToNarrow,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
-		"ｶﾞｶ゛ｶﾞｶ\u3099ｶﾞｶ゛ｶﾞｶ\u3099ｶ゛ｶﾞｶ\u3099"}, // TODO code review this case
+		"ｶﾞｶ゛ｶﾞｶ\u3099ｶﾞｶ゛ｶﾞｶ\u3099ｶ゛ｶﾞｶ\u3099"},
 	82: {KatakanaToNarrow | HiraganaToNarrow,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ゛ｱﾞｱ\u3099ｱ゛ｱﾞｱ\u3099ｱ゛ｱﾞｱ\u3099"},
@@ -467,7 +467,7 @@ var normalizetests = []NormalizeTest{
 		"AﾞAﾞAﾞ日ﾞ日ﾞ日ﾞäﾞäﾞäﾞ"},
 	108: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToWide,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
-		"ｶﾞｶ゛ｶ゛ｶ゛ｶﾞｶ゛ｶ゛ｶ゛ｶ゛ｶ゛ｶ゛"}, // TODO Consider this specification
+		"ｶﾞｶ゛ｶ゛ｶ゛ｶﾞｶ゛ｶ゛ｶ゛ｶ゛ｶ゛ｶ゛"},
 	109: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToWide,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛ｱ゛"},
@@ -656,7 +656,7 @@ var normalizetests = []NormalizeTest{
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A"},
 	167: {VoicedKanaToTraditional | IsolatedVsmToNarrow,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
-		"日ﾞ本ﾟ語ﾞ平ﾟ仮ﾞ名ﾟ"}, // TEST_N9x6dneg // TODO review source code
+		"日ﾞ本ﾟ語ﾞ平ﾟ仮ﾞ名ﾟ"}, // TEST_N9x6dneg
 	168: {VoicedKanaToTraditional | IsolatedVsmToWide,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日゛本゜語゛平゜仮゛名゜"},
