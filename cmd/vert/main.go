@@ -1,3 +1,4 @@
+// TODO should have package comment
 package main
 
 import (

@@ -69,6 +69,7 @@ func (m matrix) vert(s string, start int) (string, int) {
 	return m.String(), i
 }
 
+// TODO should have comment
 func Vert(in string, w int, h int) (out []string) {
 	if w <= 0 || h <= 0 {
 		panic("vert: non-positive Vert size")
