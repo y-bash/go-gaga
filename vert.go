@@ -25,9 +25,16 @@ func (m matrix) init() {
 
 func (m matrix) String() string {
 	var sb strings.Builder
-	for _, row := range m {
-		for _, cell := range row {
-			sb.WriteString(cell)
+	for _, r := range m {
+		var tr []string
+		for i := len(r) - 1; i >= 0; i-- {
+			if r[i] != "  " {
+				tr = r[0 : i+1]
+				break
+			}
+		}
+		for _, c := range tr {
+			sb.WriteString(c)
 		}
 		sb.WriteRune('\n')
 	}
@@ -69,17 +76,22 @@ func (m matrix) vert(s string, start int) (string, int) {
 	return m.String(), i
 }
 
-// TODO should have comment
+// Vert returns out that is a vertical conversion of the in.
+// If the converted string fits in a matrix of size w and h,
+// out is a string slice with one element, if not, out is a
+// string slice with multiple elements.
+// If in contains half-width or narrow-width characters,
+// space is added to the left of it.
 func Vert(in string, w int, h int) (out []string) {
 	if w <= 0 || h <= 0 {
-		panic("vert: non-positive Vert size")
+		return []string{}
 	}
-	inlen := len([]rune(in))
+	l := len([]rune(in))
 	m := makeMatrix(w, h)
-	for pos := 0; pos < inlen; {
+	for pos := 0; pos < l; {
 		var s string
 		s, pos = m.vert(in, pos)
 		out = append(out, s)
 	}
-	return out
+	return
 }

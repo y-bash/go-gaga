@@ -1,7 +1,7 @@
 package gaga
 
 import (
-	"fmt"
+	//	"fmt"
 	"strings"
 	"testing"
 )
@@ -26,8 +26,8 @@ var verttests = []VertTest{
 		},
 		[]string{
 			"     a",
-			"      ",
-			"      ",
+			"",
+			"",
 			"",
 		},
 	},
@@ -38,8 +38,8 @@ var verttests = []VertTest{
 		},
 		[]string{
 			"     a",
-			"      ",
-			"      ",
+			"",
+			"",
 			"",
 		},
 	},
@@ -50,7 +50,7 @@ var verttests = []VertTest{
 		[]string{
 			"     a",
 			"     b",
-			"      ",
+			"",
 			"",
 		},
 	},
@@ -62,7 +62,7 @@ var verttests = []VertTest{
 		[]string{
 			"     a",
 			"     b",
-			"      ",
+			"",
 			"",
 		},
 	},
@@ -189,8 +189,8 @@ var verttests = []VertTest{
 			" i f c",
 			"",
 			"     j",
-			"      ",
-			"      ",
+			"",
+			"",
 			"",
 		},
 	},
@@ -205,8 +205,8 @@ var verttests = []VertTest{
 			" i f c",
 			"",
 			"     j",
-			"      ",
-			"      ",
+			"",
+			"",
 			"",
 		},
 	},
@@ -218,7 +218,7 @@ var verttests = []VertTest{
 		[]string{
 			"   c a",
 			"     b",
-			"      ",
+			"",
 			"",
 		},
 	},
@@ -249,7 +249,7 @@ var verttests = []VertTest{
 			"",
 			"   j h",
 			"     i",
-			"      ",
+			"",
 			"",
 		},
 	},
@@ -270,8 +270,8 @@ var verttests = []VertTest{
 			"     j",
 			"",
 			"     n",
-			"      ",
-			"      ",
+			"",
+			"",
 			"",
 		},
 	},
@@ -287,9 +287,9 @@ var verttests = []VertTest{
 			"芭  蝉岩閑",
 			"蕉  のにさ",
 			"    声しや",
-			"      み  ",
-			"      入  ",
-			"      る  ",
+			"      み",
+			"      入",
+			"      る",
 			"",
 		},
 	},
@@ -315,7 +315,7 @@ var verttests = []VertTest{
 			"田  宙手",
 			"寅  見し",
 			"彦  物て",
-			"        ",
+			"",
 			"",
 		},
 	},
@@ -334,8 +334,8 @@ var verttests = []VertTest{
 			" q jすく cう",
 			"   kせけ dえ",
 			"   lそこ eお",
-			"   m     f  ",
-			"   n     g  ",
+			"   m     f",
+			"   n     g",
 			"",
 		},
 	},
@@ -374,48 +374,22 @@ func TestVert(t *testing.T) {
 	}
 }
 
-func vert(s string, w int, h int) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			switch v := r.(type) {
-			case error:
-				err = v
-			default:
-				err = fmt.Errorf("%s", v)
-			}
-		}
-	}()
-
-	Vert(s, w, h)
-
-	return
-}
-
 func TestVertCatchesOverflow(t *testing.T) {
 	tests := [...]struct {
-		w      int
-		h      int
-		errStr string
+		w int
+		h int
 	}{
-		0: {0, 1, "non-positive"},
-		1: {1, 0, "non-positive"},
-		2: {1, 1, ""},
-		3: {-1, 1, "non-positive"},
-		4: {1, -1, "non-positive"},
-		5: {-2147483647, 1, "non-positive"},
+		0: {0, 1},
+		1: {1, 0},
+		2: {-1, 1},
+		3: {1, -1},
+		4: {-2147483647, 1},
 	}
 
 	for i, tt := range tests {
-		err := vert("foo,bar,baz", tt.w, tt.h)
-		if tt.errStr == "" {
-			if err != nil {
-				t.Errorf("%d paniced %v", i, err)
-			}
-			continue
-		}
-
-		if err == nil || !strings.Contains(err.Error(), tt.errStr) {
-			t.Errorf("#%d expected %q got %q", i, tt.errStr, err)
+		ss := Vert("foo,bar,baz", tt.w, tt.h)
+		if len(ss) != 0 {
+			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
 		}
 	}
 }

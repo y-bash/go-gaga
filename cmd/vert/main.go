@@ -1,4 +1,3 @@
-// TODO should have package comment
 package main
 
 import (
@@ -6,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/y-bash/go-gaga"
+	"io"
+	"log"
 	"os"
 	"strings"
 )
@@ -26,52 +27,90 @@ func min(n1, n2 int) int {
 	return n1
 }
 
-func readStdin() (out string, cols, rows int) {
+func read(r io.Reader, maxcol int) (out string, row, col int) {
+	if maxcol <= 0 {
+		maxcol = 1
+	}
 	var builder strings.Builder
-	scanner := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		s := scanner.Text()
-		slen := len([]rune(s))
-		cols = max(cols, slen)
-		rows++
+		l := len([]rune(s))
+		col = max(col, min(maxcol, l))
+		if l == 0 {
+			row++
+		} else {
+			row += (l + maxcol - 1) / maxcol
+		}
 		builder.WriteString(s)
 		builder.WriteString("\n")
 	}
-	return builder.String(), cols, rows
+	out = builder.String()
+	return
+}
+
+func writeString(f io.Writer, s string, w, h int) {
+	ss := gaga.Vert(s, w, h)
+	if len(ss) > 0 {
+		fmt.Fprint(f, ss[0])
+		for i := 1; i < len(ss); i++ {
+			fmt.Fprintln(f)
+			fmt.Fprint(f, ss[i])
+		}
+	}
+}
+
+func writeSlice(f io.Writer, in []string, w, h int) {
+	if len(in) > 0 {
+		writeString(f, in[0], w, h)
+		for i := 1; i < len(in); i++ {
+			fmt.Fprintln(f)
+			writeString(f, in[i], w, h)
+		}
+	}
 }
 
 func main() {
-	var v bool
-	var w, h int
-	flag.BoolVar(&v, "v", false, "show version")
-	flag.IntVar(&w, "w", 40, "width of the output device (positive number)")
-	flag.IntVar(&h, "h", 25, "height of the output device (positive number)")
+	var ver, help bool
+	var maxw, maxh int
+	flag.BoolVar(&ver, "v", false, "show version")
+	flag.BoolVar(&help, "h", false, "show help")
+	flag.IntVar(&maxw, "width", 40, "maximum width of output")
+	flag.IntVar(&maxh, "height", 25, "maximum height of output")
 	flag.Parse()
-
-	if v {
+	if ver {
 		fmt.Println("version:", version)
 		return
 	}
-
-	if w <= 0 || h <= 0 {
+	if help {
+		flag.Usage()
+		return
+	}
+	if maxw <= 0 || maxh <= 0 {
 		flag.Usage()
 		os.Exit(2)
 	}
-
+	var ss []string
+	var w, h int
 	if flag.NArg() == 0 {
-		// TODO Implement reading of Stdin
+		var s string
+		s, w, h = read(os.Stdin, maxh)
+		ss = []string{s}
 	} else {
-		// TODO Implement reading of files flag.Arg(n)
-	}
-	in, cols, rows := readStdin()
-	w = min(w, rows)
-	h = min(h, cols)
-	ss := gaga.Vert(in, w, h)
-	if len(ss) > 0 {
-		fmt.Print(ss[0])
-		for i := 1; i < len(ss); i++ {
-			fmt.Println()
-			fmt.Print(ss[i])
+		args := flag.Args()
+		for _, path := range args {
+			f, err := os.Open(path)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+			s, r, c := read(f, maxh)
+			w = max(w, r)
+			h = max(h, c)
+			ss = append(ss, s)
 		}
 	}
+	w = min(maxw, max(w, 1))
+	h = min(maxh, max(h, 1))
+	writeSlice(os.Stdout, ss, w, h)
 }
