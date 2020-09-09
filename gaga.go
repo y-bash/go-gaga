@@ -3,6 +3,7 @@
 // Usage
 //
 // TODO update package comments
+// TODO consider Renaming to doc.go
 // Define a normalizer using NewNormalizer() with the normalization flag.
 //
 // This declares a normalizer, that converts Latin characters to

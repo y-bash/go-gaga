@@ -1,5 +1,6 @@
 // Package lib implements gaga's auto-generation utility.
 //
+// TODO consider Renaming to doc.go
 // the following features.
 // - download & parse The UCD in XML (Unicode Character Database in XML).
 // - generate the UCD in csv.
