@@ -18,7 +18,7 @@ Vert is a utility to convert text to vertical writing.
     	Maximum height of output
 
 
-## Examples
+## Examples:
 
 ### To read standard input:
 

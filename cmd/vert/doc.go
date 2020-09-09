@@ -15,7 +15,7 @@ The flags are:
 	-height
 		Maximum height of output
 
-Examples
+Examples:
 
 To read standard input:
 	$ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
