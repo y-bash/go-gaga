@@ -51,7 +51,7 @@ lint: deps
 # Run tests
 .PHONY: test
 test: deps
-	go test -v -run "^Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])" ./...
+	go test -v -run "Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])|Example" ./...
 
 .PHONY: alltest
 alltest: deps test

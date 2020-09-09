@@ -15,73 +15,86 @@ const (
 	normflagUndefined = (1 << iota) / 2 // Sequence of 0, 1, 2, 4, 8, etc...
 
 	// AlphaToNarrow converts all the full-width Latin letters to their half-width.
+	// Example: 'Ａ' => 'A'
 	AlphaToNarrow
 
 	// AlphaToWide converts all the half-width Latin letters to their full-width.
+	// Example: 'A' => 'Ａ'
 	AlphaToWide
 
 	// AlphaToUpper converts all the lower case Latin letters to their upper case.
+	// Examples: 'a' => 'A',  'ａ' => 'Ａ'
 	AlphaToUpper
 
 	// AlphaToLower converts all the upper case Latin letters to their lower case.
+	// Examples: 'A' => 'a',  'Ａ' => 'ａ'
 	AlphaToLower
 
 	// DigitToNarrow converts all the full-width Latin digits to their half-width.
+	// Example: '１' => '1'
 	DigitToNarrow
 
 	// DigitToWide converts all the half-width Latin digits to their full-width.
+	// Example: '1' => '１'
 	DigitToWide
 
 	// SymbolToNarrow converts all the full-width Latin symbols to their half-width.
+	// Example: '？' => '?'
 	SymbolToNarrow
 
 	// SymbolToWide converts all the half-width Latin symbols to their full-width.
+	// Example: '?' => '？'
 	SymbolToWide
 
 	// HiraganaToNarrow converts the full-width Hiragana letters to
 	// their half-width Katakana as much as possible.
+	// Example: 'あ' => 'ｱ'
 	HiraganaToNarrow
 
 	// HiraganaToKatakana converts the full-width Hiragana letters to
 	// their full-width Katakana as much as possible.
+	// Example: 'あ' => 'ア'
 	HiraganaToKatakana
 
 	// KatakanaToNarrow converts the full-width Katakana letters to
 	// their half-width Katakana as much as possible.
+	// Example: 'ア' => 'ｱ'
 	KatakanaToNarrow
 
 	// KatakanaToWide converts all the half-width Katakana letters to
 	// their full-width Katakana.
+	// Example: 'ｱ' => 'ア'
 	KatakanaToWide
 
 	// KatakanaToHiragana converts the half-width or full-width Katakana
 	// letters to their full-width Hiragana as much as possible.
+	// Examples: 'ア' => 'あ',  'ｱ' => 'あ'
 	KatakanaToHiragana
 
 	// KanaSymToNarrow converts the full-width Hiragana-Katakana symbols
 	// to their half-width as much as possible.
+	// Example: '、' => '､'
 	KanaSymToNarrow
 
 	// KanaSymToWide converts all the half-width Hiragana-Katakana symbols
 	// to their full-width.
+	// Example: '､' => '、'
 	KanaSymToWide
 
 	// VoicedKanaToTraditional combines voiced or semi-voiced sound marks behind
 	// Hiragana-Katakana in a traditional style.
 	// TODO Voiced character, Semi-voiced character
-	// "か゛" -> "が"
-	// "ｶ゛"  -> "ｶﾞ"
-	// "ヰ゛" -> "ヸ"
-	// "ゐ゛" -> "ゐ゛"
+	// Examples:
+	//	"か゛" => "が",  "ｶ゛"  => "ｶﾞ",   "は゜" => "ぱ"
+	//	"ヰ゛" => "ヸ",  "ゐ゛" => "ゐ゛"
 	VoicedKanaToTraditional
 
 	// VoicedKanaToCombining combines voiced or semi-voiced sound marks behind
 	// Hiragana-Katakana in a Unicode combining style.
 	// TODO Voiced character, Semi-voiced character
-	// "か゛" -> "か\u3099"
-	// "ｶ゛"  -> "ｶ\u3099"
-	// "ヰ゛" -> "ヰ\u3099"
-	// "ゐ゛" -> "ゐ\u3099"
+	// Examples:
+	//	"が" => "か\u3099",  "か゛" => "か\u3099",  "ｶ゛"  => "ｶ\u3099",
+	//	"ぱ" => "は\u309A",  "ヰ゛" => "ヰ\u3099",  "ゐ゛" => "ゐ\u3099"
 	VoicedKanaToCombining
 
 	// TODO comment Isolated
@@ -100,21 +113,103 @@ const (
 const (
 	// LatinToNarrow is a combination of normalization flags for converting
 	// all the full-width Latin characters to their half-width.
+	//
+	//          | CHARACTER     | CONVERT TO
+	// ---------+---------------+----------------
+	//          | Wide Alphabet | Narrow Alphabet
+	// Category | Wide Digit    | Narrow Digit
+	//          | Wide Symbol   | Narrow Symbol
+	// ---------+---------------+----------------
+	// Example  | "Ａ１？"      | "A1?"
+	//
 	LatinToNarrow = AlphaToNarrow | DigitToNarrow | SymbolToNarrow
 
 	// LatinToWide is a combination of normalization flags for converting
 	// all the half-width Latin characters to their full-width.
+	//
+	//          | CHARACTER       | CONVERT TO
+	// ---------+-----------------+--------------
+	//          | Narrow Alphabet | Wide Alphabet
+	// Category | Narrow Digit    | Wide Digit
+	//          | Narrow Symbol   | Wide Symbol
+	// ---------+-----------------+--------------
+	// Example  | "A1?"           | "Ａ１？"
+	//
 	LatinToWide = AlphaToWide | DigitToWide | SymbolToWide
 
 	// KanaToNarrow is a combination of normalization flags for converting
 	// the full-width Hiragana-Katakana characters to their half-width as
 	// much as possible.
+	//
+	//          | CHARACTER                      | CONVERT TO
+	// ---------+--------------------------------+----------------------
+	//          | Hiaragana                      | Narrow Katakana
+	// Category | Wide Katakana                  | Narrow Katakana
+	//          | Wide Kana Symbol               | Narrow Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter | Traditional combining
+	//          | Isolated Wide VSM/SVSM         | Narrow VSM/SVSM
+	// ---------+--------------------------------+----------------------
+	// Example  | "あイ、が゛"                   | "ｱｲ､ｶﾞﾞ"
+	//
 	KanaToNarrow = HiraganaToNarrow | KatakanaToNarrow | KanaSymToNarrow |
-		VoicedKanaToTraditional | IsolatedVsmToNarrow
+		IsolatedVsmToNarrow | VoicedKanaToTraditional
 
 	// KanaToWide is a combination of normalization flags for converting
 	// all the half-width Hiragana-Katakana characters to their full-width.
-	KanaToWide = KatakanaToWide | KanaSymToWide | VoicedKanaToTraditional | IsolatedVsmToWide
+	//
+	//          | CHARACTER                      | CONVERT TO
+	// ---------+--------------------------------+----------------------
+	//          | Narrow Katakana                | Wide Katakana
+	// Category | Narrow Kana Symbol             | Wide Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter | Traditional combining
+	//          | Isolated Narrow VSM/SVSM       | Wide VSM/SVSM
+	// ---------+--------------------------------+----------------------
+	// Example  | "ｱ､ｶﾞﾞ"                        | "ア、ガ゛"
+	//
+	KanaToWide = KatakanaToWide | KanaSymToWide | IsolatedVsmToWide |
+		VoicedKanaToTraditional
+
+	//
+	//          | CHARACTER                      | CONVERT TO
+	// ---------+--------------------------------+----------------------
+	//          | Hiragana                       | Wide Katakana
+	// Category | Narrow Katakana                | Wide Katakana
+	//          | Narrow Kana Symbol             | Wide Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter | Traditional combining
+	//          | Isolated Narrow VSM/SVSM       | Wide VSM/SVSM
+	// ---------+--------------------------------+----------------------
+	// Example  | "あｲ､ｶﾞﾞ"                       | "アイ、ガ゛"
+	//
+	KanaToWideKatakana = KatakanaToWide | HiraganaToKatakana | KanaSymToWide |
+		IsolatedVsmToWide | VoicedKanaToTraditional
+
+	//
+	//          | CHARACTER                      | CONVERT TO
+	// ---------+--------------------------------+----------------------
+	//          | Hiragana                       | Narrow Katakana
+	// Category | Wide Katakana                  | Narrow Katakana
+	//          | Wide Kana Symbol               | Narrow Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter | Traditional combining
+	//          | Isolated Wide VSM/SVSM         | Narrow VSM/SVSM
+	// ---------+--------------------------------+----------------------
+	// Example  | "あイ、が゛"                   | "ｱｲ､ｶﾞﾞ"
+	//
+	KanaToNarrowKatakana = KatakanaToNarrow | HiraganaToNarrow |
+		KanaSymToNarrow | IsolatedVsmToNarrow | VoicedKanaToTraditional
+
+	//
+	//          | CHARACTER                      | CONVERT TO
+	// ---------+--------------------------------+----------------------
+	//          | Wide Katakana                  | Hiragana
+	// Category | Narrow Katakana                | Hiragana
+	//          | Narrow Kana Symbol             | Wide Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter | Traditional combining
+	//          | Isolated Narrow VSM/SVSM       | Wide VSM/SVSM
+	// ---------+--------------------------------+----------------------
+	// Example  | "アｲ､ガ゛"                     | "あい、が゛"
+	//
+	KanaToHiragana = KatakanaToHiragana | KanaSymToWide |
+		IsolatedVsmToWide | VoicedKanaToTraditional
 )
 
 func (f NormFlag) has(f2 NormFlag) bool { return f&f2 != 0 }
