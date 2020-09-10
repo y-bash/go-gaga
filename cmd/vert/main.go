@@ -13,44 +13,19 @@ import (
 
 var version = "v0.0.0" // set value by go build -ldflags
 
-func max(n1, n2 int) int {
-	if n1 > n2 {
-		return n1
+func read(r io.Reader) string {
+	var sb strings.Builder
+	sb.Grow(1024)
+	sc := bufio.NewScanner(r)
+	for sc.Scan() {
+		sb.WriteString(sc.Text())
+		sb.WriteString("\n")
 	}
-	return n2
-}
-
-func min(n1, n2 int) int {
-	if n1 > n2 {
-		return n2
-	}
-	return n1
-}
-
-func read(r io.Reader, maxcol int) (out string, row, col int) {
-	if maxcol <= 0 {
-		maxcol = 1
-	}
-	var builder strings.Builder
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		s := scanner.Text()
-		l := len([]rune(s))
-		col = max(col, min(maxcol, l))
-		if l == 0 {
-			row++
-		} else {
-			row += (l + maxcol - 1) / maxcol
-		}
-		builder.WriteString(s)
-		builder.WriteString("\n")
-	}
-	out = builder.String()
-	return
+	return sb.String()
 }
 
 func writeString(f io.Writer, s string, w, h int) {
-	ss := gaga.Vert(s, w, h)
+	ss := gaga.VertToFitStrings(s, w, h)
 	if len(ss) > 0 {
 		fmt.Fprint(f, ss[0])
 		for i := 1; i < len(ss); i++ {
@@ -71,31 +46,28 @@ func writeSlice(f io.Writer, in []string, w, h int) {
 }
 
 func main() {
-	var ver, help bool
-	var maxw, maxh int
-	flag.BoolVar(&ver, "v", false, "show version")
-	flag.BoolVar(&help, "h", false, "show help")
-	flag.IntVar(&maxw, "width", 40, "maximum width of output")
-	flag.IntVar(&maxh, "height", 25, "maximum height of output")
+	var v, h bool
+	var width, height int
+	flag.BoolVar(&v, "v", false, "show version")
+	flag.BoolVar(&h, "h", false, "show help")
+	flag.IntVar(&width, "width", 40, "maximum width of output")
+	flag.IntVar(&height, "height", 25, "maximum height of output")
 	flag.Parse()
-	if ver {
+	if v {
 		fmt.Println("version:", version)
 		return
 	}
-	if help {
+	if h {
 		flag.Usage()
 		return
 	}
-	if maxw <= 0 || maxh <= 0 {
+	if width <= 0 || height <= 0 {
 		flag.Usage()
 		os.Exit(2)
 	}
 	var ss []string
-	var w, h int
 	if flag.NArg() == 0 {
-		var s string
-		s, w, h = read(os.Stdin, maxh)
-		ss = []string{s}
+		ss = []string{read(os.Stdin)}
 	} else {
 		args := flag.Args()
 		for _, path := range args {
@@ -104,13 +76,8 @@ func main() {
 				log.Fatal(err)
 			}
 			defer f.Close()
-			s, r, c := read(f, maxh)
-			w = max(w, r)
-			h = max(h, c)
-			ss = append(ss, s)
+			ss = append(ss, read(f))
 		}
 	}
-	w = min(maxw, max(w, 1))
-	h = min(maxh, max(h, 1))
-	writeSlice(os.Stdout, ss, w, h)
+	writeSlice(os.Stdout, ss, width, height)
 }
