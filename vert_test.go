@@ -18,11 +18,11 @@ var scannowraptests = []ScanNowrapTest{
 	2: {"a\nbb\nccc\n", 3, 3},
 	3: {"12345678901234567890123456789012345678901234567890", 1, 50},
 	4: {"1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7", 17, 1},
-	5: {"12345678901234567890123456789012345678901234567890\n"+
+	5: {"12345678901234567890123456789012345678901234567890\n" +
 		"1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7", 18, 50},
-	6: {"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"+
-		"\u0008\u0009\u000A\u000B\u000C\u000D\u000E\u000F"+
-		"\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"+
+	6: {"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007" +
+		"\u0008\u0009\u000A\u000B\u000C\u000D\u000E\u000F" +
+		"\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017" +
 		"\u0018\u0019\u001A\u001B\u001C\u001D\u001E\u001F", 2, 0},
 }
 
@@ -582,17 +582,17 @@ type VertToFitStringsTest struct {
 	out []string
 }
 
-var verttofitstringstests = []VertToFitStringsTest {
-	0: {"", 0, 0, []string{}},
-	1: {"a", 1, 1, []string{" a\n"}},
-	2: {"a\nbb\nccc\n", 4, 4, []string{" c b a\n c b\n c\n"}},
-	3: {"a\nbb\nccc\n", 4, 3, []string{" c b a\n c b\n c\n"}},
-	4: {"a\nbb\nccc\n", 3, 4, []string{" c b a\n c b\n c\n"}},
-	5: {"a\nbb\nccc\n", 3, 3, []string{" c b a\n c b\n c\n"}},
-	6: {"a\nbb\nccc\n", 3, 2, []string{" c b a\n c b\n","     c\n\n"}},
-	7: {"a\nbb\nccc\n", 2, 3, []string{" b a\n b\n\n", "   c\n   c\n   c\n"}},
-	8: {"a\nbb\nccc\n", 2, 2, []string{" b a\n b\n", " c c\n   c\n"}},
-	9: {"a\nbb\nccc\n", 2, 1, []string{" b a\n", " c b\n", " c c\n"}},
+var verttofitstringstests = []VertToFitStringsTest{
+	0:  {"", 0, 0, []string{}},
+	1:  {"a", 1, 1, []string{" a\n"}},
+	2:  {"a\nbb\nccc\n", 4, 4, []string{" c b a\n c b\n c\n"}},
+	3:  {"a\nbb\nccc\n", 4, 3, []string{" c b a\n c b\n c\n"}},
+	4:  {"a\nbb\nccc\n", 3, 4, []string{" c b a\n c b\n c\n"}},
+	5:  {"a\nbb\nccc\n", 3, 3, []string{" c b a\n c b\n c\n"}},
+	6:  {"a\nbb\nccc\n", 3, 2, []string{" c b a\n c b\n", "     c\n\n"}},
+	7:  {"a\nbb\nccc\n", 2, 3, []string{" b a\n b\n\n", "   c\n   c\n   c\n"}},
+	8:  {"a\nbb\nccc\n", 2, 2, []string{" b a\n b\n", " c c\n   c\n"}},
+	9:  {"a\nbb\nccc\n", 2, 1, []string{" b a\n", " c b\n", " c c\n"}},
 	10: {"a\nbb\nccc\n", 1, 1, []string{" a\n", " b\n", " b\n", " c\n", " c\n", " c\n"}},
 	11: {"a\nbb\nccc\n", 1, 0, []string{}},
 	12: {"a\nbb\nccc\n", 0, 1, []string{}},

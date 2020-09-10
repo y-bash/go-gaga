@@ -56,10 +56,10 @@ To limit height and width:
 	るにか
 	  染さ
 	  みや
-	
+
 	芭  蝉
 	蕉  の
 	    声
-	
+
 */
 package main

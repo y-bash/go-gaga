@@ -1,3 +1,5 @@
+// +build ignore
+
 /*
 gen implements gaga's auto-generator.
 

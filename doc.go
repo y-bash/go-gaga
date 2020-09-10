@@ -21,13 +21,13 @@ normalization flags.
 Output is:
 	Gagaはガガガではありません
 Using Vert(), make this string vertical.
-	v := gaga.Vert(normalizedString, 3, 5)
+	v := gaga.Vert(s, 3, 5)
 	fmt.Print(v[0])
 Output is:
 	あガ G
 	りガ a
 	まガ g
 	せで a
-	んはは	
+	んはは
 */
 package gaga
