@@ -14,6 +14,7 @@ $(OBJDIR)/%: $(CMDDIR)/%/main.go deps
 # Clean commands/CSVs
 .PHONY: clean
 clean:
+	go clean -testcache
 	rm -rf $(OBJDIR)
 
 # Install commands
@@ -36,10 +37,7 @@ gen:
 csv: $(OBJDIR)/ucd.csv \
 	 $(OBJDIR)/ucdex.csv
 
-$(OBJDIR)/%.csv: $(GENDIR)/gen%csv.go
-	@if [ ! -d $(OBJDIR) ]; \
-		then echo "mkdir -p $(OBJDIR)"; mkdir -p $(OBJDIR); \
-	fi
+$(OBJDIR)/%.csv: dir $(GENDIR)/gen%csv.go
 	go run $< -output $@
 
 # Lint
@@ -50,8 +48,9 @@ lint: deps
 
 # Run tests
 .PHONY: test
-test: deps
-	go test -v -run "Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])|Example" ./...
+test: deps dir
+	go test -v -coverprofile=$(OBJDIR)/cover.out -run "Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])|Example" ./...
+	go tool cover -html=$(OBJDIR)/cover.out -o $(OBJDIR)/cover.html
 
 .PHONY: alltest
 alltest: deps test
@@ -61,4 +60,11 @@ alltest: deps test
 .PHONY: deps
 deps:
 	go get github.com/mattn/go-runewidth
+
+#Make directory
+.PHONY: dir
+dir:
+	@if [ ! -d $(OBJDIR) ]; \
+		then echo "mkdir -p $(OBJDIR)"; mkdir -p $(OBJDIR); \
+	fi
 
