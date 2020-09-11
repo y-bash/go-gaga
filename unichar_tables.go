@@ -45,15 +45,15 @@ const (
 )
 
 type unichar struct {
-	codepoint   rune // Unicode code point value
-	category    int  // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
-	charCase    int  // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
-	charWidth   int  // cwUndefined/cwNarrow/cwWide
-	voicing     int  // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
-	compatCase  rune // Charcase compatible character (Upper-Lower, Hiragana-Katakana)
-	compatWidth rune // Width compatible character (Narrow-Wide)
-	compatVs    rune // Voiced sound compatible character (Unvoiced-Voiced)
-	compatSvs   rune // Semi-voiced sound compatible character (Unvoiced-Semivoiced)
+	codepoint   rune  // Unicode code point value
+	category    uint8 // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
+	charCase    uint8 // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
+	charWidth   uint8 // cwUndefined/cwNarrow/cwWide
+	voicing     uint8 // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
+	compatCase  rune  // Charcase compatible character (Upper-Lower, Hiragana-Katakana)
+	compatWidth rune  // Width compatible character (Narrow-Wide)
+	compatVs    rune  // Voiced sound compatible character (Unvoiced-Voiced)
+	compatSvs   rune  // Semi-voiced sound compatible character (Unvoiced-Semivoiced)
 }
 
 type unichars []unichar

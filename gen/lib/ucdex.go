@@ -41,7 +41,8 @@ type constValues struct {
 	list  []string
 }
 
-func (cv *constValues) name(i int) string {
+func (cv *constValues) name(u uint8) string {
+	i := int(u)
 	if i < 0 || i >= len(cv.list) {
 		return fmt.Sprintf("Unknown %s: %d", cv.title, i)
 	}
@@ -144,10 +145,10 @@ type charex struct {
 	na          string // Name  in UCD
 	age         string // Age   in UCD
 	gc          string // General category in UCD
-	category    int    // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
-	charCase    int    // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
-	charWidth   int    // cwUndefined/cwNarrow/cwWide
-	voicing     int    // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
+	category    uint8  // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
+	charCase    uint8  // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
+	charWidth   uint8  // cwUndefined/cwNarrow/cwWide
+	voicing     uint8  // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
 	compatCase  rune   // Charcase compatible character
 	compatWidth rune   // Width compatible character
 	compatVs    rune   // Voiced sound compatible character
@@ -249,7 +250,7 @@ const (
 type additionalAttr struct {
 	codepoint rune
 	attr      int
-	data      int
+	data      uint8
 }
 
 var additionalAttrList = []additionalAttr{
@@ -317,7 +318,7 @@ func isTargetCp(codepoints string) (bool, error) {
 	return isTargetRune(rs[0]), nil
 }
 
-func char2category(char *Char) (int, error) {
+func char2category(char *Char) (uint8, error) {
 	switch char.Blk {
 	case "ASCII":
 		switch char.Gc {
@@ -373,7 +374,7 @@ func char2category(char *Char) (int, error) {
 	return ctUndefined, nil
 }
 
-func char2charCase(char *Char) (int, error) {
+func char2charCase(char *Char) (uint8, error) {
 	switch char.Blk {
 	case "ASCII":
 		switch char.Gc {
@@ -428,7 +429,7 @@ func char2charCase(char *Char) (int, error) {
 	return ccUndefined, nil
 }
 
-func char2charWidth(char *Char) (charWidth int, compatWidth rune, err error) {
+func char2charWidth(char *Char) (charWidth uint8, compatWidth rune, err error) {
 	charWidth = cwUndefined
 	switch char.Blk {
 	case "ASCII":
@@ -478,7 +479,7 @@ func char2compatCase(char *Char) (r rune, err error) {
 	return r, nil
 }
 
-func char2voicing(char *Char) (voicing int, compatVs, compatSvs rune, err error) {
+func char2voicing(char *Char) (voicing uint8, compatVs, compatSvs rune, err error) {
 	if char.Blk != "Hiragana" && char.Blk != "Katakana" {
 		return vcUndefined, rune(0), rune(0), nil
 	}
@@ -1057,15 +1058,15 @@ func printConstList(f io.Writer, c constValues) {
 func printTypes(f io.Writer) {
 	text := `
 type unichar struct {
-	codepoint   rune // Unicode code point value
-	category    int  // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
-	charCase    int  // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
-	charWidth   int  // cwUndefined/cwNarrow/cwWide
-	voicing     int  // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
-	compatCase  rune // Charcase compatible character (Upper-Lower, Hiragana-Katakana)
-	compatWidth rune // Width compatible character (Narrow-Wide)
-	compatVs    rune // Voiced sound compatible character (Unvoiced-Voiced)
-	compatSvs   rune // Semi-voiced sound compatible character (Unvoiced-Semivoiced)
+	codepoint   rune  // Unicode code point value
+	category    uint8 // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
+	charCase    uint8 // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
+	charWidth   uint8 // cwUndefined/cwNarrow/cwWide
+	voicing     uint8 // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
+	compatCase  rune  // Charcase compatible character (Upper-Lower, Hiragana-Katakana)
+	compatWidth rune  // Width compatible character (Narrow-Wide)
+	compatVs    rune  // Voiced sound compatible character (Unvoiced-Voiced)
+	compatSvs   rune  // Semi-voiced sound compatible character (Unvoiced-Semivoiced)
 }
 
 type unichars []unichar
