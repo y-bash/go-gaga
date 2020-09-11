@@ -43,8 +43,7 @@ func getUnichar(r rune) (c *unichar, ok bool) {
 func getUnicharForSure(r rune) *unichar {
 	c, ok := getUnichar(r)
 	if !ok {
-		panic(fmt.Sprintf("Unexpectedly %#U.compatCase %#U was not found in the table",
-			c.codepoint, c.compatCase))
+		panic(fmt.Sprintf("Unexpectedly %#U was not found in the table", c.codepoint))
 	}
 	return c
 }
