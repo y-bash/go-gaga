@@ -13,10 +13,10 @@ import (
 
 var version = "v0.0.0" // set value by go build -ldflags
 
-func read(r io.Reader) string {
+func read(f io.Reader) string {
 	var sb strings.Builder
 	sb.Grow(1024)
-	sc := bufio.NewScanner(r)
+	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		sb.WriteString(sc.Text())
 		sb.WriteString("\n")
@@ -24,7 +24,23 @@ func read(r io.Reader) string {
 	return sb.String()
 }
 
-func writeString(f io.Writer, s string, w, h int) {
+func readfiles(paths []string) (out []string) {
+	if len(paths) == 0 {
+		out = []string{read(os.Stdin)}
+		return
+	}
+	for _, path := range paths {
+		f, err := os.Open(path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		out = append(out, read(f))
+	}
+	return
+}
+
+func vert(f io.Writer, s string, w, h int) {
 	ss := gaga.VertToFitStrings(s, w, h)
 	if len(ss) > 0 {
 		fmt.Fprint(f, ss[0])
@@ -35,12 +51,12 @@ func writeString(f io.Writer, s string, w, h int) {
 	}
 }
 
-func writeSlice(f io.Writer, in []string, w, h int) {
+func vertstrs(f io.Writer, in []string, w, h int) {
 	if len(in) > 0 {
-		writeString(f, in[0], w, h)
+		vert(f, in[0], w, h)
 		for i := 1; i < len(in); i++ {
 			fmt.Fprintln(f)
-			writeString(f, in[i], w, h)
+			vert(f, in[i], w, h)
 		}
 	}
 }
@@ -65,19 +81,6 @@ func main() {
 		flag.Usage()
 		os.Exit(2)
 	}
-	var ss []string
-	if flag.NArg() == 0 {
-		ss = []string{read(os.Stdin)}
-	} else {
-		args := flag.Args()
-		for _, path := range args {
-			f, err := os.Open(path)
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer f.Close()
-			ss = append(ss, read(f))
-		}
-	}
-	writeSlice(os.Stdout, ss, width, height)
+	ss := readfiles(flag.Args())
+	vertstrs(os.Stdout, ss, width, height)
 }

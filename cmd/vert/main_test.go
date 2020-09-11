@@ -2,17 +2,19 @@ package main
 
 import (
 	"bytes"
+	"io/ioutil"
+	"log"
 	"testing"
 )
 
-type CmdVertWriteSliceTest struct {
+type CmdVertVertStrsTest struct {
 	ss  []string
 	w   int
 	h   int
 	out string
 }
 
-var cmdvertwriteslicetests = []CmdVertWriteSliceTest{
+var cmdvertvertstrstests = []CmdVertVertStrsTest{
 	0: {[]string{"a\nbb\ncc\n"}, 3, 2,
 		" c b a\n" +
 			" c b\n"},
@@ -60,14 +62,42 @@ var cmdvertwriteslicetests = []CmdVertWriteSliceTest{
 			" c\n"},
 }
 
-func TestCmdVertWriteSlice(t *testing.T) {
-	for i, tt := range cmdvertwriteslicetests {
+func TestCmdVertVertStrs(t *testing.T) {
+	for i, tt := range cmdvertvertstrstests {
 		var buf bytes.Buffer
-		writeSlice(&buf, tt.ss, tt.w, tt.h)
+		vertstrs(&buf, tt.ss, tt.w, tt.h)
 		out := string(buf.Bytes())
 		if out != tt.out {
-			t.Errorf("#%d writeSlice(buf, %q, %d, %d) = %q, want: %q",
+			t.Errorf("#%d vertstrs(buf, %q, %d, %d) = %q, want: %q",
 				i, tt.ss, tt.w, tt.h, out, tt.out)
+		}
+	}
+}
+
+type CmdVertReadWrieTest struct {
+	in     string
+	out    string
+}
+
+var cmdvertreadwritetests = []CmdVertReadWrieTest {
+	0: {"testdata/vert_in01.txt", "testdata/vert_out01.txt"},
+	1: {"testdata/vert_in02.txt", "testdata/vert_out02.txt"},
+	2: {"testdata/vert_in03.txt", "testdata/vert_out03.txt"},
+	3: {"testdata/vert_in04.txt", "testdata/vert_out04.txt"},
+}
+
+func TestCmdVertReadWrite(t *testing.T) {
+	for i, tt := range cmdvertreadwritetests {
+		want, err := ioutil.ReadFile(tt.out)
+		if (err != nil) {
+			log.Fatal(err)
+		}
+		var have bytes.Buffer
+		ss := readfiles([]string{tt.in})
+		vertstrs(&have, ss, 40, 25)
+		if string(have.Bytes()) != string(want) {
+			t.Errorf("#%d\nin:\n%s,\nhave:\n%s,\nwant:\n%s",
+				i, ss[0], have.Bytes(), want) 
 		}
 	}
 }
