@@ -21,7 +21,7 @@ func min(n1, n2 int) int {
 
 func wordwrap(in string, w int) (out [][]rune) {
 	rs := []rune(in)
-	out = make([][]rune, 0, len(rs) * 2 / w)
+	out = make([][]rune, 0, len(rs)*2/w)
 	for i := 0; i < len(rs); {
 		if rs[i] != '\n' && runewidth.RuneWidth(rs[i]) <= 0 {
 			rs = append(rs[:i], rs[i+1:]...)

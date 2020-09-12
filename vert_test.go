@@ -615,4 +615,3 @@ func BenchmarkVert10000(b *testing.B) {
 	s := strings.Repeat("aあbいcう", 10000)
 	benchmarkVert(b, s)
 }
-
