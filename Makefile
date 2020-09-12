@@ -4,6 +4,12 @@ GENDIR  := ./gen
 CMDDIR  := ./cmd
 OBJDIR  := ./obj
 
+# Test Function REGEXP
+LIGHTW  := "Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])|Example"
+HEAVYW  := "Heavy"
+BENCHM  := "Benchmark"
+
+
 # Build commands
 .PHONY: build
 build: $(OBJDIR)/vert
@@ -49,12 +55,17 @@ lint: deps
 # Run tests
 .PHONY: test
 test: deps dir
-	go test -v -coverprofile=$(OBJDIR)/cover.out -run "Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])|Example" ./...
+	go test -v -coverprofile=$(OBJDIR)/cover.out -run $(LIGHTW) ./...
 	go tool cover -html=$(OBJDIR)/cover.out -o $(OBJDIR)/cover.html
 
 .PHONY: alltest
 alltest: deps test
-	go test -v -timeout 20m -run "Heavy"
+	go test -v -timeout 20m -run $(HEAVYW)
+
+#Benchmarks
+.PHONY: bench
+bench: deps dir
+	go test -v -run $(BENCHM) -bench . -benchmem -o $(OBJDIR)/bench.bin -cpuprofile=$(OBJDIR)/cpu.prof -memprofile=$(OBJDIR)/mem.prof
 
 #Install dependencies
 .PHONY: deps
