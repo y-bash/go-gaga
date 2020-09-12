@@ -48,29 +48,34 @@ $(OBJDIR)/%.csv: dir $(GENDIR)/gen%csv.go
 
 # Lint
 .PHONY: lint
-lint: deps
+lint: devdeps
 	go vet ./...
 	golint -set_exit_status -min_confidence 0 ./...
 
 # Run tests
 .PHONY: test
-test: deps dir
+test: devdeps dir
 	go test -v -coverprofile=$(OBJDIR)/cover.out -run $(LIGHTW) ./...
 	go tool cover -html=$(OBJDIR)/cover.out -o $(OBJDIR)/cover.html
 
 .PHONY: alltest
-alltest: deps test
+alltest: test
 	go test -v -timeout 20m -run $(HEAVYW)
 
 #Benchmarks
 .PHONY: bench
-bench: deps dir
+bench: devdeps dir
 	go test -v -run $(BENCHM) -bench . -benchmem -o $(OBJDIR)/bench.bin -cpuprofile=$(OBJDIR)/cpu.prof -memprofile=$(OBJDIR)/mem.prof
 
 #Install dependencies
 .PHONY: deps
 deps:
 	go get github.com/mattn/go-runewidth
+
+.PHONY: devdeps
+devdeps: deps
+	go get golang.org/x/lint/golint
+	go get golang.org/x/text
 
 #Make directory
 .PHONY: dir

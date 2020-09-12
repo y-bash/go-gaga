@@ -6,22 +6,39 @@ import (
 
 //go:generate go run gen/gentables.go -output unichar_tables.go
 
-// Voicde or Semi-voiced sound mark
+// Modifier mark (Voiced or Semi-voiced sound mark)
+type modmark rune
+
 const (
-	vsmCombining  = rune(0x3099)
-	vsmWide       = rune(0x309B)
-	vsmNarrow     = rune(0xFF9E)
-	svsmCombining = rune(0x309A)
-	svsmWide      = rune(0x309C)
-	svsmNarrow    = rune(0xFF9F)
+	mmNone         modmark = 0
+	mmVsmNonspace  modmark = 0x3099
+	mmVsmWide      modmark = 0x309B
+	mmVsmNarrow    modmark = 0xFF9E
+	mmSvsmNonspace modmark = 0x309A
+	mmSvsmWide     modmark = 0x309C
+	mmSvsmNarrow   modmark = 0xFF9F
 )
 
+func (m modmark) isModmark() bool {
+	return m != mmNone
+}
+
 func isVoicedSoundMark(r rune) bool {
-	return r == vsmCombining || r == vsmWide || r == vsmNarrow
+	switch modmark(r) {
+	case mmVsmNonspace, mmVsmWide, mmVsmNarrow:
+		return true
+	default:
+		return false
+	}
 }
 
 func isSemivoicedSoundMark(r rune) bool {
-	return r == svsmCombining || r == svsmWide || r == svsmNarrow
+	switch modmark(r) {
+	case mmSvsmNonspace, mmSvsmWide, mmSvsmNarrow:
+		return true
+	default:
+		return false
+	}
 }
 
 func getUnichar(r rune) (c *unichar, ok bool) {
@@ -134,14 +151,14 @@ func (c *unichar) toNarrowUnichar() *unichar {
 
 // for voiced or semi-voiced sound mark characters.
 func (c *unichar) toTraditionalMarkUnichar() *unichar {
-	if c.charCase != ccCombining {
+	if c.charCase != ccNonspace {
 		return c
 	}
 	return c.getCompatCaseUnichar()
 }
 
 // for voiced or semi-voiced sound mark characters.
-func (c *unichar) toCombiningMark() rune {
+func (c *unichar) toNonspaceMark() rune {
 	if c.charCase != ccTraditional {
 		return c.codepoint
 	}
@@ -151,28 +168,28 @@ func (c *unichar) toCombiningMark() rune {
 // for Hiragana-Katakana letters.
 // TEST_Vs4Ad89Z knows that this function returns a rune array with
 // 1 or 2 elements and no other number of elements.
-func (c *unichar) toTraditionalVoiced() []rune {
+func (c *unichar) toTraditionalVoiced() (rune, modmark) {
 	switch c.voicing {
 	case vcVoiced:
-		return []rune{c.codepoint}
+		return c.codepoint, mmNone
 	case vcSemivoiced:
 		// TEST_fW6auXUi knows that every semi-voiced character has
 		// a corresponding unvoiced character, and that unvoiced
 		// character has a corresponding voiced character.
-		return []rune{c.getCompatSvsUnichar().compatVs}
+		return c.getCompatSvsUnichar().compatVs, mmNone
 	case vcUnvoiced:
 		// TEST_Jt3UaWwr knows that every unvoiced character has a
 		// corresponding voiced character.
-		return []rune{c.compatVs}
+		return c.compatVs, mmNone
 	case vcUndefined:
 		switch c.charWidth {
 		case cwNarrow:
-			return []rune{c.codepoint, vsmNarrow}
+			return c.codepoint, mmVsmNarrow
 		case cwWide:
-			return []rune{c.codepoint, vsmWide}
+			return c.codepoint, mmVsmWide
 		case cwUndefined:
 			// These characters (U+3040, U+3097, U+3098, U+FF00) are not in the UCD.
-			return []rune{c.codepoint}
+			return c.codepoint, mmNone
 		default:
 			// TEST_U2mt8xTY knows that the program never passes here
 			panic("unreachable")
@@ -186,33 +203,33 @@ func (c *unichar) toTraditionalVoiced() []rune {
 // for Hiragana-Katakana letters.
 // TEST_s8U59Hzf knows that this function returns a rune array with
 // 1 or 2 elements and no other number of elements.
-func (c *unichar) toTraditionalSemivoiced() []rune {
+func (c *unichar) toTraditionalSemivoiced() (rune, modmark) {
 	switch c.voicing {
 	case vcSemivoiced:
-		return []rune{c.codepoint}
+		return c.codepoint, mmNone
 	case vcVoiced:
 		unvoiced := c.getCompatVsUnichar()
 		if unvoiced.existsCompatSvs() {
-			return []rune{unvoiced.compatSvs}
+			return unvoiced.compatSvs, mmNone
 		}
 		switch c.charWidth {
 		case cwNarrow:
-			return []rune{c.compatVs, svsmNarrow}
+			return c.compatVs, mmSvsmNarrow
 		case cwWide:
-			return []rune{c.compatVs, svsmWide}
+			return c.compatVs, mmSvsmWide
 		default:
 			// TEST_T2eKd76G knows that the program never passes here
 			panic("unreachable")
 		}
 	case vcUnvoiced:
 		if c.existsCompatSvs() {
-			return []rune{c.compatSvs}
+			return c.compatSvs, mmNone
 		}
 		switch c.charWidth {
 		case cwNarrow:
-			return []rune{c.codepoint, svsmNarrow}
+			return c.codepoint, mmSvsmNarrow
 		case cwWide:
-			return []rune{c.codepoint, svsmWide}
+			return c.codepoint, mmSvsmWide
 		default:
 			// TEST_Mw87qjkF knows that the program never passes here
 			panic("unreachable")
@@ -220,12 +237,12 @@ func (c *unichar) toTraditionalSemivoiced() []rune {
 	case vcUndefined:
 		switch c.charWidth {
 		case cwNarrow:
-			return []rune{c.codepoint, svsmNarrow}
+			return c.codepoint, mmSvsmNarrow
 		case cwWide:
-			return []rune{c.codepoint, svsmWide}
+			return c.codepoint, mmSvsmWide
 		case cwUndefined:
 			// These characters (U+3040, U+3097, U+3098, U+FF00) are not in the UCD.
-			return []rune{c.codepoint}
+			return c.codepoint, mmNone
 		default:
 			// TEST_U2mt8xTY knows that the program never passes here
 			panic("unreachable")
@@ -239,14 +256,14 @@ func (c *unichar) toTraditionalSemivoiced() []rune {
 // for Hiragana-Katakana letters.
 // TEST_R4gNVpGj knows that this function returns a rune array with
 // 1 or 2 elements and no other number of elements.
-func (c *unichar) toCombiningVoiced() []rune {
+func (c *unichar) toNonspaceVoiced() (rune, modmark) {
 	switch c.voicing {
 	case vcUnvoiced, vcUndefined:
-		return []rune{c.codepoint, vsmCombining}
+		return c.codepoint, mmVsmNonspace
 	case vcVoiced:
-		return []rune{c.compatVs, vsmCombining}
+		return c.compatVs, mmVsmNonspace
 	case vcSemivoiced:
-		return []rune{c.compatSvs, vsmCombining}
+		return c.compatSvs, mmVsmNonspace
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
 		panic("unreachable")
@@ -256,14 +273,14 @@ func (c *unichar) toCombiningVoiced() []rune {
 // for Hiragana-Katakana letters.
 // TEST_Pp9gBVj2 knows that this function returns a rune array with
 // 1 or 2 elements and no other number of elements.
-func (c *unichar) toCombiningSemivoiced() []rune {
+func (c *unichar) toNonspaceSemivoiced() (rune, modmark) {
 	switch c.voicing {
 	case vcUnvoiced, vcUndefined:
-		return []rune{c.codepoint, svsmCombining}
+		return c.codepoint, mmSvsmNonspace
 	case vcVoiced:
-		return []rune{c.compatVs, svsmCombining}
+		return c.compatVs, mmSvsmNonspace
 	case vcSemivoiced:
-		return []rune{c.compatSvs, svsmCombining}
+		return c.compatSvs, mmSvsmNonspace
 	default:
 		// TEST_R8jrnbCz knows that the program never passes here
 		panic("unreachable")

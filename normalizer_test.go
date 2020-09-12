@@ -2,6 +2,7 @@ package gaga
 
 import (
 	"fmt"
+	"golang.org/x/text/unicode/norm"
 	"log"
 	"strings"
 	"testing"
@@ -13,7 +14,7 @@ const (
 	excr = maxr + 1
 )
 
-type NormalizeRuneTest struct {
+type NormalizeRuneSeqTest struct {
 	name string
 	flag NormFlag
 	lo   rune
@@ -21,7 +22,7 @@ type NormalizeRuneTest struct {
 	diff rune
 }
 
-var normalizerunetests = []NormalizeRuneTest{
+var normalizeruneseqtests = []NormalizeRuneSeqTest{
 	// latin letter
 	0: {"a-z -> A-Z", AlphaToUpper, 'a', 'z', 'A' - 'a'},
 	1: {"A-Z -> a-ｚ", AlphaToLower, 'A', 'Z', 'a' - 'A'},
@@ -116,21 +117,19 @@ var normalizerunetests = []NormalizeRuneTest{
 	81: {"｡-･ -> ｡-･", LatinToNarrow | AlphaToLower, '｡', '･', 0},
 }
 
-func TestNormalizeRune(t *testing.T) {
-	for i, tt := range normalizerunetests {
+func TestNormalizeRuneSeq(t *testing.T) {
+	for i, tt := range normalizeruneseqtests {
 		n, err := NewNormalizer(tt.flag)
 		if err != nil {
 			t.Errorf("#%d: %s", i, err.Error())
 			continue
 		}
 		for src := tt.lo; src <= tt.hi; src++ {
-			want := src + tt.diff
-			got := n.NormalizeRune(src)
-			if len(got) != 1 {
-				t.Errorf("#%d %s NormalizeRune(%#U) = %v, want len(%v) is 1", i, tt.name, src, got, got)
-			}
-			if got[0] != want {
-				t.Errorf("#%d %s NormalizeRune(%#U) = %#U, want %#U", i, tt.name, src, got[0], want)
+			want, wantMm := src+tt.diff, mmNone
+			have, haveMm := n.NormalizeRune(src)
+			if have != want || haveMm != mmNone {
+				t.Errorf("#%d %s, %s\nNormalizeRune(%#U)\nhave:(%#U, %#U), \nwant:(%#U, %#U)",
+					i, tt.name, tt.flag, src, have, haveMm, want, wantMm)
 			}
 		}
 	}
@@ -412,24 +411,24 @@ var normalizetests = []NormalizeTest{
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099"},
 
 	// simple Japanese conversion (voiced kana traditional directive) <- Voiced sound character/Voiced sound mark
-	90: {KatakanaToHiragana | VoicedKanaToCombining,
+	90: {KatakanaToHiragana | VoicedKanaToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099"},
-	91: {KatakanaToHiragana | VoicedKanaToCombining,
+	91: {KatakanaToHiragana | VoicedKanaToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099"},
-	92: {KatakanaToHiragana | VoicedKanaToCombining,
+	92: {KatakanaToHiragana | VoicedKanaToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099"},
 
 	// multiple Japanese conversion (voiced kana traditional directive) <- Voiced sound character/Voiced sound mark
-	93: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining,
+	93: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099"},
-	94: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining,
+	94: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099"},
-	95: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining,
+	95: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099"},
 
@@ -452,13 +451,13 @@ var normalizetests = []NormalizeTest{
 	101: {KatakanaToHiragana | IsolatedVsmToWide,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛A゛A゛日゛日゛日゛ä゛ä゛ä゛"},
-	102: {KatakanaToHiragana | IsolatedVsmToCombining,
+	102: {KatakanaToHiragana | IsolatedVsmToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"がか\u3099か\u3099か\u3099がか\u3099か\u3099か\u3099か\u3099か\u3099か\u3099"},
-	103: {KatakanaToHiragana | IsolatedVsmToCombining,
+	103: {KatakanaToHiragana | IsolatedVsmToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099"},
-	104: {KatakanaToHiragana | IsolatedVsmToCombining,
+	104: {KatakanaToHiragana | IsolatedVsmToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
 
@@ -481,13 +480,13 @@ var normalizetests = []NormalizeTest{
 	110: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToWide,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛A゛A゛日゛日゛日゛ä゛ä゛ä゛"},
-	111: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToCombining,
+	111: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"ｶﾞｶ\u3099ｶ\u3099ｶ\u3099ｶﾞｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099"},
-	112: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToCombining,
+	112: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099"},
-	113: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToCombining,
+	113: {KatakanaToNarrow | HiraganaToNarrow | IsolatedVsmToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
 
@@ -510,13 +509,13 @@ var normalizetests = []NormalizeTest{
 	119: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToWide,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛A゛A゛日゛日゛日゛ä゛ä゛ä゛"},
-	120: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToCombining,
+	120: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"ががががががががががが"},
-	121: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToCombining,
+	121: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"あ゛あ゛あ゛あ゛あ゛あ゛あ゛あ゛あ゛"},
-	122: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToCombining,
+	122: {KatakanaToHiragana | VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
 
@@ -539,71 +538,71 @@ var normalizetests = []NormalizeTest{
 	128: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToWide,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛A゛A゛日゛日゛日゛ä゛ä゛ä゛"},
-	129: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToCombining,
+	129: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"ｶﾞｶﾞｶﾞｶﾞｶﾞｶﾞｶﾞｶﾞｶﾞｶﾞｶﾞ"},
-	130: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToCombining,
+	130: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱﾞｱﾞｱﾞｱﾞｱﾞｱﾞｱﾞｱﾞｱﾞ"},
-	131: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToCombining,
+	131: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
 
 	// simple Japanese conversion (voiced kana combining directive/isolated vsm directive) <- Voiced sound character/Voiced sound mark
-	132: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToNarrow,
+	132: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099"},
-	133: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToNarrow,
+	133: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099"},
-	134: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToNarrow,
+	134: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"AﾞAﾞAﾞ日ﾞ日ﾞ日ﾞäﾞäﾞäﾞ"},
-	135: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToWide,
+	135: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToWide,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099"},
-	136: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToWide,
+	136: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToWide,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099"},
-	137: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToWide,
+	137: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToWide,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛A゛A゛日゛日゛日゛ä゛ä゛ä゛"},
-	138: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToCombining,
+	138: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099か\u3099"},
-	139: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToCombining,
+	139: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099あ\u3099"},
-	140: {KatakanaToHiragana | VoicedKanaToCombining | IsolatedVsmToCombining,
+	140: {KatakanaToHiragana | VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
 
 	// multiple Japanese conversion (voiced kana combining directive/isolated vsm directive) <- Voiced sound character/Voiced sound mark
-	141: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToNarrow,
+	141: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099"},
-	142: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToNarrow,
+	142: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099"},
-	143: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToNarrow,
+	143: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"AﾞAﾞAﾞ日ﾞ日ﾞ日ﾞäﾞäﾞäﾞ"},
-	144: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToWide,
+	144: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToWide,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099"},
-	145: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToWide,
+	145: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToWide,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099"},
-	146: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToWide,
+	146: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToWide,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A゛A゛A゛日゛日゛日゛ä゛ä゛ä゛"},
-	147: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToCombining,
+	147: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"がか゛かﾞか\u3099ガカ゛カﾞカ\u3099ｶ゛ｶﾞｶ\u3099",
 		"ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099ｶ\u3099"},
-	148: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToCombining,
+	148: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"あ゛あﾞあ\u3099ア゛アﾞア\u3099ｱ゛ｱﾞｱ\u3099",
 		"ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099ｱ\u3099"},
-	149: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToCombining | IsolatedVsmToCombining,
+	149: {KatakanaToNarrow | HiraganaToNarrow | VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"A゛AﾞA\u3099日゛日ﾞ日\u3099ä゛äﾞä\u3099",
 		"A\u3099A\u3099A\u3099日\u3099日\u3099日\u3099ä\u3099ä\u3099ä\u3099"},
 
@@ -617,19 +616,19 @@ var normalizetests = []NormalizeTest{
 	152: {VoicedKanaToTraditional | IsolatedVsmToWide,
 		"は゛ば゛ぱ゛は゜ば゜ぱ゜ハ゛バ゛パ゛ハ゜バ゜パ゜ﾊ゛ﾊ゜",
 		"ばば゛ぱ゛ぱば゜ぱ゜ババ゛パ゛パバ゜パ゜ﾊﾞﾊﾟ"},
-	153: {VoicedKanaToTraditional | IsolatedVsmToCombining,
+	153: {VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"は゛ば゛ぱ゛は゜ば゜ぱ゜ハ゛バ゛パ゛ハ゜バ゜パ゜ﾊ゛ﾊ゜",
 		"ばば\u3099ぱ\u3099ぱば\u309Aぱ\u309Aババ\u3099パ\u3099パバ\u309Aパ\u309Aﾊﾞﾊﾟ"},
-	154: {VoicedKanaToCombining,
+	154: {VoicedKanaToNonspace,
 		"は゛ば゛ぱ゛は゜ば゜ぱ゜ハ゛バ゛パ゛ハ゜バ゜パ゜ﾊ゛ﾊ゜",
 		"は\u3099は\u3099゛は\u309A゛は\u309Aは\u3099゜は\u309A゜ハ\u3099ハ\u3099゛ハ\u309A゛ハ\u309Aハ\u3099゜ハ\u309A゜ﾊ\u3099ﾊ\u309A"},
-	155: {VoicedKanaToCombining | IsolatedVsmToNarrow,
+	155: {VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"は゛ば゛ぱ゛は゜ば゜ぱ゜ハ゛バ゛パ゛ハ゜バ゜パ゜ﾊ゛ﾊ゜",
 		"は\u3099は\u3099ﾞは\u309Aﾞは\u309Aは\u3099ﾟは\u309Aﾟハ\u3099ハ\u3099ﾞハ\u309Aﾞハ\u309Aハ\u3099ﾟハ\u309Aﾟﾊ\u3099ﾊ\u309A"},
-	156: {VoicedKanaToCombining | IsolatedVsmToWide,
+	156: {VoicedKanaToNonspace | IsolatedVsmToWide,
 		"は゛ば゛ぱ゛は゜ば゜ぱ゜ハ゛バ゛パ゛ハ゜バ゜パ゜ﾊ゛ﾊ゜",
 		"は\u3099は\u3099゛は\u309A゛は\u309Aは\u3099゜は\u309A゜ハ\u3099ハ\u3099゛ハ\u309A゛ハ\u309Aハ\u3099゜ハ\u309A゜ﾊ\u3099ﾊ\u309A"},
-	157: {VoicedKanaToCombining | IsolatedVsmToCombining,
+	157: {VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"は゛ば゛ぱ゛は゜ば゜ぱ゜ハ゛バ゛パ゛ハ゜バ゜パ゜ﾊ゛ﾊ゜",
 		"は\u3099は\u3099\u3099は\u309A\u3099は\u309Aは\u3099\u309Aは\u309A\u309Aハ\u3099ハ\u3099\u3099ハ\u309A\u3099ハ\u309Aハ\u3099\u309Aハ\u309A\u309Aﾊ\u3099ﾊ\u309A"},
 	158: {VoicedKanaToTraditional,
@@ -641,19 +640,19 @@ var normalizetests = []NormalizeTest{
 	160: {VoicedKanaToTraditional | IsolatedVsmToWide,
 		"はﾞばﾞぱﾞはﾟばﾟぱﾟハﾞバﾞパﾞハﾟバﾟパﾟﾊﾞﾊﾟ",
 		"ばば゛ぱ゛ぱば゜ぱ゜ババ゛パ゛パバ゜パ゜ﾊﾞﾊﾟ"},
-	161: {VoicedKanaToTraditional | IsolatedVsmToCombining,
+	161: {VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"はﾞばﾞぱﾞはﾟばﾟぱﾟハﾞバﾞパﾞハﾟバﾟパﾟﾊﾞﾊﾟ",
 		"ばば\u3099ぱ\u3099ぱば\u309Aぱ\u309Aババ\u3099パ\u3099パバ\u309Aパ\u309Aﾊﾞﾊﾟ"},
-	162: {VoicedKanaToCombining,
+	162: {VoicedKanaToNonspace,
 		"はﾞばﾞぱﾞはﾟばﾟぱﾟハﾞバﾞパﾞハﾟバﾟパﾟﾊﾞﾊﾟ",
 		"は\u3099は\u3099ﾞは\u309Aﾞは\u309Aは\u3099ﾟは\u309Aﾟハ\u3099ハ\u3099ﾞハ\u309Aﾞハ\u309Aハ\u3099ﾟハ\u309Aﾟﾊ\u3099ﾊ\u309A"},
-	163: {VoicedKanaToCombining | IsolatedVsmToNarrow,
+	163: {VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"はﾞばﾞぱﾞはﾟばﾟぱﾟハﾞバﾞパﾞハﾟバﾟパﾟﾊﾞﾊﾟ",
 		"は\u3099は\u3099ﾞは\u309Aﾞは\u309Aは\u3099ﾟは\u309Aﾟハ\u3099ハ\u3099ﾞハ\u309Aﾞハ\u309Aハ\u3099ﾟハ\u309Aﾟﾊ\u3099ﾊ\u309A"},
-	164: {VoicedKanaToCombining | IsolatedVsmToWide,
+	164: {VoicedKanaToNonspace | IsolatedVsmToWide,
 		"はﾞばﾞぱﾞはﾟばﾟぱﾟハﾞバﾞパﾞハﾟバﾟパﾟﾊﾞﾊﾟ",
 		"は\u3099は\u3099゛は\u309A゛は\u309Aは\u3099゜は\u309A゜ハ\u3099ハ\u3099゛ハ\u309A゛ハ\u309Aハ\u3099゜ハ\u309A゜ﾊ\u3099ﾊ\u309A"},
-	165: {VoicedKanaToCombining | IsolatedVsmToCombining,
+	165: {VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"はﾞばﾞぱﾞはﾟばﾟぱﾟハﾞバﾞパﾞハﾟバﾟパﾟﾊﾞﾊﾟ",
 		"は\u3099は\u3099\u3099は\u309A\u3099は\u309Aは\u3099\u309Aは\u309A\u309Aハ\u3099ハ\u3099\u3099ハ\u309A\u3099ハ\u309Aハ\u3099\u309Aハ\u309A\u309Aﾊ\u3099ﾊ\u309A"},
 
@@ -667,19 +666,19 @@ var normalizetests = []NormalizeTest{
 	168: {VoicedKanaToTraditional | IsolatedVsmToWide,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日゛本゜語゛平゜仮゛名゜"},
-	169: {VoicedKanaToTraditional | IsolatedVsmToCombining,
+	169: {VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日\u3099本\u309A語\u3099平\u309A仮\u3099名\u309A"},
-	170: {VoicedKanaToCombining,
+	170: {VoicedKanaToNonspace,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A"},
-	171: {VoicedKanaToCombining | IsolatedVsmToNarrow,
+	171: {VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日ﾞ本ﾟ語ﾞ平ﾟ仮ﾞ名ﾟ"},
-	172: {VoicedKanaToCombining | IsolatedVsmToWide,
+	172: {VoicedKanaToNonspace | IsolatedVsmToWide,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日゛本゜語゛平゜仮゛名゜"},
-	173: {VoicedKanaToCombining | IsolatedVsmToCombining,
+	173: {VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		"日゛本゜語ﾞ平ﾟ仮\u3099名\u309A",
 		"日\u3099本\u309A語\u3099平\u309A仮\u3099名\u309A"},
 
@@ -787,19 +786,19 @@ var normalizetests = []NormalizeTest{
 	206: {VoicedKanaToTraditional | IsolatedVsmToWide,
 		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
 		string([]rune{excr, '゛', excr, '゛', excr, '゛', excr, '゜', excr, '゜', excr, '゜'})},
-	207: {VoicedKanaToTraditional | IsolatedVsmToCombining,
+	207: {VoicedKanaToTraditional | IsolatedVsmToNonspace,
 		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
 		string([]rune{excr, '\u3099', excr, '\u3099', excr, '\u3099', excr, '\u309A', excr, '\u309A', excr, '\u309A'})},
-	208: {VoicedKanaToCombining,
+	208: {VoicedKanaToNonspace,
 		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
 		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'})},
-	209: {VoicedKanaToCombining | IsolatedVsmToNarrow,
+	209: {VoicedKanaToNonspace | IsolatedVsmToNarrow,
 		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
 		string([]rune{excr, 'ﾞ', excr, 'ﾞ', excr, 'ﾞ', excr, 'ﾟ', excr, 'ﾟ', excr, 'ﾟ'})},
-	210: {VoicedKanaToCombining | IsolatedVsmToWide,
+	210: {VoicedKanaToNonspace | IsolatedVsmToWide,
 		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
 		string([]rune{excr, '゛', excr, '゛', excr, '゛', excr, '゜', excr, '゜', excr, '゜'})},
-	211: {VoicedKanaToCombining | IsolatedVsmToCombining,
+	211: {VoicedKanaToNonspace | IsolatedVsmToNonspace,
 		string([]rune{excr, '゛', excr, 'ﾞ', excr, '\u3099', excr, '゜', excr, 'ﾟ', excr, '\u309A'}),
 		string([]rune{excr, '\u3099', excr, '\u3099', excr, '\u3099', excr, '\u309A', excr, '\u309A', excr, '\u309A'})},
 
@@ -864,7 +863,7 @@ var normalizetests = []NormalizeTest{
 	233: {VoicedKanaToTraditional,
 		string([]rune{-1, '\u0000', maxr, excr}),
 		string([]rune{-1, '\u0000', maxr, excr})},
-	234: {VoicedKanaToCombining,
+	234: {VoicedKanaToNonspace,
 		string([]rune{-1, '\u0000', maxr, excr}),
 		string([]rune{-1, '\u0000', maxr, excr})},
 	235: {LatinToNarrow | KanaToWide,
@@ -974,6 +973,7 @@ outer:
 	return valid, invalid
 }
 
+/* xxx
 func TestHeavyNormFlags(t *testing.T) {
 	valid, invalid := parenormflagcombs()
 	log.Printf("  valid : %7d\n", len(valid))
@@ -1008,4 +1008,36 @@ outer:
 			log.Printf("%5d/%5d (%3d%% done)", i, len(valid), i*100/len(valid))
 		}
 	}
+}
+*/
+
+//const normSTR = "\t Aa#　Ａａ＃あア。ｱ｡”ﾞ漢字ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ\U0010FFFF"
+const normSTR = "ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ\U0010FFFF"
+
+func BenchmarkNormalize(b *testing.B) {
+	n, _ := NewNormalizer(LatinToNarrow | KanaToWide)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := strings.Repeat(normSTR, 1)
+		n.Normalize(s)
+	}
+	b.StopTimer()
+}
+
+func BenchmarkNormNFKD(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := strings.Repeat(normSTR, 1)
+		norm.NFKD.String(s)
+	}
+	b.StopTimer()
+}
+
+func BenchmarkNormNFKC(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := strings.Repeat(normSTR, 1)
+		norm.NFKC.String(s)
+	}
+	b.StopTimer()
 }

@@ -294,7 +294,7 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			if !isVoicedSoundMark(c.codepoint) && !isSemivoicedSoundMark(c.codepoint) {
 				t.Errorf("%s[%#U] is not VSM or SVSM, want VSM or SVSM", name, c.codepoint)
 			}
-			if c.charCase != ccTraditional && c.charCase != ccCombining {
+			if c.charCase != ccTraditional && c.charCase != ccNonspace {
 				t.Errorf("%s[%#U].charCase is %d, want 3 or 4", name, c.codepoint, c.charCase)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide {
@@ -316,6 +316,8 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 		}
 
+		/* xxx
+
 		// Testing return values of methods
 		var rs []rune
 
@@ -336,20 +338,21 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 		}
 
 		// TEST_R4gNVpGj
-		rs = c.toCombiningVoiced()
+		rs = c.toNonspaceVoiced()
 		switch len(rs) {
 		case 1, 2:
 		default:
-			t.Errorf("%s[%#U].toCombiningVoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
+			t.Errorf("%s[%#U].toNonspaceVoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
 		}
 
 		// TEST_Pp9gBVj2
-		rs = c.toCombiningSemivoiced()
+		rs = c.toNonspaceSemivoiced()
 		switch len(rs) {
 		case 1, 2:
 		default:
-			t.Errorf("%s[%#U].toCombiningSemivoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
+			t.Errorf("%s[%#U].toNonspaceSemivoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
 		}
+		*/
 	}
 }
 
@@ -360,47 +363,49 @@ func TestUnicharTable(t *testing.T) {
 }
 
 type ToVoicedTest struct {
-	in             rune
-	outTraditional string
-	outCombining   string
+	in          rune
+	outTradChar rune
+	outTradMark modmark
+	outNonsChar rune
+	outNonsMark modmark
 }
 
 var tovoicedtests = []ToVoicedTest{
 	// vcUnvoiced
-	0: {'か', "が", "か\u3099"}, // compatVs is exists, compatSvs is not exists
-	1: {'は', "ば", "は\u3099"}, // compatVs is exists, compatSvs is exists
+	0: {'か', 'が', mmNone, 'か', '\u3099'}, // compatVs is exists, compatSvs is not exists
+	1: {'は', 'ば', mmNone, 'は', '\u3099'}, // compatVs is exists, compatSvs is exists
 	// vcVoiced
-	2: {'が', "が", "か\u3099"}, // compatVs.compatSvs is not exists
-	3: {'ば', "ば", "は\u3099"}, // compatVs.compatSvs is exists
+	2: {'が', 'が', mmNone, 'か', '\u3099'}, // compatVs.compatSvs is not exists
+	3: {'ば', 'ば', mmNone, 'は', '\u3099'}, // compatVs.compatSvs is exists
 	// vcSemivoiced
-	4: {'ぱ', "ば", "は\u3099"},
+	4: {'ぱ', 'ば', mmNone, 'は', '\u3099'},
 	// vcUndefined, cwWide
-	5:  {'あ', "あ゛", "あ\u3099"}, // ctKanaLetter, ccHiragana
-	6:  {'ア', "ア゛", "ア\u3099"}, // ctKanaLetter, ccKatakana
-	7:  {'・', "・゛", "・\u3099"}, // ctKanaSymbol, ccUndefined
-	8:  {'Ａ', "Ａ゛", "Ａ\u3099"}, // ctLatinLetter, ccUpper
-	9:  {'ａ', "ａ゛", "ａ\u3099"}, // ctLatinLetter, ccLower
-	10: {'１', "１゛", "１\u3099"}, // ctLatinDigit, ccUndefined
-	11: {'＃', "＃゛", "＃\u3099"}, // ctLatinSymbol, ccUndefined
+	5:  {'あ', 'あ', '゛', 'あ', '\u3099'}, // ctKanaLetter, ccHiragana
+	6:  {'ア', 'ア', '゛', 'ア', '\u3099'}, // ctKanaLetter, ccKatakana
+	7:  {'・', '・', '゛', '・', '\u3099'}, // ctKanaSymbol, ccUndefined
+	8:  {'Ａ', 'Ａ', '゛', 'Ａ', '\u3099'}, // ctLatinLetter, ccUpper
+	9:  {'ａ', 'ａ', '゛', 'ａ', '\u3099'}, // ctLatinLetter, ccLower
+	10: {'１', '１', '゛', '１', '\u3099'}, // ctLatinDigit, ccUndefined
+	11: {'＃', '＃', '゛', '＃', '\u3099'}, // ctLatinSymbol, ccUndefined
 	// vcUndefined, cwNarrow
-	12: {'ｱ', "ｱﾞ", "ｱ\u3099"}, // ctKanaLetter, ccKatakana
-	13: {'ｶ', "ｶﾞ", "ｶ\u3099"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
-	14: {'ﾊ', "ﾊﾞ", "ﾊ\u3099"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
-	15: {'･', "･ﾞ", "･\u3099"}, // ctKanaSymbol, ccUndefined
-	16: {'A', "Aﾞ", "A\u3099"}, // ctLatinLetter, ccUpper
-	17: {'a', "aﾞ", "a\u3099"}, // ctLatinLetter, ccLower
-	18: {'1', "1ﾞ", "1\u3099"}, // ctLatinDigit, ccUndefined
-	19: {'#', "#ﾞ", "#\u3099"}, // ctLatinDigit, ccUndefined
+	12: {'ｱ', 'ｱ', 'ﾞ', 'ｱ', '\u3099'}, // ctKanaLetter, ccKatakana
+	13: {'ｶ', 'ｶ', 'ﾞ', 'ｶ', '\u3099'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
+	14: {'ﾊ', 'ﾊ', 'ﾞ', 'ﾊ', '\u3099'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
+	15: {'･', '･', 'ﾞ', '･', '\u3099'}, // ctKanaSymbol, ccUndefined
+	16: {'A', 'A', 'ﾞ', 'A', '\u3099'}, // ctLatinLetter, ccUpper
+	17: {'a', 'a', 'ﾞ', 'a', '\u3099'}, // ctLatinLetter, ccLower
+	18: {'1', '1', 'ﾞ', '1', '\u3099'}, // ctLatinDigit, ccUndefined
+	19: {'#', '#', 'ﾞ', '#', '\u3099'}, // ctLatinDigit, ccUndefined
 	// ctUndefined
-	20: {'\u3040', "\u3040", "\u3040\u3099"},
+	20: {'\u3040', '\u3040', mmNone, '\u3040', '\u3099'},
 	// VSM
-	21: {'゛', "゛゛", "゛\u3099"},
-	22: {'\u3099', "\u3099゛", "\u3099\u3099"},
-	23: {'ﾞ', "ﾞﾞ", "ﾞ\u3099"},
+	21: {'゛', '゛', '゛', '゛', '\u3099'},
+	22: {'\u3099', '\u3099', '゛', '\u3099', '\u3099'},
+	23: {'ﾞ', 'ﾞ', 'ﾞ', 'ﾞ', '\u3099'},
 	// SVSM
-	24: {'゜', "゜゛", "゜\u3099"},
-	25: {'\u309A', "\u309A゛", "\u309A\u3099"},
-	26: {'ﾟ', "ﾟﾞ", "ﾟ\u3099"},
+	24: {'゜', '゜', '゛', '゜', '\u3099'},
+	25: {'\u309A', '\u309A', '゛', '\u309A', '\u3099'},
+	26: {'ﾟ', 'ﾟ', 'ﾞ', 'ﾟ', '\u3099'},
 }
 
 func TestToVoiced(t *testing.T) {
@@ -410,77 +415,74 @@ func TestToVoiced(t *testing.T) {
 			t.Errorf("%d: %#U is not found by getUnichar()", n, tt.in)
 			continue
 		}
-		var got, want []rune
-		got = c.toTraditionalVoiced()
-		want = []rune(tt.outTraditional)
-		if len(got) != len(want) {
-			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
-			continue
+		var have, want rune
+		var haveMm, wantMm modmark
+
+		have, haveMm = c.toTraditionalVoiced()
+		want = tt.outTradChar
+		wantMm = tt.outTradMark
+		if have != want || haveMm != wantMm {
+			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
+				n, have, haveMm, tt.outTradChar, tt.outTradMark)
+			break
 		}
-		for i := 0; i < len(got); i++ {
-			if got[i] != want[i] {
-				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
-				break
-			}
-		}
-		got = c.toCombiningVoiced()
-		want = []rune(tt.outCombining)
-		if len(got) != len(want) {
-			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outCombining)
-			continue
-		}
-		for i := 0; i < len(got); i++ {
-			if got[i] != want[i] {
-				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outCombining)
-				break
-			}
+
+		have, haveMm = c.toNonspaceVoiced()
+		want = tt.outNonsChar
+		wantMm = tt.outNonsMark
+		if have != want || haveMm != wantMm {
+			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
+				n, have, haveMm, tt.outNonsChar, tt.outNonsMark)
+			break
 		}
 
 	}
 }
 
 type ToSemivoicedTest struct {
-	in             rune
-	outTraditional string
-	outCombining   string
+	in          rune
+	outTradChar rune
+	outTradMark modmark
+	outNonsChar rune
+	outNonsMark modmark
 }
 
 var tosemivoicedtests = []ToSemivoicedTest{
 	// vcUnvoiced
-	0: {'か', "か゜", "か\u309A"}, // compatVs is exists, compatSvs is not exists
-	1: {'は', "ぱ", "は\u309A"},  // compatVs is exists, compatSvs is exists
-	// vcVoiced
-	2: {'が', "か゜", "か\u309A"}, // compatVs.compatSvs is not exists
-	3: {'ば', "ぱ", "は\u309A"},  // compatVs.compatSvs is exists
+	0: {'か', 'か', '゜', 'か', '\u309A'},    // compatVs is exists, compatSvs is not exists
+	1: {'は', 'ぱ', mmNone, 'は', '\u309A'}, // compatVs is exists, compatSvs is exists
+	// vcVoice'
+	2: {'が', 'か', '゜', 'か', '\u309A'},    // compatVs.compatSvs is not exists
+	3: {'ば', 'ぱ', mmNone, 'は', '\u309A'}, // compatVs.compatSvs is exists
 	// vcSemivoiced
-	4: {'ぱ', "ぱ", "は\u309A"},
+	4: {'ぱ', 'ぱ', mmNone, 'は', '\u309A'},
 	// vcUndefined, cwWide
-	5:  {'あ', "あ゜", "あ\u309A"}, // ctKanaLetter, ccHiragana
-	6:  {'ア', "ア゜", "ア\u309A"}, // ctKanaLetter, ccKatakana
-	7:  {'・', "・゜", "・\u309A"}, // ctKanaSymbol, ccUndefined
-	8:  {'Ａ', "Ａ゜", "Ａ\u309A"}, // ctLatinLetter, ccUpper
-	9:  {'ａ', "ａ゜", "ａ\u309A"}, // ctLatinLetter, ccLower
-	10: {'１', "１゜", "１\u309A"}, // ctLatinDigit, ccUndefined
-	11: {'＃', "＃゜", "＃\u309A"}, // ctLatinSymbol, ccUndefined
+	5:  {'あ', 'あ', '゜', 'あ', '\u309A'}, // ctKanaLetter, ccHiragana
+	6:  {'ア', 'ア', '゜', 'ア', '\u309A'}, // ctKanaLetter, ccKatakana
+	7:  {'・', '・', '゜', '・', '\u309A'}, // ctKanaSymbol, ccUndefined
+	8:  {'Ａ', 'Ａ', '゜', 'Ａ', '\u309A'}, // ctLatinLetter, ccUpper
+	9:  {'ａ', 'ａ', '゜', 'ａ', '\u309A'}, // ctLatinLetter, ccLower
+	10: {'１', '１', '゜', '１', '\u309A'}, // ctLatinDigit, ccUndefined
+	11: {'＃', '＃', '゜', '＃', '\u309A'}, // ctLatinSymbol, ccUndefined
 	// vcUndefined, cwNarrow
-	12: {'ｱ', "ｱﾟ", "ｱ\u309A"}, // ctKanaLetter, ccKatakana
-	13: {'ｶ', "ｶﾟ", "ｶ\u309A"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
-	14: {'ﾊ', "ﾊﾟ", "ﾊ\u309A"}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
-	15: {'･', "･ﾟ", "･\u309A"}, // ctKanaSymbol, ccUndefined
-	16: {'A', "Aﾟ", "A\u309A"}, // ctLatinLetter, ccUpper
-	17: {'a', "aﾟ", "a\u309A"}, // ctLatinLetter, ccLower
-	18: {'1', "1ﾟ", "1\u309A"}, // ctLatinDigit, ccUndefined
-	19: {'#', "#ﾟ", "#\u309A"}, // ctLatinDigit, ccUndefined
+	12: {'ｱ', 'ｱ', 'ﾟ', 'ｱ', '\u309A'}, // ctKanaLetter, ccKatakana
+	13: {'ｶ', 'ｶ', 'ﾟ', 'ｶ', '\u309A'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
+	14: {'ﾊ', 'ﾊ', 'ﾟ', 'ﾊ', '\u309A'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
+	15: {'･', '･', 'ﾟ', '･', '\u309A'}, // ctKanaSymbol, ccUndefined
+	16: {'A', 'A', 'ﾟ', 'A', '\u309A'}, // ctLatinLetter, ccUpper
+	17: {'a', 'a', 'ﾟ', 'a', '\u309A'}, // ctLatinLetter, ccLower
+	18: {'1', '1', 'ﾟ', '1', '\u309A'}, // ctLatinDigit, ccUndefined
+	19: {'#', '#', 'ﾟ', '#', '\u309A'}, // ctLatinDigit, ccUndefined
 	// ctUndefined
-	20: {'\u3040', "\u3040", "\u3040\u309A"},
+	20: {'\u3040', '\u3040', mmNone, '\u3040', '\u309A'},
 	// VSM
-	21: {'゛', "゛゜", "゛\u309A"},
-	22: {'\u3099', "\u3099゜", "\u3099\u309A"},
-	23: {'ﾞ', "ﾞﾟ", "ﾞ\u309A"},
+	21: {'゛', '゛', '゜', '゛', '\u309A'},
+	22: {'\u3099', '\u3099', '゜', '\u3099', '\u309A'},
+	23: {'ﾞ', 'ﾞ', 'ﾟ', 'ﾞ', '\u309A'},
 	// SVSM
-	24: {'゜', "゜゜", "゜\u309A"},
-	25: {'\u309A', "\u309A゜", "\u309A\u309A"},
-	26: {'ﾟ', "ﾟﾟ", "ﾟ\u309A"},
+	24: {'゜', '゜', '゜', '゜', '\u309A'},
+	25: {'\u309A', '\u309A', '゜', '\u309A', '\u309A'},
+	26: {'ﾟ', 'ﾟ', 'ﾟ', 'ﾟ', '\u309A'},
 }
 
 func TestToSemivoiced(t *testing.T) {
@@ -490,30 +492,25 @@ func TestToSemivoiced(t *testing.T) {
 			t.Errorf("%d: %#U is not found by getUnichar()", n, tt.in)
 			continue
 		}
-		var got, want []rune
-		got = c.toTraditionalSemivoiced()
-		want = []rune(tt.outTraditional)
-		if len(got) != len(want) {
-			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
-			continue
+		var have, want rune
+		var haveMm, wantMm modmark
+
+		have, haveMm = c.toTraditionalSemivoiced()
+		want = tt.outTradChar
+		wantMm = tt.outTradMark
+		if have != want || haveMm != wantMm {
+			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
+				n, have, haveMm, tt.outTradChar, tt.outTradMark)
+			break
 		}
-		for i := 0; i < len(got); i++ {
-			if got[i] != want[i] {
-				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outTraditional)
-				break
-			}
-		}
-		got = c.toCombiningSemivoiced()
-		want = []rune(tt.outCombining)
-		if len(got) != len(want) {
-			t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outCombining)
-			continue
-		}
-		for i := 0; i < len(got); i++ {
-			if got[i] != want[i] {
-				t.Errorf("%d: got: %q, want: %q", n, string(got), tt.outCombining)
-				break
-			}
+
+		have, haveMm = c.toNonspaceSemivoiced()
+		want = tt.outNonsChar
+		wantMm = tt.outNonsMark
+		if have != want || haveMm != wantMm {
+			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
+				n, have, haveMm, tt.outNonsChar, tt.outNonsMark)
+			break
 		}
 
 	}
