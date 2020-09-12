@@ -518,3 +518,15 @@ func TestToSemivoiced(t *testing.T) {
 
 	}
 }
+
+func BenchmarkGetUnichar(b *testing.B) {
+	s := "\t Aa#　Ａａ＃あア。ｱ｡”ﾞ漢字\U0010FFFF"
+	rs := []rune(s)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for _, r := range rs {
+			getUnichar(r)
+		}
+	}
+	b.StopTimer()
+}
