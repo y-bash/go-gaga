@@ -1,7 +1,6 @@
 package gaga
 
 import (
-	"bufio"
 	"github.com/mattn/go-runewidth"
 	"strings"
 )
@@ -20,44 +19,35 @@ func min(n1, n2 int) int {
 	return n1
 }
 
-func ss2s(ss []string) string {
-	if len(ss) <= 0 {
-		return ""
-	}
-	var size int
-	for _, s := range ss {
-		size += len([]rune(s)) + 1
-	}
-	var sb strings.Builder
-	sb.Grow(size)
-	sb.WriteString(ss[0])
-	for i := 1; i < len(ss); i++ {
-		sb.WriteRune('\n')
-		sb.WriteString(ss[i])
-	}
-	return sb.String()
-}
-
 func wordwrap(in string, w int) (out [][]rune) {
-	r := strings.NewReader(in)
-	sc := bufio.NewScanner(r)
-	for sc.Scan() {
-		rs := []rune(sc.Text())
-		for i := 0; i < len(rs); {
-			if runewidth.RuneWidth(rs[i]) > 0 {
-				i++
-			} else {
-				rs = append(rs[:i], rs[i+1:]...)
-			}
+	rs := []rune(in)
+	out = make([][]rune, 0, len(rs) * 2 / w)
+	for i := 0; i < len(rs); {
+		if rs[i] != '\n' && runewidth.RuneWidth(rs[i]) <= 0 {
+			rs = append(rs[:i], rs[i+1:]...)
+			continue
 		}
-		if len(rs) > 0 {
-			for i := 0; i < len(rs); i += w {
-				e := min(i+w, len(rs))
-				out = append(out, rs[i:e])
-			}
-		} else {
-			out = append(out, []rune{})
+		i++
+	}
+	width := 0
+	start := 0
+	for i := 0; i < len(rs); i++ {
+		if rs[i] == '\n' {
+			out = append(out, rs[start:i])
+			start = i + 1
+			width = 0
+			continue
 		}
+		if width >= w {
+			out = append(out, rs[start:i])
+			start = i
+			width = 1
+			continue
+		}
+		width++
+	}
+	if width > 0 {
+		out = append(out, rs[start:len(rs)])
 	}
 	return
 }
@@ -66,74 +56,61 @@ func vert(in [][]rune, w, h int) (out []string) {
 	if w <= 0 || h <= 0 {
 		return
 	}
+	rs := make([]rune, 0, w*h+h)
 	n := (len(in) + w - 1) / w
 	for i := 0; i < n; i++ {
 		tail := i * w
 		head := tail + w - 1
-		var rsb strings.Builder
-		rsb.Grow(w * h * 4)
 		for j := 0; j < h; j++ {
-			var csb strings.Builder
-			csb.Grow(h * 4)
 			for k := head; k >= tail; k-- {
 				if k >= len(in) || j >= len(in[k]) {
-					csb.WriteString("  ")
+					rs = append(rs, ' ', ' ')
 					continue
 				}
 				if runewidth.RuneWidth(in[k][j]) == 1 {
-					csb.WriteRune(' ')
+					rs = append(rs, ' ')
 				}
-				csb.WriteRune(in[k][j])
+				rs = append(rs, in[k][j])
 			}
-			s := strings.TrimRight(csb.String(), " ")
-			rsb.WriteString(s)
-			rsb.WriteRune('\n')
+			k := len(rs) - 1
+			for ; k >= 0 && rs[k] == ' '; k-- {
+			}
+			rs = rs[:k+1]
+			rs = append(rs, '\n')
 		}
-		out = append(out, rsb.String())
+		out = append(out, string(rs))
+		rs = rs[:0]
 	}
 	return
 }
 
-func ScanNowrap(s string) (w, h int) {
-	r := strings.NewReader(s)
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		s := scanner.Text()
-		rs := []rune(s)
-		l := 0
-		for _, r := range rs {
-			if runewidth.RuneWidth(r) > 0 {
-				l++
-			}
-		}
-
-		h = max(h, l)
-		w++
-	}
-	return
-}
-
-func ScanWordwrap(s string, maxh int) (w, h int) {
+func estimateSize(s string, maxh int) (w, h int) {
 	if maxh <= 0 {
 		maxh = 1
 	}
-	r := strings.NewReader(s)
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		s := scanner.Text()
-		rs := []rune(s)
-		l := 0
-		for _, r := range rs {
-			if runewidth.RuneWidth(r) > 0 {
-				l++
-			}
-		}
-		h = max(h, min(maxh, l))
-		if l == 0 {
+	height := 0
+	rs := []rune(s)
+	for _, r := range rs {
+		if r == '\n' {
 			w++
-		} else {
-			w += (l + maxh - 1) / maxh
+			h = max(h, height)
+			height = 0
+			continue
 		}
+		if runewidth.RuneWidth(r) <= 0 {
+			continue
+		}
+		if height >= maxh {
+			w++
+			h = maxh
+			height = 1
+			continue
+		}
+		height++
+	}
+	if height > 0 {
+		w++
+		h = max(h, height)
 	}
 	return
 }
@@ -145,7 +122,7 @@ func ScanWordwrap(s string, maxh int) (w, h int) {
 // If in contains half-width or narrow-width characters, space
 // is added to the left of it.
 // TODO renew comments
-func VertFixStrings(in string, w int, h int) []string {
+func VertFix(in string, w int, h int) []string {
 	if w <= 0 || h <= 0 {
 		return []string{}
 	}
@@ -153,29 +130,14 @@ func VertFixStrings(in string, w int, h int) []string {
 	return vert(rss, w, h)
 }
 
-func VertToFitStrings(in string, w, h int) []string {
-	sw, sh := ScanWordwrap(in, h)
-	w = min(w, sw)
-	h = min(h, sh)
-	return VertFixStrings(in, w, h)
-}
-
-func VertFix(s string, w, h int) string {
-	ss := VertFixStrings(s, w, h)
-	return ss2s(ss)
-}
-
-func VertToFit(s string, w, h int) string {
-	ss := VertToFitStrings(s, w, h)
-	return ss2s(ss)
-}
-
-func VertNowrap(s string) string {
-	w, h := ScanNowrap(s)
-	ss := VertFixStrings(s, w, h)
-	return ss2s(ss)
+func VertShrink(in string, w, h int) []string {
+	ew, eh := estimateSize(in, h)
+	w = min(w, ew)
+	h = min(h, eh)
+	return VertFix(in, w, h)
 }
 
 func Vert(s string) string {
-	return VertToFit(s, 40, 25)
+	ss := VertShrink(s, 40, 25)
+	return strings.Join(ss, "\n")
 }

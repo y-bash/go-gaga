@@ -6,44 +6,14 @@ import (
 	"testing"
 )
 
-type ScanNowrapTest struct {
-	s string
-	w int
-	h int
-}
-
-var scannowraptests = []ScanNowrapTest{
-	0: {"", 0, 0},
-	1: {"a", 1, 1},
-	2: {"a\nbb\nccc\n", 3, 3},
-	3: {"12345678901234567890123456789012345678901234567890", 1, 50},
-	4: {"1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7", 17, 1},
-	5: {"12345678901234567890123456789012345678901234567890\n" +
-		"1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7", 18, 50},
-	6: {"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007" +
-		"\u0008\u0009\u000A\u000B\u000C\u000D\u000E\u000F" +
-		"\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017" +
-		"\u0018\u0019\u001A\u001B\u001C\u001D\u001E\u001F", 2, 0},
-}
-
-func TestScanNowrap(t *testing.T) {
-	for i, tt := range scannowraptests {
-		w, h := ScanNowrap(tt.s)
-		if w != tt.w || h != tt.h {
-			t.Errorf("#%d ScanNowrap(%q)=(w: %d, h: %d), want:(w: %d, h: %d)",
-				i, tt.s, w, h, tt.w, tt.h)
-		}
-	}
-}
-
-type ScanWordwrapTest struct {
+type EstimateSizeTest struct {
 	s    string
 	maxh int
 	w    int
 	h    int
 }
 
-var scanwordwraptests = []ScanWordwrapTest{
+var estimatesizetests = []EstimateSizeTest{
 	0:  {"a\nbb\nccc\n", 1, 6, 1},
 	1:  {"a\nbb\nccc\n", 2, 4, 2},
 	2:  {"a\nbb\nccc\n", 3, 3, 3},
@@ -83,24 +53,24 @@ var scanwordwraptests = []ScanWordwrapTest{
 	36: {"a\n\n\nabc", 1, 6, 1},
 }
 
-func TestScanWordwrap(t *testing.T) {
-	for i, tt := range scanwordwraptests {
-		w, h := ScanWordwrap(tt.s, tt.maxh)
+func TestEstimateSize(t *testing.T) {
+	for i, tt := range estimatesizetests {
+		w, h := estimateSize(tt.s, tt.maxh)
 		if w != tt.w || h != tt.h {
-			t.Errorf("#%d ScanWordwrap(%q, %d)=(w: %d, h: %d), want(w: %d, h: %d)",
+			t.Errorf("#%d EstimateSize(%q, %d)=(w: %d, h: %d), want(w: %d, h: %d)",
 				i, tt.s, tt.maxh, w, h, tt.w, tt.h)
 		}
 	}
 }
 
-type VertFixStringsTest struct {
+type VertFixTest struct {
 	w   int
 	h   int
 	in  []string
 	out []string
 }
 
-var verttests = []VertFixStringsTest{
+var vertfixtests = []VertFixTest{
 	0: {3, 3,
 		[]string{
 			"",
@@ -542,20 +512,20 @@ var verttests = []VertFixStringsTest{
 	},
 }
 
-func TestVertFixStrings(t *testing.T) {
-	for i, tt := range verttests {
+func TestVertFix(t *testing.T) {
+	for i, tt := range vertfixtests {
 		in := strings.Join(tt.in, "\n")
 		exp := strings.Join(tt.out, "\n")
-		ss := VertFixStrings(in, tt.w, tt.h)
+		ss := VertFix(in, tt.w, tt.h)
 		got := strings.Join(ss, "\n")
 		if got != exp {
-			t.Errorf("#%d VertFixStrings(in,%d,%d):\nin=(\n%s\n),\nexpected=(\n%s\n),\ngot=(\n%s\n)",
+			t.Errorf("#%d VertFix(in,%d,%d):\nin=(\n%s\n),\nexpected=(\n%s\n),\ngot=(\n%s\n)",
 				i, tt.w, tt.h, in, exp, got)
 		}
 	}
 }
 
-func TestVertFixStringsCatchesOverflow(t *testing.T) {
+func TestVertFixCatchesOverflow(t *testing.T) {
 	tests := [...]struct {
 		w int
 		h int
@@ -568,21 +538,21 @@ func TestVertFixStringsCatchesOverflow(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		ss := VertFixStrings("foo,bar,baz", tt.w, tt.h)
+		ss := VertFix("foo,bar,baz", tt.w, tt.h)
 		if len(ss) != 0 {
 			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
 		}
 	}
 }
 
-type VertToFitStringsTest struct {
+type VertShrinkTest struct {
 	s   string
 	w   int
 	h   int
 	out []string
 }
 
-var verttofitstringstests = []VertToFitStringsTest{
+var vertshrinktests = []VertShrinkTest{
 	0:  {"", 0, 0, []string{}},
 	1:  {"a", 1, 1, []string{" a\n"}},
 	2:  {"a\nbb\nccc\n", 4, 4, []string{" c b a\n c b\n c\n"}},
@@ -606,40 +576,43 @@ var verttofitstringstests = []VertToFitStringsTest{
 		" 7 4 1\n 8 5 2\n 9 6 3\n", " 1   0\n 2\n 3\n", "     4\n     5\n\n"}},
 }
 
-func TestVertToFitStrings(t *testing.T) {
-	for i, tt := range verttofitstringstests {
-		ss := VertToFitStrings(tt.s, tt.w, tt.h)
+func TestVertShrink(t *testing.T) {
+	for i, tt := range vertshrinktests {
+		ss := VertShrink(tt.s, tt.w, tt.h)
 		if len(ss) != len(tt.out) {
-			t.Errorf("#%d VertToFitStrings(%q, %d, %d),\n\thave:(%q),\n\twant:(%q)",
+			t.Errorf("#%d VertShrink(%q, %d, %d),\n\thave:(%q),\n\twant:(%q)",
 				i, tt.s, tt.w, tt.h, ss, tt.out)
 			continue
 		}
 		for j, s := range ss {
 			if s != tt.out[j] {
-				t.Errorf("#%d VertToFitStrings(%q, %d, %d)[%d],\n\thave:%q,\n\twant:%q",
+				t.Errorf("#%d VertShrink(%q, %d, %d)[%d],\n\thave:%q,\n\twant:%q",
 					i, tt.s, tt.w, tt.h, j, s, tt.out[j])
 			}
 		}
 	}
 }
 
-func benchmarkVertFixStrings(b *testing.B, s string, w, h int) {
+func benchmarkVert(b *testing.B, s string) {
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		VertFixStrings(s, w, h)
+		Vert(s)
 	}
+	b.StopTimer()
 }
 
-func BenchmarkVertFixStrings100(b *testing.B) {
+func BenchmarkVert100(b *testing.B) {
 	s := strings.Repeat("aあbいcう", 100)
-	benchmarkVertFixStrings(b, s, 40, 25)
+	benchmarkVert(b, s)
 }
 
-func BenchmarkVertFixStrings1000(b *testing.B) {
+func BenchmarkVert1000(b *testing.B) {
 	s := strings.Repeat("aあbいcう", 1000)
-	benchmarkVertFixStrings(b, s, 40, 25)
+	benchmarkVert(b, s)
 }
 
-func BenchmarkVertFixStrings10000(b *testing.B) {
+func BenchmarkVert10000(b *testing.B) {
 	s := strings.Repeat("aあbいcう", 10000)
-	benchmarkVertFixStrings(b, s, 40, 25)
+	benchmarkVert(b, s)
 }
+
