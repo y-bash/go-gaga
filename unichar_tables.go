@@ -23,7 +23,7 @@ const (
 	ccHiragana
 	ccKatakana
 	ccTraditional
-	ccCombining
+	ccNonspace
 	ccMax
 )
 
@@ -315,8 +315,8 @@ var kanaTable = unichars{
 	{0x3096, ctKanaLetter, ccHiragana, cwWide, vcUndefined, 'ヶ', 'ｹ', 'ゖ', 'ゖ'},                          // 0x3096 ゖ
 	{0x3097, ctUndefined, ccUndefined, cwUndefined, vcUndefined, '\u3097', '\u3097', '\u3097', '\u3097'}, // 0x3097 ゗
 	{0x3098, ctUndefined, ccUndefined, cwUndefined, vcUndefined, '\u3098', '\u3098', '\u3098', '\u3098'}, // 0x3098 ゘
-	{0x3099, ctKanaVsm, ccCombining, cwWide, vcUndefined, '゛', 'ﾞ', '゙', '゙'},                            // 0x3099 ゙
-	{0x309A, ctKanaVsm, ccCombining, cwWide, vcUndefined, '゜', 'ﾟ', '゚', '゚'},                            // 0x309A ゚
+	{0x3099, ctKanaVsm, ccNonspace, cwWide, vcUndefined, '゛', 'ﾞ', '゙', '゙'},                             // 0x3099 ゙
+	{0x309A, ctKanaVsm, ccNonspace, cwWide, vcUndefined, '゜', 'ﾟ', '゚', '゚'},                             // 0x309A ゚
 	{0x309B, ctKanaVsm, ccTraditional, cwWide, vcUndefined, '゙', 'ﾞ', '゛', '゛'},                          // 0x309B ゛
 	{0x309C, ctKanaVsm, ccTraditional, cwWide, vcUndefined, '゚', 'ﾟ', '゜', '゜'},                          // 0x309C ゜
 	{0x309D, ctKanaLetter, ccHiragana, cwWide, vcUndefined, 'ヽ', 'ゝ', 'ゝ', 'ゝ'},                          // 0x309D ゝ

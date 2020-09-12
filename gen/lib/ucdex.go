@@ -83,7 +83,7 @@ const (
 	ccHiragana
 	ccKatakana
 	ccTraditional
-	ccCombining
+	ccNonspace
 	ccMax
 )
 
@@ -96,7 +96,7 @@ var charCases = constValues{
 		"ccHiragana",
 		"ccKatakana",
 		"ccTraditional",
-		"ccCombining",
+		"ccNonspace",
 		"ccMax",
 	},
 }
@@ -254,19 +254,19 @@ type additionalAttr struct {
 }
 
 var additionalAttrList = []additionalAttr{
-	{'　', aaCategory, ctLatinSymbol},    // 0x3000 [　] ctKanaSymbol -> ctLatinSymbol
-	{'\u3099', aaCategory, ctKanaVsm},   // 0x3099 [ ◌゙] ctKanaLetter -> ctKanaVsm
-	{'\u309A', aaCategory, ctKanaVsm},   // 0x309A [゚゚ ゚] ctKanaLetter -> ctKanaVsm
-	{'゛', aaCategory, ctKanaVsm},        // 0x309B [゛] ctKanaLetter -> ctKanaVsm
-	{'゜', aaCategory, ctKanaVsm},        // 0x309C [゜] ctKanaLetter -> ctKanaVsm
-	{'ﾞ', aaCategory, ctKanaVsm},        // FF9E [ﾞ] ctKanaLetter -> ctKanaVsm
-	{'ﾟ', aaCategory, ctKanaVsm},        // FF9F [ﾟ] ctKanaLetter -> ctKanaVsm
-	{'\u3099', aaCharCase, ccCombining}, // 0x3099 [ ◌゙] ccHiragana -> ccTraditional
-	{'\u309A', aaCharCase, ccCombining}, // 0x309A [゚゚ ゚] ccHiragana -> ccTraditional
-	{'゛', aaCharCase, ccTraditional},    // 0x309B [゛] ccHiragana -> ccTraditional
-	{'゜', aaCharCase, ccTraditional},    // 0x309C [゜] ccHiragana -> ccTraditional
-	{'ﾞ', aaCharCase, ccTraditional},    // FF9E [ﾞ] ccKatakana -> ccTraditional
-	{'ﾟ', aaCharCase, ccTraditional},    // FF9F [ﾟ] ccKatakana -> ccTraditional
+	{'　', aaCategory, ctLatinSymbol},   // 0x3000 [　] ctKanaSymbol -> ctLatinSymbol
+	{'\u3099', aaCategory, ctKanaVsm},  // 0x3099 [ ◌゙] ctKanaLetter -> ctKanaVsm
+	{'\u309A', aaCategory, ctKanaVsm},  // 0x309A [゚゚ ゚] ctKanaLetter -> ctKanaVsm
+	{'゛', aaCategory, ctKanaVsm},       // 0x309B [゛] ctKanaLetter -> ctKanaVsm
+	{'゜', aaCategory, ctKanaVsm},       // 0x309C [゜] ctKanaLetter -> ctKanaVsm
+	{'ﾞ', aaCategory, ctKanaVsm},       // FF9E [ﾞ] ctKanaLetter -> ctKanaVsm
+	{'ﾟ', aaCategory, ctKanaVsm},       // FF9F [ﾟ] ctKanaLetter -> ctKanaVsm
+	{'\u3099', aaCharCase, ccNonspace}, // 0x3099 [ ◌゙] ccHiragana -> ccTraditional
+	{'\u309A', aaCharCase, ccNonspace}, // 0x309A [゚゚ ゚] ccHiragana -> ccTraditional
+	{'゛', aaCharCase, ccTraditional},   // 0x309B [゛] ccHiragana -> ccTraditional
+	{'゜', aaCharCase, ccTraditional},   // 0x309C [゜] ccHiragana -> ccTraditional
+	{'ﾞ', aaCharCase, ccTraditional},   // FF9E [ﾞ] ccKatakana -> ccTraditional
+	{'ﾟ', aaCharCase, ccTraditional},   // FF9F [ﾟ] ccKatakana -> ccTraditional
 }
 
 // Get the multiple codepoints from Cp(UCD)
