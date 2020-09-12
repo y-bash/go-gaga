@@ -75,11 +75,11 @@ func TestCmdVertVertStrs(t *testing.T) {
 }
 
 type CmdVertReadWrieTest struct {
-	in     string
-	out    string
+	in  string
+	out string
 }
 
-var cmdvertreadwritetests = []CmdVertReadWrieTest {
+var cmdvertreadwritetests = []CmdVertReadWrieTest{
 	0: {"testdata/vert_in01.txt", "testdata/vert_out01.txt"},
 	1: {"testdata/vert_in02.txt", "testdata/vert_out02.txt"},
 	2: {"testdata/vert_in03.txt", "testdata/vert_out03.txt"},
@@ -89,7 +89,7 @@ var cmdvertreadwritetests = []CmdVertReadWrieTest {
 func TestCmdVertReadWrite(t *testing.T) {
 	for i, tt := range cmdvertreadwritetests {
 		want, err := ioutil.ReadFile(tt.out)
-		if (err != nil) {
+		if err != nil {
 			log.Fatal(err)
 		}
 		var have bytes.Buffer
@@ -97,7 +97,7 @@ func TestCmdVertReadWrite(t *testing.T) {
 		vertstrs(&have, ss, 40, 25)
 		if string(have.Bytes()) != string(want) {
 			t.Errorf("#%d\nin:\n%s,\nhave:\n%s,\nwant:\n%s",
-				i, ss[0], have.Bytes(), want) 
+				i, ss[0], have.Bytes(), want)
 		}
 	}
 }
