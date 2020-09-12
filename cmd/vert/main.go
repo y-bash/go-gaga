@@ -41,7 +41,7 @@ func readfiles(paths []string) (out []string) {
 }
 
 func vert(f io.Writer, s string, w, h int) {
-	ss := gaga.VertToFitStrings(s, w, h)
+	ss := gaga.VertShrink(s, w, h)
 	if len(ss) > 0 {
 		fmt.Fprint(f, ss[0])
 		for i := 1; i < len(ss); i++ {
