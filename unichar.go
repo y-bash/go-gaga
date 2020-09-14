@@ -166,9 +166,6 @@ func (c *unichar) toCombiningR() rune {
 }
 
 // for Hiragana-Katakana letters.
-// TEST_Vs4Ad89Z knows that this function returns a rune array with
-// 1 or 2 elements and no other number of elements.
-// TODO comment, func name
 func (c *unichar) composeVoiced() (rune, vom) {
 	switch c.voicing {
 	case vcVoiced:
@@ -202,8 +199,6 @@ func (c *unichar) composeVoiced() (rune, vom) {
 }
 
 // for Hiragana-Katakana letters.
-// TEST_s8U59Hzf knows that this function returns a rune array with
-// 1 or 2 elements and no other number of elements.
 func (c *unichar) composeSemivoiced() (rune, vom) {
 	switch c.voicing {
 	case vcSemivoiced:
@@ -255,8 +250,6 @@ func (c *unichar) composeSemivoiced() (rune, vom) {
 }
 
 // for Hiragana-Katakana letters.
-// TEST_R4gNVpGj knows that this function returns a rune array with
-// 1 or 2 elements and no other number of elements.
 func (c *unichar) decomposeVoiced() (rune, vom) {
 	switch c.voicing {
 	case vcUnvoiced, vcUndefined:
@@ -272,8 +265,6 @@ func (c *unichar) decomposeVoiced() (rune, vom) {
 }
 
 // for Hiragana-Katakana letters.
-// TEST_Pp9gBVj2 knows that this function returns a rune array with
-// 1 or 2 elements and no other number of elements.
 func (c *unichar) decomposeSemivoiced() (rune, vom) {
 	switch c.voicing {
 	case vcUnvoiced, vcUndefined:

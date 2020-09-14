@@ -3,6 +3,7 @@ package gaga
 import (
 	"fmt"
 	"golang.org/x/text/unicode/norm"
+	"golang.org/x/text/width"
 	"log"
 	"strings"
 	"testing"
@@ -973,7 +974,6 @@ outer:
 	return valid, invalid
 }
 
-/* xxx
 func TestHeavyNormFlags(t *testing.T) {
 	valid, invalid := parenormflagcombs()
 	log.Printf("  valid : %7d\n", len(valid))
@@ -982,7 +982,7 @@ func TestHeavyNormFlags(t *testing.T) {
 	for _, flag := range invalid {
 		_, err := NewNormalizer(flag)
 		if err == nil {
-			t.Errorf("TestInvalidFlags: %s is valid, want: invalid\n", flag)
+			t.Errorf("TestInvalidFlags: %s is valid, want: invalid", flag)
 		}
 	}
 	// testing valid flags
@@ -991,28 +991,90 @@ outer:
 	for i, flag := range valid {
 		n, err := NewNormalizer(flag)
 		if err != nil {
-			t.Errorf("TestInvalidFlags: %s is invalid, want: valid\n", flag)
+			t.Errorf("TestInvalidFlags: %s is invalid, want: valid", flag)
 			continue
 		}
 		for r := rune(0); r < maxr; r++ {
-			rs := n.NormalizeRune(r)
-			switch len(rs) {
-			case 1, 2:
-			default: // TEST_Fc68JR9i
-				t.Errorf("NormalizaRune(%#U), flags: %s, invalid return %v;"+
-					"want: number of elements is 1 or 2\n", r, flag, rs)
+			c, rOK := getUnichar(r)
+			nr, vm := n.NormalizeRune(r)
+			_, nrOK := getUnichar(nr)
+			if rOK != nrOK {
+				// TEST_G9amUMTr
+				if rOK {
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: %#U is not exists in unichars"+
+						"\n\twant: %#U is exists in unichars", r, flag, nr, nr, )
+				} else {
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: %#U is exists in unichars"+
+						"\n\twant: %#U is not exists in unichars", r, flag, nr, nr, )
+				}
 				break outer
 			}
+			if !nrOK {
+				if vm != vmNone {
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+						r, flag, nr, vm, vmNone)
+					break outer
+				}
+				if r != nr {
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: nr=%#U",
+						r, flag, nr, vm, r)
+					break outer
+				}
+				continue
+			}
+			if c.voicing == vcUndefined || c.voicing == vcUnvoiced {
+				if vm != vmNone {
+					// TEST_nD7FwQUW
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+						r, flag, nr, vm, vmNone)
+					break outer
+				}
+				continue
+			}
+			if (c.charCase == ccHiragana && flag.has(HiraganaToNarrow) && !flag.has(DecomposeVom)) ||
+				(c.charCase == ccKatakana && flag.has(KatakanaToNarrow) && !flag.has(DecomposeVom)) {
+				if c.voicing == vcVoiced && vm != vmVsmNarrow {
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+						r, flag, nr, vm, vmVsmNarrow)
+					break outer
+				}
+				if c.voicing == vcSemivoiced && vm != vmSsmNarrow {
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+						r, flag, nr, vm, vmSsmNarrow)
+					break outer
+				}
+			}
+			if c.charCase == ccHiragana && flag.has(HiraganaToKatakana) && !flag.has(DecomposeVom) {
+				if vm != vmNone {
+					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+						r, flag, nr, vm, vmNone)
+					break outer
+				}
+			}
+			if c.charCase == ccKatakana && flag.has(KatakanaToHiragana) && !flag.has(DecomposeVom) {
+				switch r {
+				case 'ヷ','ヸ', 'ヹ', 'ヺ':
+					if vm != vmVsmWide {
+						t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+							r, flag, nr, vm, vmVsmWide)
+						break outer
+					}
+				default:
+					if vm != vmNone {
+						t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+							r, flag, nr, vm, vmNone)
+						break outer
+					}
+				}
+			}
 		}
-		if i%200 == 0 {
+		if i%500 == 0 {
 			log.Printf("%5d/%5d (%3d%% done)", i, len(valid), i*100/len(valid))
 		}
 	}
 }
-*/
 
-//const normSTR = "\t Aa#　Ａａ＃あア。ｱ｡”ﾞ漢字ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ\U0010FFFF"
-const normSTR = "ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ\U0010FFFF"
+const normSTR = "\t Aa#　Ａａ＃あア。ｱ｡”ﾞ漢字ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ\U0010FFFF"
 
 func BenchmarkNormalize(b *testing.B) {
 	n, _ := NewNormalizer(LatinToNarrow | KanaToWide)
@@ -1041,3 +1103,31 @@ func BenchmarkNormNFKC(b *testing.B) {
 	}
 	b.StopTimer()
 }
+
+func BenchmarkWidthNarrow(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := strings.Repeat(normSTR, 1)
+		width.Narrow.String(s)
+	}
+	b.StopTimer()
+}
+
+func BenchmarkWidthWiden(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := strings.Repeat(normSTR, 1)
+		width.Widen.String(s)
+	}
+	b.StopTimer()
+}
+
+func BenchmarkWidthFold(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s := strings.Repeat(normSTR, 1)
+		width.Fold.String(s)
+	}
+	b.StopTimer()
+}
+

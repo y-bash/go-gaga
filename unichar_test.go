@@ -315,44 +315,6 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
 			}
 		}
-
-		/* xxx
-
-		// Testing return values of methods
-		var rs []rune
-
-		// TEST_Vs4Ad89Z
-		rs = c.toTraditionalVoiced()
-		switch len(rs) {
-		case 1, 2:
-		default:
-			t.Errorf("%s[%#U].toTraditionalVoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
-		}
-
-		// TEST_s8U59Hzf
-		rs = c.toTraditionalSemivoiced()
-		switch len(rs) {
-		case 1, 2:
-		default:
-			t.Errorf("%s[%#U].toTraditionalSemivoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
-		}
-
-		// TEST_R4gNVpGj
-		rs = c.toNonspaceVoiced()
-		switch len(rs) {
-		case 1, 2:
-		default:
-			t.Errorf("%s[%#U].toNonspaceVoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
-		}
-
-		// TEST_Pp9gBVj2
-		rs = c.toNonspaceSemivoiced()
-		switch len(rs) {
-		case 1, 2:
-		default:
-			t.Errorf("%s[%#U].toNonspaceSemivoiced() is %v, want 1 or 2 elements", name, c.codepoint, rs)
-		}
-		*/
 	}
 }
 

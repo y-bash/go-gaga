@@ -14,7 +14,6 @@ const (
 	// normflagUndefined indicates that the normalization flag is undefined.
 	normflagUndefined = (1 << iota) / 2 // Sequence of 0, 1, 2, 4, 8, etc...
 
-	// TODO convert to ?
 	// AlphaToNarrow converts all the full-width Latin letters to their half-width.
 	// Example: [Ａ] =>[A]
 	AlphaToNarrow
@@ -308,11 +307,8 @@ func (n *Normalizer) maybeComposeVom(r1, r2 rune) (rune, vom, bool) {
 		return r, m, false
 	}
 
-	nr1, _ := n.NormalizeRune(r1)
-	nc1, ok := getUnichar(nr1)
-	if !ok {
-		panic("xxx")
-	}
+	nr1, _ := n.NormalizeRune(r1) // // TEST_nD7FwQUW knows that NormalizeRune() definitely return the vmNone
+	nc1, _ := getUnichar(nr1) // TEST_G9amUMTr knows that getUnichar() definitely return the ok value
 	switch {
 	case vom(r2).isVsm():
 		switch {
