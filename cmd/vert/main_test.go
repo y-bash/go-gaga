@@ -7,14 +7,14 @@ import (
 	"testing"
 )
 
-type CmdVertVertStrsTest struct {
+type CmdVertStrsTest struct {
 	ss  []string
 	w   int
 	h   int
 	out string
 }
 
-var cmdvertvertstrstests = []CmdVertVertStrsTest{
+var cmdvertvertstrstests = []CmdVertStrsTest{
 	0: {[]string{"a\nbb\ncc\n"}, 3, 2,
 		" c b a\n" +
 			" c b\n"},
@@ -62,7 +62,7 @@ var cmdvertvertstrstests = []CmdVertVertStrsTest{
 			" c\n"},
 }
 
-func TestCmdVertVertStrs(t *testing.T) {
+func TestCmdVertStrs(t *testing.T) {
 	for i, tt := range cmdvertvertstrstests {
 		var buf bytes.Buffer
 		vertstrs(&buf, tt.ss, tt.w, tt.h)
