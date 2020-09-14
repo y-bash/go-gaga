@@ -2,7 +2,6 @@ package gaga
 
 import (
 	"fmt"
-	//	"github.com/mattn/go-runewidth"
 	"strings"
 )
 
@@ -14,35 +13,43 @@ const (
 	// normflagUndefined indicates that the normalization flag is undefined.
 	normflagUndefined = (1 << iota) / 2 // Sequence of 0, 1, 2, 4, 8, etc...
 
-	// AlphaToNarrow converts all the full-width Latin letters to their half-width.
+	// AlphaToNarrow converts all the full-width Latin letters to
+	// their half-width.
 	// Example: [Ａ] =>[A]
 	AlphaToNarrow
 
-	// AlphaToWide converts all the half-width Latin letters to their full-width.
+	// AlphaToWide converts all the half-width Latin letters to
+	// their full-width.
 	// Example: [A] => [Ａ]
 	AlphaToWide
 
-	// AlphaToUpper converts all the lower case Latin letters to their upper case.
+	// AlphaToUpper converts all the lower case Latin letters to
+	// their upper case.
 	// Examples: [a] => [A],  [ａ] => [Ａ]
 	AlphaToUpper
 
-	// AlphaToLower converts all the upper case Latin letters to their lower case.
+	// AlphaToLower converts all the upper case Latin letters to
+	// their lower case.
 	// Examples: [A] => [a],  [Ａ] => [ａ]
 	AlphaToLower
 
-	// DigitToNarrow converts all the full-width Latin digits to their half-width.
+	// DigitToNarrow converts all the full-width Latin digits to
+	// their half-width.
 	// Example: [１] => [1]
 	DigitToNarrow
 
-	// DigitToWide converts all the half-width Latin digits to their full-width.
+	// DigitToWide converts all the half-width Latin digits to
+	// their full-width.
 	// Example: [1] => [１]
 	DigitToWide
 
-	// SymbolToNarrow converts all the full-width Latin symbols to their half-width.
+	// SymbolToNarrow converts all the full-width Latin symbols to
+	// their half-width.
 	// Example: [？] => [?]
 	SymbolToNarrow
 
-	// SymbolToWide converts all the half-width Latin symbols to their full-width.
+	// SymbolToWide converts all the half-width Latin symbols to
+	// their full-width.
 	// Example: [?] => [？]
 	SymbolToWide
 
@@ -71,42 +78,50 @@ const (
 	// Examples: [ア] => [あ],  [ｱ] => [あ]
 	KatakanaToHiragana
 
-	// KanaSymbolToNarrow converts the full-width Hiragana-Katakana symbols
-	// to their half-width as much as possible.
+	// KanaSymbolToNarrow converts the full-width Hiragana-Katakana
+	// symbols to their half-width as much as possible.
 	// Example: [、] => [､]
 	KanaSymbolToNarrow
 
-	// KanaSymbolToWide converts all the half-width Hiragana-Katakana symbols
-	// to their full-width.
+	// KanaSymbolToWide converts all the half-width Hiragana-Katakana
+	// symbols to their full-width.
 	// Example: [､] => [、]
 	KanaSymbolToWide
 
-	// ComposeVom combines voiced or semi-voiced sound letter
-	// in the traditional JIS X 0201 or JIS X 0208 sytle.
-	// marks behind
-	// Hiragana-Katakana in a traditional style.
-	// JIS X 0201 and JIS X 0208
-	// TODO Voiced character, Semi-voiced character, CombinedModmark, Traditional combining
+	// ComposeVom composes the voiced or semi-voiced sound letter.
 	// Examples:
-	//	[か][゛] => [が],    [ｶ][゛]  => [ｶ][ﾞ],     [は][゜] => [ぱ]
-	//	[ヰ][゛] => [ヸ],    [ゐ][゛] => [ゐ][゛]
+	//	[が]     => [が],  [か][゛] => [が],    [か][\u3099] => [が],
+	//  [か][ﾞ]  => [が],  [ｶ][゛]  => [ｶ][ﾞ],  [ｶ][ﾞ]       => [ｶ][ﾞ],
+	//  [は][゜] => [ぱ],  [ヰ][゛] => [ヸ],    [ゐ][゛]     => [ゐ][゛]
 	ComposeVom
 
-	// DecomposeVom combines voiced or semi-voiced sound marks behind
-	// Hiragana-Katakana in a Unicode combining style.
-	// TODO Voiced character, Semi-voiced character, Unicode Canonical combining
+	// DecomposeVom decomposes the voiced or semi-voiced sound letter.
 	// Examples:
-	//	[が] => [か][\u3099],  [か][゛] => [か][\u3099],  [ｶ][゛]  => [ｶ][\u3099],
-	//	[ぱ] => [は][\u309A],  [ヰ][゛] => [ヰ][\u3099],  [ゐ][゛] => [ゐ][\u3099]
+	//	[が]         => [か][\u3099],  [か][゛] => [か][\u3099],
+	//  [か][\u3099] => [か][\u3099],  [か][ﾞ]  => [か][\u3099],
+	//  [ｶ][゛]      => [ｶ][\u3099],   [ｶ][ﾞ]   => [ｶ][\u3099],
+	//	[ぱ]         => [は][\u309A],  [ヰ][゛] => [ヰ][\u3099],
+	//  [ゐ][゛]     => [ゐ][\u3099]
 	DecomposeVom
 
-	// TODO comment Isolated
+	// IsolatedKanaVomToNarrow converts an isolated voicing modifier
+	// which was not combined into a base letter into a half-width
+	// voiced or semi-voiced sound letter.
+	// Examples:
+	//  [゛] => [ﾞ],  [\u3099] => [ﾞ],  [゜] => [ﾟ],  [\u309A] => [ﾟ]
 	IsolatedKanaVomToNarrow
 
-	// TODO comment
+	// IsolatedKanaVomToWide converts an isolated voicing modifier
+	// which was not combined into a base letter into a full-width
+	// voiced or semi-voiced sound letter.
+	// Examples:
+	//  [\u3099] => [゛],  [ﾞ] => [゛],  [\u309A] => [゜],  [ﾟ] => [゜]
 	IsolatedKanaVomToWide
 
-	// TODO comment
+	// IsolatedKanaVomToCombining converts an isolated voicing
+	// modifier which was not combined into a base letter into a
+	// combining voiced or semi-voiced sound letter.
+	//  [゛] => [\u3099],  [ﾞ] => [\u3099],  [゜] = [\u309A],  [ﾟ] => [\u309A]
 	IsolatedKanaVomToNonspace
 
 	normflagMax
@@ -144,15 +159,15 @@ const (
 	// the full-width Hiragana-Katakana characters to their half-width as
 	// much as possible.
 	//
-	//          | CHARACTER                      | CONVERT TO
-	// ---------+--------------------------------+----------------------
-	//          | Hiaragana                      | Narrow Katakana
-	// Category | Wide Katakana                  | Narrow Katakana
-	//          | Wide Kana Symbol               | Narrow Kana Symbol
-	//          | Voiced/Semi-voiced Kana Letter | Traditional voicing
-	//          | Isolated Wide VSM/SVSM         | Narrow VSM/SVSM
-	// ---------+--------------------------------+----------------------
-	// Example  | "あイ、が゛"                   | "ｱｲ､ｶﾞﾞ"
+	//          | CHARACTER                       | CONVERT TO
+	// ---------+---------------------------------+-------------------
+	//          | Hiaragana                       | Narrow Katakana
+	// Category | Wide Katakana                   | Narrow Katakana
+	//          | Wide Kana Symbol                | Narrow Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter  | Legacy composed
+	//          | Isolated Voicing Modifier (VOM) | Narrow VOM
+	// ---------+---------------------------------+-------------------
+	// Example  | "あイ、が゛"                    | "ｱｲ､ｶﾞﾞ"
 	//
 	KanaToNarrow = HiraganaToNarrow | KatakanaToNarrow | KanaSymbolToNarrow |
 		IsolatedKanaVomToNarrow | ComposeVom
@@ -160,56 +175,56 @@ const (
 	// KanaToWide is a combination of normalization flags for converting
 	// all the half-width Hiragana-Katakana characters to their full-width.
 	//
-	//          | CHARACTER                      | CONVERT TO
-	// ---------+--------------------------------+----------------------
-	//          | Narrow Katakana                | Wide Katakana
-	// Category | Narrow Kana Symbol             | Wide Kana Symbol
-	//          | Voiced/Semi-voiced Kana Letter | Traditional voicing
-	//          | Isolated Narrow VSM/SVSM       | Wide VSM/SVSM
-	// ---------+--------------------------------+----------------------
-	// Example  | "ｱ､ｶﾞﾞ"                        | "ア、ガ゛"
+	//          | CHARACTER                       | CONVERT TO
+	// ---------+---------------------------------+-----------------
+	//          | Narrow Katakana                 | Wide Katakana
+	// Category | Narrow Kana Symbol              | Wide Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter  | Legacy composed
+	//          | Isolated Voicing Modifier (VOM) | Wide VOM
+	// ---------+---------------------------------+-----------------
+	// Example  | "ｱ､ｶﾞﾞ"                         | "ア、ガ゛"
 	//
 	KanaToWide = KatakanaToWide | KanaSymbolToWide | IsolatedKanaVomToWide |
 		ComposeVom
 
 	//
-	//          | CHARACTER                      | CONVERT TO
-	// ---------+--------------------------------+----------------------
-	//          | Hiragana                       | Wide Katakana
-	// Category | Narrow Katakana                | Wide Katakana
-	//          | Narrow Kana Symbol             | Wide Kana Symbol
-	//          | Voiced/Semi-voiced Kana Letter | Traditional voicing
-	//          | Isolated Narrow VSM/SVSM       | Wide VSM/SVSM
-	// ---------+--------------------------------+----------------------
+	//          | CHARACTER                       | CONVERT TO
+	// ---------+---------------------------------+-----------------
+	//          | Hiragana                        | Wide Katakana
+	// Category | Narrow Katakana                 | Wide Katakana
+	//          | Narrow Kana Symbol              | Wide Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter  | Legacy composed
+	//          | Isolated Voicing Modifier (VOM) | Wide VOM
+	// ---------+---------------------------------+-----------------
 	// Example  | "あｲ､ｶﾞﾞ"                       | "アイ、ガ゛"
 	//
 	KanaToWideKatakana = KatakanaToWide | HiraganaToKatakana | KanaSymbolToWide |
 		IsolatedKanaVomToWide | ComposeVom
 
 	//
-	//          | CHARACTER                      | CONVERT TO
-	// ---------+--------------------------------+----------------------
-	//          | Hiragana                       | Narrow Katakana
-	// Category | Wide Katakana                  | Narrow Katakana
-	//          | Wide Kana Symbol               | Narrow Kana Symbol
-	//          | Voiced/Semi-voiced Kana Letter | Traditional voicing
-	//          | Isolated Wide VSM/SVSM         | Narrow VSM/SVSM
-	// ---------+--------------------------------+----------------------
-	// Example  | "あイ、が゛"                   | "ｱｲ､ｶﾞﾞ"
+	//          | CHARACTER                       | CONVERT TO
+	// ---------+---------------------------------+----------------------
+	//          | Hiragana                        | Narrow Katakana
+	// Category | Wide Katakana                   | Narrow Katakana
+	//          | Wide Kana Symbol                | Narrow Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter  | Legacy composed
+	//          | Isolated Voicing Modifier (VOM) | Narrow VOM
+	// ---------+---------------------------------+----------------------
+	// Example  | "あイ、が゛"                    | "ｱｲ､ｶﾞﾞ"
 	//
 	KanaToNarrowKatakana = KatakanaToNarrow | HiraganaToNarrow |
 		KanaSymbolToNarrow | IsolatedKanaVomToNarrow | ComposeVom
 
 	//
-	//          | CHARACTER                      | CONVERT TO
-	// ---------+--------------------------------+----------------------
-	//          | Wide Katakana                  | Hiragana
-	// Category | Narrow Katakana                | Hiragana
-	//          | Narrow Kana Symbol             | Wide Kana Symbol
-	//          | Voiced/Semi-voiced Kana Letter | Traditional voicing
-	//          | Isolated Narrow VSM/SVSM       | Wide VSM/SVSM
-	// ---------+--------------------------------+----------------------
-	// Example  | "アｲ､ガ゛"                     | "あい、が゛"
+	//          | CHARACTER                       | CONVERT TO
+	// ---------+---------------------------------+----------------------
+	//          | Wide Katakana                   | Hiragana
+	// Category | Narrow Katakana                 | Hiragana
+	//          | Narrow Kana Symbol              | Wide Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter  | Legacy composed
+	//          | Isolated Voicing Modifier (VOM) | Wide VOM
+	// ---------+---------------------------------+----------------------
+	// Example  | "アｲ､ガ゛"                      | "あい、が゛"
 	//
 	KanaToHiragana = KatakanaToHiragana | KanaSymbolToWide |
 		IsolatedKanaVomToWide | ComposeVom
@@ -257,12 +272,13 @@ func (f NormFlag) String() string {
 	}
 }
 
-// Normalizer normalizes the input provided and returns the normalized string.
+// Normalizer normalizes the input provided and returns
+// the normalized string.
 type Normalizer struct {
 	flag NormFlag
 }
 
-// invalid combination of normalization flags
+// invalid combination of normalization flags.
 var invalidFlagsList = []NormFlag{
 	AlphaToUpper | AlphaToLower,
 	AlphaToNarrow | AlphaToWide,
@@ -285,7 +301,9 @@ func validateNormFlag(flag NormFlag) error {
 	}
 	for _, invalid := range invalidFlagsList {
 		if flag&invalid == invalid {
-			return fmt.Errorf("invalid normalization flag: %d, invalid combination: %d", flag, invalid)
+			return fmt.Errorf(
+				"invalid normalization flag: %d, invalid combination: %d",
+				flag, invalid)
 		}
 	}
 	return nil
@@ -302,13 +320,20 @@ func (n *Normalizer) maybeComposeVom(r1, r2 rune) (rune, vom, bool) {
 		return r1, vmNone, false
 	}
 
-	if c1.category != ctKanaLetter || c1.voicing == vcVoiced || c1.voicing == vcSemivoiced {
+	if c1.category != ctKanaLetter ||
+		c1.voicing == vcVoiced || c1.voicing == vcSemivoiced {
 		r, m := n.NormalizeRune(r1)
 		return r, m, false
 	}
 
-	nr1, _ := n.NormalizeRune(r1) // // TEST_nD7FwQUW knows that NormalizeRune() definitely return the vmNone
-	nc1, _ := getUnichar(nr1)     // TEST_G9amUMTr knows that getUnichar() definitely return the ok value
+	// TEST_nD7FwQUW knows that NormalizeRune() will definitely return
+	// a rune and the vmNone.
+	nr1, _ := n.NormalizeRune(r1)
+
+	// TEST_G9amUMTr knows that getUnichar() definitely return a rune
+	// and the ok value.
+	nc1, _ := getUnichar(nr1)
+
 	switch {
 	case vom(r2).isVsm():
 		switch {
@@ -338,8 +363,9 @@ func (n *Normalizer) maybeComposeVom(r1, r2 rune) (rune, vom, bool) {
 	panic("unreachable")
 }
 
-// NewNormalizer creates a new Normalizer with specified flag (LatinToNarrow etc.).
-// If successful, methods on the returned Normalizer can be used for normalization.
+// NewNormalizer creates a new Normalizer with specified flag
+// (LatinToNarrow etc.). If successful, methods on the returned
+// Normalizer can be used for normalization.
 func NewNormalizer(flag NormFlag) (*Normalizer, error) {
 	err := validateNormFlag(flag)
 	if err != nil {
@@ -349,7 +375,8 @@ func NewNormalizer(flag NormFlag) (*Normalizer, error) {
 	return &n, nil
 }
 
-// SetFlag changes the normalization mode with the newly specified flag.
+// SetFlag changes the normalization mode with
+// the newly specified flag.
 func (n *Normalizer) SetFlag(flag NormFlag) error {
 	err := validateNormFlag(flag)
 	if err != nil {
@@ -359,10 +386,11 @@ func (n *Normalizer) SetFlag(flag NormFlag) error {
 	return nil
 }
 
-// NormalizeRune normalizes the rune according to the current normalization
-// mode. Depending on the mode, the voiced or semi-voiced sound mark may be
-// separated, so it may return multiple runes. but, this function allways
-// returns a rune array with 1 or 2 elements, and never returns an array with
+// NormalizeRune normalizes the rune according to the current
+// normalization mode. Depending on the mode, the voiced or
+// semi-voiced sound mark may be separated, so it may return
+// multiple runes. but, this function allways returns a rune
+// array with 1 or 2 elements, and never returns an array with
 // any other number of elements.
 func (n *Normalizer) NormalizeRune(r rune) (rune, vom) {
 	// TEST_Fc68JR9i knows about the number of elements in
