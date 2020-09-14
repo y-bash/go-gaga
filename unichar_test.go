@@ -22,7 +22,7 @@ type tableInfo struct {
 
 var tables = []tableInfo{
 	{latinTable, "latinTable", 96, "d90c9a10f72b6c029cb6aba58128f534d1935aa760fd5a073c232e16fc4eca22"},
-	{kanaTable, "kanaTable", 256, "9f30b8ed44761d8667e55a08181f4f9db584e9694db352255291db0102014e54"},
+	{kanaTable, "kanaTable", 256, "d7c8dd3e5efb23e2447498e580852728f5663b19ae146de5ad527262bcbdf138"},
 	{kanaExtTable, "kanaExtTable", 16, "4c23e39933c8312f42c602a7b602041fed92634c8936cd57786c45ebe8df52b2"},
 	{widthTable, "widthTable", 160, "79f5d0526d0696730a8e55526da769628e8280d100e954ea62151ff54699708d"},
 }
@@ -111,13 +111,14 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				}
 			}
 		}
-		// TODO Check for problems in the following cases
-		/*
-			if c.charCase != ccUndefined && c.compatCase == c.codepoint {
+		if c.charCase != ccUndefined && c.compatCase == c.codepoint {
+			switch c.codepoint {
+			case 'ゟ', 'ー', 'ヿ', 'ｰ':
+			default:
 				t.Errorf("%s[%#U].charCase is %d and compatCase is %#U, want another one",
 					name, c.codepoint, c.charCase, c.compatCase)
 			}
-		*/
+		}
 
 		// character width
 		switch c.charWidth {
@@ -151,13 +152,6 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				}
 			}
 		}
-		// TODO Check for problems in the following cases
-		/*
-			if c.charWidth != cwUndefined && c.compatWidth == c.codepoint {
-				t.Errorf("%s[%#U].charWidth is %d and compatWidth is %#U, want another one",
-					name, c.codepoint, c.charWidth, c.compatWidth)
-			}
-		*/
 
 		// voicing
 		switch c.voicing {

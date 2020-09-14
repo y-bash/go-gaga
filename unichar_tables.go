@@ -414,7 +414,7 @@ var kanaTable = unichars{
 	{0x30F9, ctKanaLetter, ccKatakana, cwWide, vcVoiced, 'ゑ', 'ｴ', 'ヱ', 'ヹ'},                             // 0x30F9 ヹ
 	{0x30FA, ctKanaLetter, ccKatakana, cwWide, vcVoiced, 'を', 'ｦ', 'ヲ', 'ヺ'},                             // 0x30FA ヺ
 	{0x30FB, ctKanaSymbol, ccUndefined, cwWide, vcUndefined, '・', '･', '・', '・'},                         // 0x30FB ・
-	{0x30FC, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ー', 'ー', 'ー', 'ー'},                          // 0x30FC ー
+	{0x30FC, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ー', 'ｰ', 'ー', 'ー'},                          // 0x30FC ー
 	{0x30FD, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ゝ', 'ヽ', 'ヽ', 'ヽ'},                          // 0x30FD ヽ
 	{0x30FE, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ゞ', 'ヾ', 'ヾ', 'ヾ'},                          // 0x30FE ヾ
 	{0x30FF, ctKanaLetter, ccKatakana, cwWide, vcUndefined, 'ヿ', 'ヿ', 'ヿ', 'ヿ'},                          // 0x30FF ヿ

@@ -622,12 +622,10 @@ func updateLatinRelation(c *charex, m ucdex) error {
 func updateKanaLetterRelation(c *charex, m ucdex) error {
 	// Only half-width katakana characters are targeted.
 	// However, the following special katakana leters are excluded.
-	// U+FF70 'ｰ' HALFWIDTH KATAKANA-HIRAGANA PROLONGED SOUND MARK
 	// U+FF9E 'ﾞ' HALFWIDTH KATAKANA VOICED SOUND MARK
 	// U+FF9F 'ﾟ' HALFWIDTH KATAKANA SEMI-VOICED SOUND MARK
-	if c.blk != "Half_And_Full_Forms" ||
-		c.charWidth != cwNarrow || c.category == ctKanaSymbol ||
-		c.codepoint == 'ｰ' || c.codepoint == 'ﾞ' || c.codepoint == 'ﾟ' {
+	if c.blk != "Half_And_Full_Forms" || c.charWidth != cwNarrow ||
+		c.category == ctKanaSymbol || c.codepoint == 'ﾞ' || c.codepoint == 'ﾟ' {
 		return nil
 	}
 
@@ -660,6 +658,14 @@ func updateKanaLetterRelation(c *charex, m ucdex) error {
 		return fmt.Errorf("updateKanaLetterRelation; %#U.compatWidth -> %#U.compatWidth is not 0",
 			narrowKatakana.codepoint, wideKatakana.codepoint)
 	}
+
+	// Hiragana related the following character is not exists.
+	// U+FF70 'ｰ' HALFWIDTH KATAKANA-HIRAGANA PROLONGED SOUND MARK
+	if c.codepoint == '\uFF70' {
+		wideKatakana.compatWidth = narrowKatakana.codepoint
+		return nil
+	}
+
 	if wideKatakana.compatCase == 0 {
 		return fmt.Errorf("updateKanaLetterRelation; %#U.compatWidth -> %#U.compatCase is 0",
 			narrowKatakana.codepoint, wideKatakana.codepoint)

@@ -849,7 +849,7 @@ var normalizetests = []NormalizeTest{
 		"ㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿㇰ゜ㇱ゜ㇲ゜ㇳ゜ㇴ゜ㇵ゜ㇶ゜ㇷ゜ㇸ゜ㇹ゜ㇺ゜ㇻ゜ㇼ゜ㇽ゜ㇾ゜ㇿ゜",
 		"ｸｼｽﾄﾇﾊﾋﾌﾍﾎﾑﾗﾘﾙﾚﾛｸﾟｼﾟｽﾟﾄﾟﾇﾟﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟﾑﾟﾗﾟﾘﾟﾙﾟﾚﾟﾛﾟ"},
 
-	// Yen mark
+	// the Yen mark
 	231: {SymbolToWide, "\\￥", "＼￥"},
 	232: {SymbolToNarrow, "＼￥", "\\￥"},
 
@@ -864,13 +864,19 @@ var normalizetests = []NormalizeTest{
 		string([]rune{-1, '\u0000', maxr, excr}),
 		string([]rune{-1, '\u0000', maxr, excr})},
 
-	// Whitespace
+	// the whitespace
 	236: {SymbolToWide, "\u0020\u3000", "\u3000\u3000"},
 	237: {SymbolToNarrow, "\u0020\u3000", "\u0020\u0020"},
 
-	// Wave dash and characters similar to it
+	// the wave dash and the characters similar to it
 	238: {SymbolToWide, "~\uFF5E\u301C\U0001301C", "\uFF5E\uFF5E\u301C\U0001301C"},
 	239: {SymbolToNarrow, "~\uFF5E\u301C\U0001301C", "~~\u301C\U0001301C"},
+
+	// the hyphen-minus and the characters similar to it
+	240: {SymbolToWide, "-\uFF0D\uFF70\u30FC", "\uFF0D\uFF0D\uFF70\u30FC"},
+	241: {SymbolToNarrow, "-\uFF0D\uFF70\u30FC", "--\uFF70\u30FC"},
+	242: {KatakanaToWide, "-\uFF0D\uFF70\u30FC", "-\uFF0D\u30FC\u30FC"},
+	243: {KatakanaToNarrow, "-\uFF0D\uFF70\u30FC", "-\uFF0D\uFF70\uFF70"},
 }
 
 func hexs(s string) string {
