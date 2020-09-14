@@ -9,9 +9,9 @@ const (
 	ctLatinLetter
 	ctLatinDigit
 	ctLatinSymbol
-	ctKanaLetter
-	ctKanaSymbol
-	ctKanaVsm
+	ctKanaLetter // a Hiragana or Katakana letter
+	ctKanaSymbol // a Japanese symbol, voicing modifiers excluded
+	ctKanaVom    // a Japanese voicing modifier (a voiced or semi-voiced sound mark)
 	ctMax
 )
 
@@ -22,8 +22,8 @@ const (
 	ccLower
 	ccHiragana
 	ccKatakana
-	ccTraditional
-	ccNonspace
+	ccLegacy    // A legacy voicing modifier
+	ccCombining // A non-space voicing modifier (a combining character)
 	ccMax
 )
 
@@ -37,23 +37,23 @@ const (
 
 // Voicing values
 const (
-	vcUndefined = iota
-	vcUnvoiced
-	vcVoiced
-	vcSemivoiced
+	vcUndefined  = iota // A character that is usually not combined with a voicing modifier
+	vcUnvoiced          // A base letter that may be combined with a voicing modifier
+	vcVoiced            // A voiced sound letter (a base letter and a voicing modifier precomposed)
+	vcSemivoiced        // A Semi-voiced sound letter (a base letter and a voicing modifier precomposed)
 	vcMax
 )
 
 type unichar struct {
-	codepoint   rune  // Unicode code point value
-	category    uint8 // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
-	charCase    uint8 // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
-	charWidth   uint8 // cwUndefined/cwNarrow/cwWide
-	voicing     uint8 // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
-	compatCase  rune  // Charcase compatible character (Upper-Lower, Hiragana-Katakana)
-	compatWidth rune  // Width compatible character (Narrow-Wide)
-	compatVs    rune  // Voiced sound compatible character (Unvoiced-Voiced)
-	compatSvs   rune  // Semi-voiced sound compatible character (Unvoiced-Semivoiced)
+	codepoint        rune  // A Unicode code point value
+	category         uint8 // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol/ctKanaModifier
+	charCase         uint8 // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana/ccLegacy/ccCombining
+	charWidth        uint8 // cwUndefined/cwNarrow/cwWide
+	voicing          uint8 // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
+	compatCase       rune  // A charcase compatible character (Upper-Lower, Hiragana-Katakana, Legacy-Combining)
+	compatWidth      rune  // A width compatible character (Narrow-Wide)
+	compatVoiced     rune  // A voiced sound compatible character (Unvoiced-Voiced)
+	compatSemivoiced rune  // A semi-voiced sound compatible character (Unvoiced-Semivoiced)
 }
 
 type unichars []unichar
@@ -315,10 +315,10 @@ var kanaTable = unichars{
 	{0x3096, ctKanaLetter, ccHiragana, cwWide, vcUndefined, 'ヶ', 'ｹ', 'ゖ', 'ゖ'},                          // 0x3096 ゖ
 	{0x3097, ctUndefined, ccUndefined, cwUndefined, vcUndefined, '\u3097', '\u3097', '\u3097', '\u3097'}, // 0x3097 ゗
 	{0x3098, ctUndefined, ccUndefined, cwUndefined, vcUndefined, '\u3098', '\u3098', '\u3098', '\u3098'}, // 0x3098 ゘
-	{0x3099, ctKanaVsm, ccNonspace, cwWide, vcUndefined, '゛', 'ﾞ', '゙', '゙'},                             // 0x3099 ゙
-	{0x309A, ctKanaVsm, ccNonspace, cwWide, vcUndefined, '゜', 'ﾟ', '゚', '゚'},                             // 0x309A ゚
-	{0x309B, ctKanaVsm, ccTraditional, cwWide, vcUndefined, '゙', 'ﾞ', '゛', '゛'},                          // 0x309B ゛
-	{0x309C, ctKanaVsm, ccTraditional, cwWide, vcUndefined, '゚', 'ﾟ', '゜', '゜'},                          // 0x309C ゜
+	{0x3099, ctKanaVom, ccCombining, cwWide, vcUndefined, '゛', 'ﾞ', '゙', '゙'},                            // 0x3099 ゙
+	{0x309A, ctKanaVom, ccCombining, cwWide, vcUndefined, '゜', 'ﾟ', '゚', '゚'},                            // 0x309A ゚
+	{0x309B, ctKanaVom, ccLegacy, cwWide, vcUndefined, '゙', 'ﾞ', '゛', '゛'},                               // 0x309B ゛
+	{0x309C, ctKanaVom, ccLegacy, cwWide, vcUndefined, '゚', 'ﾟ', '゜', '゜'},                               // 0x309C ゜
 	{0x309D, ctKanaLetter, ccHiragana, cwWide, vcUndefined, 'ヽ', 'ゝ', 'ゝ', 'ゝ'},                          // 0x309D ゝ
 	{0x309E, ctKanaLetter, ccHiragana, cwWide, vcUndefined, 'ヾ', 'ゞ', 'ゞ', 'ゞ'},                          // 0x309E ゞ
 	{0x309F, ctKanaLetter, ccHiragana, cwWide, vcUndefined, 'ゟ', 'ゟ', 'ゟ', 'ゟ'},                          // 0x309F ゟ
@@ -602,6 +602,6 @@ var widthTable = unichars{
 	{0xFF9B, ctKanaLetter, ccKatakana, cwNarrow, vcUndefined, 'ろ', 'ロ', 'ﾛ', 'ﾛ'},                        // 0xFF9B ﾛ
 	{0xFF9C, ctKanaLetter, ccKatakana, cwNarrow, vcUndefined, 'わ', 'ワ', 'ﾜ', 'ﾜ'},                        // 0xFF9C ﾜ
 	{0xFF9D, ctKanaLetter, ccKatakana, cwNarrow, vcUndefined, 'ん', 'ン', 'ﾝ', 'ﾝ'},                        // 0xFF9D ﾝ
-	{0xFF9E, ctKanaVsm, ccTraditional, cwNarrow, vcUndefined, '゙', '゛', 'ﾞ', 'ﾞ'},                        // 0xFF9E ﾞ
-	{0xFF9F, ctKanaVsm, ccTraditional, cwNarrow, vcUndefined, '゚', '゜', 'ﾟ', 'ﾟ'},                        // 0xFF9F ﾟ
+	{0xFF9E, ctKanaVom, ccLegacy, cwNarrow, vcUndefined, '゙', '゛', 'ﾞ', 'ﾞ'},                             // 0xFF9E ﾞ
+	{0xFF9F, ctKanaVom, ccLegacy, cwNarrow, vcUndefined, '゚', '゜', 'ﾟ', 'ﾟ'},                             // 0xFF9F ﾟ
 }

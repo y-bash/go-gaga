@@ -38,15 +38,16 @@ var blockRanges = []blockRange{
 // Constant values structure
 type constValues struct {
 	title string
-	list  []string
+	names []string
+	descs []string
 }
 
 func (cv *constValues) name(u uint8) string {
 	i := int(u)
-	if i < 0 || i >= len(cv.list) {
+	if i < 0 || i >= len(cv.names) {
 		return fmt.Sprintf("Unknown %s: %d", cv.title, i)
 	}
-	return cv.list[i]
+	return cv.names[i]
 }
 
 // Category values
@@ -57,21 +58,31 @@ const (
 	ctLatinSymbol
 	ctKanaLetter
 	ctKanaSymbol
-	ctKanaVsm
+	ctKanaModifier
 	ctMax
 )
 
 var categories = constValues{
 	title: "Category values",
-	list: []string{
+	names: []string{
 		"ctUndefined",
 		"ctLatinLetter",
 		"ctLatinDigit",
 		"ctLatinSymbol",
 		"ctKanaLetter",
 		"ctKanaSymbol",
-		"ctKanaVsm",
+		"ctKanaVom",
 		"ctMax",
+	},
+	descs: []string{
+		"",
+		"",
+		"",
+		"",
+		"// a Hiragana or Katakana letter",
+		"// a Japanese symbol, voicing modifiers excluded",
+		"// a Japanese voicing modifier (a voiced or semi-voiced sound mark)",
+		"",
 	},
 }
 
@@ -82,22 +93,32 @@ const (
 	ccLower
 	ccHiragana
 	ccKatakana
-	ccTraditional
-	ccNonspace
+	ccLegacy
+	ccCombining
 	ccMax
 )
 
 var charCases = constValues{
 	title: "Character case values",
-	list: []string{
+	names: []string{
 		"ccUndefined",
 		"ccUpper",
 		"ccLower",
 		"ccHiragana",
 		"ccKatakana",
-		"ccTraditional",
-		"ccNonspace",
+		"ccLegacy",
+		"ccCombining",
 		"ccMax",
+	},
+	descs: []string{
+		"",
+		"",
+		"",
+		"",
+		"",
+		"// A legacy voicing modifier",
+		"// A non-space voicing modifier (a combining character)",
+		"",
 	},
 }
 
@@ -111,11 +132,17 @@ const (
 
 var charWidths = constValues{
 	title: "Character width values",
-	list: []string{
+	names: []string{
 		"cwUndefined",
 		"cwNarrow",
 		"cwWide",
 		"cwMax",
+	},
+	descs: []string{
+		"",
+		"",
+		"",
+		"",
 	},
 }
 
@@ -130,29 +157,36 @@ const (
 
 var voicings = constValues{
 	title: "Voicing values",
-	list: []string{
+	names: []string{
 		"vcUndefined",
 		"vcUnvoiced",
 		"vcVoiced",
 		"vcSemivoiced",
 		"vcMax",
 	},
+	descs: []string{
+		"// A character that is usually not combined with a voicing modifier",
+		"// A base letter that may be combined with a voicing modifier",
+		"// A voiced sound letter (a base letter and a voicing modifier precomposed)",
+		"// A Semi-voiced sound letter (a base letter and a voicing modifier precomposed)",
+		"",
+	},
 }
 
 type charex struct {
-	codepoint   rune   // Unicode code point value
-	blk         string // Block in UCD
-	na          string // Name  in UCD
-	age         string // Age   in UCD
-	gc          string // General category in UCD
-	category    uint8  // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
-	charCase    uint8  // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
-	charWidth   uint8  // cwUndefined/cwNarrow/cwWide
-	voicing     uint8  // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
-	compatCase  rune   // Charcase compatible character
-	compatWidth rune   // Width compatible character
-	compatVs    rune   // Voiced sound compatible character
-	compatSvs   rune   // Semi-voiced sound compatible character
+	codepoint        rune   // A Unicode code point value
+	blk              string // A block property value in UCD
+	na               string // A name property value in UCD
+	age              string // An age property value in UCD
+	gc               string // A general category property value in UCD
+	category         uint8  // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol/ctKanaModifier
+	charCase         uint8  // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana/ccLegacy/ccCombining
+	charWidth        uint8  // cwUndefined/cwNarrow/cwWide
+	voicing          uint8  // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
+	compatCase       rune   // A charcase compatible character (Upper-Lower, Hiragana-Katakana, Legacy-Combining)
+	compatWidth      rune   // A width compatible character (Narrow-Wide)
+	compatVoiced     rune   // A voiced sound compatible character (Unvoiced-Voiced)
+	compatSemivoiced rune   // A semi-voiced sound compatible character (Unvoiced-Semivoiced)
 }
 
 type ucdex map[rune]*charex
@@ -172,8 +206,8 @@ var hiragana2katakana = []charmap{
 const (
 	arCompatCase = iota
 	arCompatWidth
-	arCompatVs
-	arCompatSvs
+	arCompatVo
+	arCompatSe
 )
 
 type additionalRef struct {
@@ -254,19 +288,19 @@ type additionalAttr struct {
 }
 
 var additionalAttrList = []additionalAttr{
-	{'　', aaCategory, ctLatinSymbol},   // 0x3000 [　] ctKanaSymbol -> ctLatinSymbol
-	{'\u3099', aaCategory, ctKanaVsm},  // 0x3099 [ ◌゙] ctKanaLetter -> ctKanaVsm
-	{'\u309A', aaCategory, ctKanaVsm},  // 0x309A [゚゚ ゚] ctKanaLetter -> ctKanaVsm
-	{'゛', aaCategory, ctKanaVsm},       // 0x309B [゛] ctKanaLetter -> ctKanaVsm
-	{'゜', aaCategory, ctKanaVsm},       // 0x309C [゜] ctKanaLetter -> ctKanaVsm
-	{'ﾞ', aaCategory, ctKanaVsm},       // FF9E [ﾞ] ctKanaLetter -> ctKanaVsm
-	{'ﾟ', aaCategory, ctKanaVsm},       // FF9F [ﾟ] ctKanaLetter -> ctKanaVsm
-	{'\u3099', aaCharCase, ccNonspace}, // 0x3099 [ ◌゙] ccHiragana -> ccTraditional
-	{'\u309A', aaCharCase, ccNonspace}, // 0x309A [゚゚ ゚] ccHiragana -> ccTraditional
-	{'゛', aaCharCase, ccTraditional},   // 0x309B [゛] ccHiragana -> ccTraditional
-	{'゜', aaCharCase, ccTraditional},   // 0x309C [゜] ccHiragana -> ccTraditional
-	{'ﾞ', aaCharCase, ccTraditional},   // FF9E [ﾞ] ccKatakana -> ccTraditional
-	{'ﾟ', aaCharCase, ccTraditional},   // FF9F [ﾟ] ccKatakana -> ccTraditional
+	{'　', aaCategory, ctLatinSymbol},       // 0x3000 [　] ctKanaSymbol -> ctLatinSymbol
+	{'\u3099', aaCategory, ctKanaModifier}, // 0x3099 [ ◌゙] ctKanaLetter -> ctKanaModifier
+	{'\u309A', aaCategory, ctKanaModifier}, // 0x309A [゚゚ ゚] ctKanaLetter -> ctKanaModifier
+	{'゛', aaCategory, ctKanaModifier},      // 0x309B [゛] ctKanaLetter -> ctKanaModifier
+	{'゜', aaCategory, ctKanaModifier},      // 0x309C [゜] ctKanaLetter -> ctKanaModifier
+	{'ﾞ', aaCategory, ctKanaModifier},      // FF9E [ﾞ] ctKanaLetter -> ctKanaModifier
+	{'ﾟ', aaCategory, ctKanaModifier},      // FF9F [ﾟ] ctKanaLetter -> ctKanaModifier
+	{'\u3099', aaCharCase, ccCombining},    // 0x3099 [ ◌゙] ccHiragana -> ccCombining
+	{'\u309A', aaCharCase, ccCombining},    // 0x309A [゚゚ ゚] ccHiragana -> ccCombining
+	{'゛', aaCharCase, ccLegacy},            // 0x309B [゛] ccHiragana -> ccLegacy
+	{'゜', aaCharCase, ccLegacy},            // 0x309C [゜] ccHiragana -> ccLegacy
+	{'ﾞ', aaCharCase, ccLegacy},            // FF9E [ﾞ] ccKatakana -> ccLegacy
+	{'ﾟ', aaCharCase, ccLegacy},            // FF9F [ﾟ] ccKatakana -> ccLegacy
 }
 
 // Get the multiple codepoints from Cp(UCD)
@@ -479,7 +513,7 @@ func char2compatCase(char *Char) (r rune, err error) {
 	return r, nil
 }
 
-func char2voicing(char *Char) (voicing uint8, compatVs, compatSvs rune, err error) {
+func char2voicing(char *Char) (voicing uint8, compatVoiced, compatSemivoiced rune, err error) {
 	if char.Blk != "Hiragana" && char.Blk != "Katakana" {
 		return vcUndefined, rune(0), rune(0), nil
 	}
@@ -546,7 +580,7 @@ func updateLatinRelation(c *charex, m ucdex) error {
 	// U+FF5F '｟' FULLWIDTH LEFT WHITE PARENTHESIS
 	// U+FF60 '｠' FULLWIDTH RIGHT WHITE PARENTHESIS
 	if c.charWidth != cwWide || c.category == ctUndefined ||
-		c.category == ctKanaLetter || c.category == ctKanaSymbol || c.category == ctKanaVsm ||
+		c.category == ctKanaLetter || c.category == ctKanaSymbol || c.category == ctKanaModifier ||
 		c.codepoint == '｟' || c.codepoint == '｠' {
 		return nil
 	}
@@ -707,28 +741,28 @@ func updateVoicingRelation(c *charex, m ucdex) error {
 
 	voiced := c
 
-	if voiced.compatVs == 0 {
-		return fmt.Errorf("updateVoicingRelation; %#U.compatVs is not 0", voiced.codepoint)
+	if voiced.compatVoiced == 0 {
+		return fmt.Errorf("updateVoicingRelation; %#U.compatVoiced is not 0", voiced.codepoint)
 	}
 
-	unvoiced, ok := m[voiced.compatVs]
+	unvoiced, ok := m[voiced.compatVoiced]
 	if !ok {
-		return fmt.Errorf("updateVoicingRelation; %#U.compatVs -> %#U is not exists in ucdex",
-			voiced.codepoint, voiced.compatVs)
+		return fmt.Errorf("updateVoicingRelation; %#U.compatVoiced -> %#U is not exists in ucdex",
+			voiced.codepoint, voiced.compatVoiced)
 	}
 	if unvoiced.voicing != vcUndefined && unvoiced.voicing != vcUnvoiced {
-		return fmt.Errorf("updateVoicingRelation; %#U.compatVs -> %#U.voiceing = %s, want %s or %s",
+		return fmt.Errorf("updateVoicingRelation; %#U.compatVoiced -> %#U.voiceing = %s, want %s or %s",
 			voiced.codepoint, unvoiced.codepoint, voicings.name(unvoiced.voicing),
 			voicings.name(vcUndefined), voicings.name(vcUnvoiced))
 	}
-	if unvoiced.compatVs != 0 {
-		return fmt.Errorf("updateVoicingRelation; %#U.compatVs -> %#U.compatVs -> %#U is not 0",
-			voiced.compatVs, unvoiced.codepoint, unvoiced.compatVs)
+	if unvoiced.compatVoiced != 0 {
+		return fmt.Errorf("updateVoicingRelation; %#U.compatVoiced -> %#U.compatVoiced -> %#U is not 0",
+			voiced.compatVoiced, unvoiced.codepoint, unvoiced.compatVoiced)
 	}
 
 	// The main theme of this function
 	unvoiced.voicing = vcUnvoiced
-	unvoiced.compatVs = voiced.codepoint
+	unvoiced.compatVoiced = voiced.codepoint
 
 	return nil
 }
@@ -741,28 +775,28 @@ func updateSemivoicingRelation(c *charex, m ucdex) error {
 
 	semivoiced := c
 
-	if semivoiced.compatSvs == 0 {
-		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSvs is not 0", semivoiced.codepoint)
+	if semivoiced.compatSemivoiced == 0 {
+		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSemivoiced is not 0", semivoiced.codepoint)
 	}
 
-	unvoiced, ok := m[semivoiced.compatSvs]
+	unvoiced, ok := m[semivoiced.compatSemivoiced]
 	if !ok {
-		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSvs -> %#U is not exists in ucdex",
-			semivoiced.codepoint, semivoiced.compatSvs)
+		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSemivoiced -> %#U is not exists in ucdex",
+			semivoiced.codepoint, semivoiced.compatSemivoiced)
 	}
 	if unvoiced.voicing != vcUndefined && unvoiced.voicing != vcUnvoiced {
-		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSvs -> %#U.voiceing = %s, want %s or %s",
+		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSemivoiced -> %#U.voiceing = %s, want %s or %s",
 			semivoiced.codepoint, unvoiced.codepoint, voicings.name(unvoiced.voicing),
 			voicings.name(vcUndefined), voicings.name(vcUnvoiced))
 	}
-	if unvoiced.compatSvs != 0 {
-		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSs -> %#U.compatSvs -> %#U is not 0",
-			semivoiced.compatSvs, unvoiced.codepoint, unvoiced.compatSvs)
+	if unvoiced.compatSemivoiced != 0 {
+		return fmt.Errorf("updateSemivoicingRelation; %#U.compatSs -> %#U.compatSemivoiced -> %#U is not 0",
+			semivoiced.compatSemivoiced, unvoiced.codepoint, unvoiced.compatSemivoiced)
 	}
 
 	// The main theme of this function
 	unvoiced.voicing = vcUnvoiced
-	unvoiced.compatSvs = semivoiced.codepoint
+	unvoiced.compatSemivoiced = semivoiced.codepoint
 
 	return nil
 }
@@ -778,24 +812,24 @@ func updateVoicingWidthRelation(c *charex, m ucdex) error {
 	if voiced.compatWidth != 0 {
 		return fmt.Errorf("updateVoicingWidthRelation; %#U.compatWidth is not 0", voiced.codepoint)
 	}
-	if voiced.compatVs == 0 && voiced.compatSvs == 0 {
-		return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVs and compatSvs are 0", voiced.codepoint)
+	if voiced.compatVoiced == 0 && voiced.compatSemivoiced == 0 {
+		return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVoiced and compatSemivoiced are 0", voiced.codepoint)
 	}
-	if voiced.compatVs != 0 && voiced.compatSvs != 0 {
-		return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVs is %#U and compatSvs is %#U, want Either one is 0",
-			voiced.codepoint, voiced.compatVs, voiced.compatSvs)
+	if voiced.compatVoiced != 0 && voiced.compatSemivoiced != 0 {
+		return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVoiced is %#U and compatSemivoiced is %#U, want Either one is 0",
+			voiced.codepoint, voiced.compatVoiced, voiced.compatSemivoiced)
 	}
 
 	var unvoiced *charex
 	var ok bool
-	if voiced.compatVs != 0 {
-		unvoiced, ok = m[voiced.compatVs]
+	if voiced.compatVoiced != 0 {
+		unvoiced, ok = m[voiced.compatVoiced]
 		if !ok {
-			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVs -> %#U is not exists in ucdex",
-				voiced.codepoint, voiced.compatVs)
+			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVoiced -> %#U is not exists in ucdex",
+				voiced.codepoint, voiced.compatVoiced)
 		}
 		if unvoiced.voicing != vcUnvoiced {
-			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVs -> %#U.voicing is %s, want vcUnvoiced",
+			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatVoiced -> %#U.voicing is %s, want vcUnvoiced",
 				voiced.codepoint, unvoiced.codepoint, voicings.name(unvoiced.voicing))
 		}
 		if unvoiced.compatWidth == 0 {
@@ -804,17 +838,17 @@ func updateVoicingWidthRelation(c *charex, m ucdex) error {
 			// log.Printf("INFO: %#U have no related half-width character", unvoiced.codepoint)
 		}
 	} else {
-		unvoiced, ok = m[voiced.compatSvs]
+		unvoiced, ok = m[voiced.compatSemivoiced]
 		if !ok {
-			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatSvs -> %#U is not exists in ucdex",
-				voiced.codepoint, voiced.compatSvs)
+			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatSemivoiced -> %#U is not exists in ucdex",
+				voiced.codepoint, voiced.compatSemivoiced)
 		}
 		if unvoiced.voicing != vcUnvoiced {
-			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatSvs -> %#U.voicing is %s, want vcUnvoiced",
+			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatSemivoiced -> %#U.voicing is %s, want vcUnvoiced",
 				voiced.codepoint, unvoiced.codepoint, voicings.name(unvoiced.voicing))
 		}
 		if unvoiced.compatWidth == 0 {
-			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatSvs -> %#U.compatWidth is 0",
+			return fmt.Errorf("updateVoicingWidthRelation; %#U.compatSemivoiced -> %#U.compatWidth is 0",
 				voiced.codepoint, unvoiced.codepoint)
 		}
 	}
@@ -842,10 +876,10 @@ func updateAdditionalRefList(m ucdex) error {
 			c.compatCase = ad.data
 		case arCompatWidth:
 			c.compatWidth = ad.data
-		case arCompatVs:
-			c.compatVs = ad.data
-		case arCompatSvs:
-			c.compatSvs = ad.data
+		case arCompatVo:
+			c.compatVoiced = ad.data
+		case arCompatSe:
+			c.compatSemivoiced = ad.data
 		default:
 			return fmt.Errorf("updateAdditionalRefList; Unexpected ad.ref: %d", ad.ref)
 		}
@@ -912,25 +946,25 @@ func createUCDEX(ucd *UCD) (ucdex, error) {
 		if err != nil {
 			return nil, err
 		}
-		voicing, compatVs, compatSvs, err := char2voicing(&char)
+		voicing, compatVoiced, compatSemivoiced, err := char2voicing(&char)
 		if err != nil {
 			return nil, err
 		}
 
 		m[codepoint] = &charex{
-			codepoint:   codepoint,
-			blk:         char.Blk,
-			na:          char.Na,
-			age:         char.Age,
-			gc:          char.Gc,
-			category:    category,
-			charCase:    charCase,
-			charWidth:   charWidth,
-			compatCase:  compatCase,
-			voicing:     voicing,
-			compatWidth: compatWidth,
-			compatVs:    compatVs,
-			compatSvs:   compatSvs,
+			codepoint:        codepoint,
+			blk:              char.Blk,
+			na:               char.Na,
+			age:              char.Age,
+			gc:               char.Gc,
+			category:         category,
+			charCase:         charCase,
+			charWidth:        charWidth,
+			compatCase:       compatCase,
+			voicing:          voicing,
+			compatWidth:      compatWidth,
+			compatVoiced:     compatVoiced,
+			compatSemivoiced: compatSemivoiced,
 		}
 	}
 
@@ -1017,10 +1051,10 @@ func writeUCDEX(f io.Writer, m ucdex) {
 				fmt.Fprintf(f, ",%s", formatRune(c.compatWidth))
 				fmt.Fprintf(f, ",%s", escapeChar(c.compatWidth))
 				fmt.Fprintf(f, ",%s", voicings.name(c.voicing))
-				fmt.Fprintf(f, ",%s", formatRune(c.compatVs))
-				fmt.Fprintf(f, ",%s", escapeChar(c.compatVs))
-				fmt.Fprintf(f, ",%s", formatRune(c.compatSvs))
-				fmt.Fprintf(f, ",%s", escapeChar(c.compatSvs))
+				fmt.Fprintf(f, ",%s", formatRune(c.compatVoiced))
+				fmt.Fprintf(f, ",%s", escapeChar(c.compatVoiced))
+				fmt.Fprintf(f, ",%s", formatRune(c.compatSemivoiced))
+				fmt.Fprintf(f, ",%s", escapeChar(c.compatSemivoiced))
 				fmt.Fprintln(f, "")
 			}
 		}
@@ -1047,9 +1081,9 @@ func GenUCDEX(f io.Writer) error {
 func printConstList(f io.Writer, c constValues) {
 	fmt.Fprintf(f, "// %s\n", c.title)
 	fmt.Fprintln(f, "const (")
-	fmt.Fprintf(f, "\t%s = iota\n", c.list[0])
-	for i := 1; i < len(c.list); i++ {
-		fmt.Fprintf(f, "\t%s\n", c.list[i])
+	fmt.Fprintf(f, "\t%s = iota %s\n", c.names[0], c.descs[0])
+	for i := 1; i < len(c.names); i++ {
+		fmt.Fprintf(f, "\t%s %s\n", c.names[i], c.descs[i])
 	}
 	fmt.Fprint(f, ")\n\n")
 }
@@ -1058,15 +1092,15 @@ func printConstList(f io.Writer, c constValues) {
 func printTypes(f io.Writer) {
 	text := `
 type unichar struct {
-	codepoint   rune  // Unicode code point value
-	category    uint8 // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol
-	charCase    uint8 // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana
-	charWidth   uint8 // cwUndefined/cwNarrow/cwWide
-	voicing     uint8 // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
-	compatCase  rune  // Charcase compatible character (Upper-Lower, Hiragana-Katakana)
-	compatWidth rune  // Width compatible character (Narrow-Wide)
-	compatVs    rune  // Voiced sound compatible character (Unvoiced-Voiced)
-	compatSvs   rune  // Semi-voiced sound compatible character (Unvoiced-Semivoiced)
+	codepoint        rune   // A Unicode code point value
+	category         uint8  // ctUndefined/ctLatinLetter/ctLatinDigit/ctLatinSymbol/ctKanaLetter/ctKanaSymbol/ctKanaModifier
+	charCase         uint8  // ccUndefined/ccUpper/ccLower/ccHiragana/ccKatakana/ccLegacy/ccCombining
+	charWidth        uint8  // cwUndefined/cwNarrow/cwWide
+	voicing          uint8  // vcUndefined/vcUnvoiced/vcVoiced/vcSemivoiced
+	compatCase       rune   // A charcase compatible character (Upper-Lower, Hiragana-Katakana, Legacy-Combining)
+	compatWidth      rune   // A width compatible character (Narrow-Wide)
+	compatVoiced     rune   // A voiced sound compatible character (Unvoiced-Voiced)
+	compatSemivoiced rune   // A semi-voiced sound compatible character (Unvoiced-Semivoiced)
 }
 
 type unichars []unichar
@@ -1114,8 +1148,8 @@ func generate(f io.Writer, m ucdex, genname string) {
 				fmt.Fprintf(f, ",%s", voicings.name(c.voicing))
 				fmt.Fprintf(f, ",%s", nonZeroOrElse(c.compatCase, c.codepoint))
 				fmt.Fprintf(f, ",%s", nonZeroOrElse(c.compatWidth, c.codepoint))
-				fmt.Fprintf(f, ",%s", nonZeroOrElse(c.compatVs, c.codepoint))
-				fmt.Fprintf(f, ",%s", nonZeroOrElse(c.compatSvs, c.codepoint))
+				fmt.Fprintf(f, ",%s", nonZeroOrElse(c.compatVoiced, c.codepoint))
+				fmt.Fprintf(f, ",%s", nonZeroOrElse(c.compatSemivoiced, c.codepoint))
 			}
 			fmt.Fprintf(f, "}, // 0x%04X %s\n", i, string([]rune{i}))
 

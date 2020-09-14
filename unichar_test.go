@@ -10,7 +10,7 @@ import (
 func (c *unichar) String() string {
 	return fmt.Sprintf("(%x,%x,%x,%x,%x,%x,%x,%x,%x)",
 		c.codepoint, c.category, c.charCase, c.charWidth,
-		c.voicing, c.compatCase, c.compatWidth, c.compatVs, c.compatSvs)
+		c.voicing, c.compatCase, c.compatWidth, c.compatVoiced, c.compatSemivoiced)
 }
 
 type tableInfo struct {
@@ -81,7 +81,7 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 		// category
 		switch c.category {
 		case ctUndefined, ctLatinLetter, ctLatinDigit, ctLatinSymbol,
-			ctKanaLetter, ctKanaSymbol, ctKanaVsm:
+			ctKanaLetter, ctKanaSymbol, ctKanaVom:
 		default: // TEST_P8w4qtsm
 			t.Errorf("%s[%#U].category == %d, want %d <= category < %d",
 				name, c.codepoint, c.category, ctUndefined, ctMax)
@@ -167,19 +167,19 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				name, c.codepoint, c.voicing, vcUndefined, vcMax)
 		}
 		if c.voicing == vcUndefined {
-			if c.compatVs != c.codepoint {
-				t.Errorf("%s[%#U].voicing == %d, but compatVs == %#U, want compatVs == %#U",
-					name, c.codepoint, c.voicing, c.compatVs, c.codepoint)
+			if c.compatVoiced != c.codepoint {
+				t.Errorf("%s[%#U].voicing == %d, but compatVoiced == %#U, want compatVoiced == %#U",
+					name, c.codepoint, c.voicing, c.compatVoiced, c.codepoint)
 			}
-			if c.compatSvs != c.codepoint {
-				t.Errorf("%s[%#U].voicing == %d, but compatSvs == %#U, want compatSvs == %#U",
-					name, c.codepoint, c.voicing, c.compatSvs, c.codepoint)
+			if c.compatSemivoiced != c.codepoint {
+				t.Errorf("%s[%#U].voicing == %d, but compatSemivoiced == %#U, want compatSemivoiced == %#U",
+					name, c.codepoint, c.voicing, c.compatSemivoiced, c.codepoint)
 			}
 		}
 		if c.voicing == vcUnvoiced {
-			if c.compatVs == c.codepoint { // TEST_Jt3UaWwr
-				t.Errorf("%s[%#U].voicing == %d, but compatVs == %#U, want another one",
-					name, c.codepoint, c.voicing, c.compatVs)
+			if c.compatVoiced == c.codepoint { // TEST_Jt3UaWwr
+				t.Errorf("%s[%#U].voicing == %d, but compatVoiced == %#U, want another one",
+					name, c.codepoint, c.voicing, c.compatVoiced)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide { // TEST_Mw87qjkF
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
@@ -187,9 +187,9 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 		}
 		if c.voicing == vcVoiced {
-			if c.compatVs == c.codepoint {
-				t.Errorf("%s[%#U].voicing == %d, but compatVs == %#U, want another one",
-					name, c.codepoint, c.voicing, c.compatVs)
+			if c.compatVoiced == c.codepoint {
+				t.Errorf("%s[%#U].voicing == %d, but compatVoiced == %#U, want another one",
+					name, c.codepoint, c.voicing, c.compatVoiced)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide { // TEST_T2eKd76G
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
@@ -197,62 +197,62 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 		}
 		if c.voicing == vcSemivoiced {
-			if c.compatSvs == c.codepoint {
-				t.Errorf("%s[%#U].voicing is %d and compatSvs is %#U, want another one",
-					name, c.codepoint, c.voicing, c.compatSvs)
+			if c.compatSemivoiced == c.codepoint {
+				t.Errorf("%s[%#U].voicing is %d and compatSemivoiced is %#U, want another one",
+					name, c.codepoint, c.voicing, c.compatSemivoiced)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide {
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
 					name, c.codepoint, c.voicing, c.charWidth, cwNarrow, cwWide)
 			}
-			unvoiced := c.getCompatSvsUnichar()
-			if !unvoiced.existsCompatVs() { // TEST_fW6auXUi
-				t.Errorf("%s[%#U].voicing == %d, but getCompatSvsUnichar().existsCompatVs() == false, want true",
+			unvoiced := c.getCompatSemivoicedC()
+			if !unvoiced.existsCompatVoiced() { // TEST_fW6auXUi
+				t.Errorf("%s[%#U].voicing == %d, but getCompatSemivoicedC().existsCompatVoiced() == false, want true",
 					name, c.codepoint, c.voicing)
 			}
 		}
 
-		if c.compatVs != c.codepoint {
-			if compatVs, ok := getUnichar(c.compatVs); !ok { // TEST_Cu8iKMxF
-				t.Errorf("%s[%#U].compatVs %#U is not found by getUnichar()", name, c.codepoint, c.compatVs)
+		if c.compatVoiced != c.codepoint {
+			if compatVoiced, ok := getUnichar(c.compatVoiced); !ok { // TEST_Cu8iKMxF
+				t.Errorf("%s[%#U].compatVoiced %#U is not found by getUnichar()", name, c.codepoint, c.compatVoiced)
 			} else {
-				if c.category != compatVs.category {
-					t.Errorf("%s[%#U].category is %d and compatVs %#U.category is %d, want same value",
-						name, c.codepoint, c.category, compatVs.codepoint, compatVs.category)
+				if c.category != compatVoiced.category {
+					t.Errorf("%s[%#U].category is %d and compatVoiced %#U.category is %d, want same value",
+						name, c.codepoint, c.category, compatVoiced.codepoint, compatVoiced.category)
 				}
-				if c.charWidth != compatVs.charWidth {
-					t.Errorf("%s[%#U].charWidth is %d and compatVs %#U.charWidth is %d, want same value",
-						name, c.codepoint, c.charWidth, compatVs.codepoint, compatVs.charWidth)
+				if c.charWidth != compatVoiced.charWidth {
+					t.Errorf("%s[%#U].charWidth is %d and compatVoiced %#U.charWidth is %d, want same value",
+						name, c.codepoint, c.charWidth, compatVoiced.codepoint, compatVoiced.charWidth)
 				}
-				if c.voicing == vcUnvoiced && compatVs.voicing != vcVoiced {
-					t.Errorf("%s[%#U].voicing is %d and compatVs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, compatVs.codepoint, compatVs.voicing, vcVoiced)
+				if c.voicing == vcUnvoiced && compatVoiced.voicing != vcVoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatVoiced %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatVoiced.codepoint, compatVoiced.voicing, vcVoiced)
 				}
-				if c.voicing == vcVoiced && compatVs.voicing != vcUnvoiced {
-					t.Errorf("%s[%#U].voicing is %d and compatVs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, compatVs.codepoint, compatVs.voicing, vcUnvoiced)
+				if c.voicing == vcVoiced && compatVoiced.voicing != vcUnvoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatVoiced %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatVoiced.codepoint, compatVoiced.voicing, vcUnvoiced)
 				}
 			}
 		}
-		if c.compatSvs != c.codepoint {
-			if compatSvs, ok := getUnichar(c.compatSvs); !ok { // TEST_rW4UiNHC
-				t.Errorf("%s[%#U].compatSvs %#U is not found by getUnichar()", name, c.codepoint, c.compatSvs)
+		if c.compatSemivoiced != c.codepoint {
+			if compatSemivoiced, ok := getUnichar(c.compatSemivoiced); !ok { // TEST_rW4UiNHC
+				t.Errorf("%s[%#U].compatSemivoiced %#U is not found by getUnichar()", name, c.codepoint, c.compatSemivoiced)
 			} else {
-				if c.category != compatSvs.category {
-					t.Errorf("%s[%#U].category is %d and compatSvs %#U.category is %d, want same value",
-						name, c.codepoint, c.category, compatSvs.codepoint, compatSvs.category)
+				if c.category != compatSemivoiced.category {
+					t.Errorf("%s[%#U].category is %d and compatSemivoiced %#U.category is %d, want same value",
+						name, c.codepoint, c.category, compatSemivoiced.codepoint, compatSemivoiced.category)
 				}
-				if c.charWidth != compatSvs.charWidth {
-					t.Errorf("%s[%#U].charWidth is %d and compatSvs %#U.charWidth is %d, want same value",
-						name, c.codepoint, c.charWidth, compatSvs.codepoint, compatSvs.charWidth)
+				if c.charWidth != compatSemivoiced.charWidth {
+					t.Errorf("%s[%#U].charWidth is %d and compatSemivoiced %#U.charWidth is %d, want same value",
+						name, c.codepoint, c.charWidth, compatSemivoiced.codepoint, compatSemivoiced.charWidth)
 				}
-				if c.voicing == vcUnvoiced && compatSvs.voicing != vcSemivoiced {
-					t.Errorf("%s[%#U].voicing is %d and compatSvs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, compatSvs.codepoint, compatSvs.voicing, vcSemivoiced)
+				if c.voicing == vcUnvoiced && compatSemivoiced.voicing != vcSemivoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatSemivoiced %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatSemivoiced.codepoint, compatSemivoiced.voicing, vcSemivoiced)
 				}
-				if c.voicing == vcSemivoiced && compatSvs.voicing != vcUnvoiced {
-					t.Errorf("%s[%#U].voicing is %d and compatSvs %#U.voicing is %d, want %d",
-						name, c.codepoint, c.voicing, compatSvs.codepoint, compatSvs.voicing, vcUnvoiced)
+				if c.voicing == vcSemivoiced && compatSemivoiced.voicing != vcUnvoiced {
+					t.Errorf("%s[%#U].voicing is %d and compatSemivoiced %#U.voicing is %d, want %d",
+						name, c.codepoint, c.voicing, compatSemivoiced.codepoint, compatSemivoiced.voicing, vcUnvoiced)
 				}
 			}
 		}
@@ -290,11 +290,11 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			if c.voicing != vcUndefined {
 				t.Errorf("%s[%#U].voicing is %d, want 0", name, c.codepoint, c.voicing)
 			}
-		case ctKanaVsm:
-			if !isVoicedSoundMark(c.codepoint) && !isSemivoicedSoundMark(c.codepoint) {
-				t.Errorf("%s[%#U] is not VSM or SVSM, want VSM or SVSM", name, c.codepoint)
+		case ctKanaVom:
+			if !vom(c.codepoint).isVom() {
+				t.Errorf("%s[%#U] is not Vom, want Vom", name, c.codepoint)
 			}
-			if c.charCase != ccTraditional && c.charCase != ccNonspace {
+			if c.charCase != ccLegacy && c.charCase != ccCombining {
 				t.Errorf("%s[%#U].charCase is %d, want 3 or 4", name, c.codepoint, c.charCase)
 			}
 			if c.charWidth != cwNarrow && c.charWidth != cwWide {
@@ -365,20 +365,20 @@ func TestUnicharTable(t *testing.T) {
 type ToVoicedTest struct {
 	in          rune
 	outTradChar rune
-	outTradMark modmark
+	outTradMark vom
 	outNonsChar rune
-	outNonsMark modmark
+	outNonsMark vom
 }
 
 var tovoicedtests = []ToVoicedTest{
 	// vcUnvoiced
-	0: {'か', 'が', mmNone, 'か', '\u3099'}, // compatVs is exists, compatSvs is not exists
-	1: {'は', 'ば', mmNone, 'は', '\u3099'}, // compatVs is exists, compatSvs is exists
+	0: {'か', 'が', vmNone, 'か', '\u3099'}, // compatVoiced is exists, compatSemivoiced is not exists
+	1: {'は', 'ば', vmNone, 'は', '\u3099'}, // compatVoiced is exists, compatSemivoiced is exists
 	// vcVoiced
-	2: {'が', 'が', mmNone, 'か', '\u3099'}, // compatVs.compatSvs is not exists
-	3: {'ば', 'ば', mmNone, 'は', '\u3099'}, // compatVs.compatSvs is exists
+	2: {'が', 'が', vmNone, 'か', '\u3099'}, // compatVoiced.compatSemivoiced is not exists
+	3: {'ば', 'ば', vmNone, 'は', '\u3099'}, // compatVoiced.compatSemivoiced is exists
 	// vcSemivoiced
-	4: {'ぱ', 'ば', mmNone, 'は', '\u3099'},
+	4: {'ぱ', 'ば', vmNone, 'は', '\u3099'},
 	// vcUndefined, cwWide
 	5:  {'あ', 'あ', '゛', 'あ', '\u3099'}, // ctKanaLetter, ccHiragana
 	6:  {'ア', 'ア', '゛', 'ア', '\u3099'}, // ctKanaLetter, ccKatakana
@@ -389,15 +389,15 @@ var tovoicedtests = []ToVoicedTest{
 	11: {'＃', '＃', '゛', '＃', '\u3099'}, // ctLatinSymbol, ccUndefined
 	// vcUndefined, cwNarrow
 	12: {'ｱ', 'ｱ', 'ﾞ', 'ｱ', '\u3099'}, // ctKanaLetter, ccKatakana
-	13: {'ｶ', 'ｶ', 'ﾞ', 'ｶ', '\u3099'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
-	14: {'ﾊ', 'ﾊ', 'ﾞ', 'ﾊ', '\u3099'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
+	13: {'ｶ', 'ｶ', 'ﾞ', 'ｶ', '\u3099'}, // ctKanaLetter, ccKatakana, compatWidth.compatVoiced is exists, compatWidth.compatSemivoiced is not exists
+	14: {'ﾊ', 'ﾊ', 'ﾞ', 'ﾊ', '\u3099'}, // ctKanaLetter, ccKatakana, compatWidth.compatVoiced is exists, compatWidth.compatSemivoiced is exists
 	15: {'･', '･', 'ﾞ', '･', '\u3099'}, // ctKanaSymbol, ccUndefined
 	16: {'A', 'A', 'ﾞ', 'A', '\u3099'}, // ctLatinLetter, ccUpper
 	17: {'a', 'a', 'ﾞ', 'a', '\u3099'}, // ctLatinLetter, ccLower
 	18: {'1', '1', 'ﾞ', '1', '\u3099'}, // ctLatinDigit, ccUndefined
 	19: {'#', '#', 'ﾞ', '#', '\u3099'}, // ctLatinDigit, ccUndefined
 	// ctUndefined
-	20: {'\u3040', '\u3040', mmNone, '\u3040', '\u3099'},
+	20: {'\u3040', '\u3040', vmNone, '\u3040', '\u3099'},
 	// VSM
 	21: {'゛', '゛', '゛', '゛', '\u3099'},
 	22: {'\u3099', '\u3099', '゛', '\u3099', '\u3099'},
@@ -416,9 +416,9 @@ func TestToVoiced(t *testing.T) {
 			continue
 		}
 		var have, want rune
-		var haveMm, wantMm modmark
+		var haveMm, wantMm vom
 
-		have, haveMm = c.toTraditionalVoiced()
+		have, haveMm = c.composeVoiced()
 		want = tt.outTradChar
 		wantMm = tt.outTradMark
 		if have != want || haveMm != wantMm {
@@ -427,7 +427,7 @@ func TestToVoiced(t *testing.T) {
 			break
 		}
 
-		have, haveMm = c.toNonspaceVoiced()
+		have, haveMm = c.decomposeVoiced()
 		want = tt.outNonsChar
 		wantMm = tt.outNonsMark
 		if have != want || haveMm != wantMm {
@@ -442,20 +442,20 @@ func TestToVoiced(t *testing.T) {
 type ToSemivoicedTest struct {
 	in          rune
 	outTradChar rune
-	outTradMark modmark
+	outTradMark vom
 	outNonsChar rune
-	outNonsMark modmark
+	outNonsMark vom
 }
 
 var tosemivoicedtests = []ToSemivoicedTest{
 	// vcUnvoiced
-	0: {'か', 'か', '゜', 'か', '\u309A'},    // compatVs is exists, compatSvs is not exists
-	1: {'は', 'ぱ', mmNone, 'は', '\u309A'}, // compatVs is exists, compatSvs is exists
+	0: {'か', 'か', '゜', 'か', '\u309A'},    // compatVoiced is exists, compatSemivoiced is not exists
+	1: {'は', 'ぱ', vmNone, 'は', '\u309A'}, // compatVoiced is exists, compatSemivoiced is exists
 	// vcVoice'
-	2: {'が', 'か', '゜', 'か', '\u309A'},    // compatVs.compatSvs is not exists
-	3: {'ば', 'ぱ', mmNone, 'は', '\u309A'}, // compatVs.compatSvs is exists
+	2: {'が', 'か', '゜', 'か', '\u309A'},    // compatVoiced.compatSemivoiced is not exists
+	3: {'ば', 'ぱ', vmNone, 'は', '\u309A'}, // compatVoiced.compatSemivoiced is exists
 	// vcSemivoiced
-	4: {'ぱ', 'ぱ', mmNone, 'は', '\u309A'},
+	4: {'ぱ', 'ぱ', vmNone, 'は', '\u309A'},
 	// vcUndefined, cwWide
 	5:  {'あ', 'あ', '゜', 'あ', '\u309A'}, // ctKanaLetter, ccHiragana
 	6:  {'ア', 'ア', '゜', 'ア', '\u309A'}, // ctKanaLetter, ccKatakana
@@ -466,15 +466,15 @@ var tosemivoicedtests = []ToSemivoicedTest{
 	11: {'＃', '＃', '゜', '＃', '\u309A'}, // ctLatinSymbol, ccUndefined
 	// vcUndefined, cwNarrow
 	12: {'ｱ', 'ｱ', 'ﾟ', 'ｱ', '\u309A'}, // ctKanaLetter, ccKatakana
-	13: {'ｶ', 'ｶ', 'ﾟ', 'ｶ', '\u309A'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is not exists
-	14: {'ﾊ', 'ﾊ', 'ﾟ', 'ﾊ', '\u309A'}, // ctKanaLetter, ccKatakana, compatWidth.compatVs is exists, compatWidth.compatSvs is exists
+	13: {'ｶ', 'ｶ', 'ﾟ', 'ｶ', '\u309A'}, // ctKanaLetter, ccKatakana, compatWidth.compatVoiced is exists, compatWidth.compatSemivoiced is not exists
+	14: {'ﾊ', 'ﾊ', 'ﾟ', 'ﾊ', '\u309A'}, // ctKanaLetter, ccKatakana, compatWidth.compatVoiced is exists, compatWidth.compatSemivoiced is exists
 	15: {'･', '･', 'ﾟ', '･', '\u309A'}, // ctKanaSymbol, ccUndefined
 	16: {'A', 'A', 'ﾟ', 'A', '\u309A'}, // ctLatinLetter, ccUpper
 	17: {'a', 'a', 'ﾟ', 'a', '\u309A'}, // ctLatinLetter, ccLower
 	18: {'1', '1', 'ﾟ', '1', '\u309A'}, // ctLatinDigit, ccUndefined
 	19: {'#', '#', 'ﾟ', '#', '\u309A'}, // ctLatinDigit, ccUndefined
 	// ctUndefined
-	20: {'\u3040', '\u3040', mmNone, '\u3040', '\u309A'},
+	20: {'\u3040', '\u3040', vmNone, '\u3040', '\u309A'},
 	// VSM
 	21: {'゛', '゛', '゜', '゛', '\u309A'},
 	22: {'\u3099', '\u3099', '゜', '\u3099', '\u309A'},
@@ -493,9 +493,9 @@ func TestToSemivoiced(t *testing.T) {
 			continue
 		}
 		var have, want rune
-		var haveMm, wantMm modmark
+		var haveMm, wantMm vom
 
-		have, haveMm = c.toTraditionalSemivoiced()
+		have, haveMm = c.composeSemivoiced()
 		want = tt.outTradChar
 		wantMm = tt.outTradMark
 		if have != want || haveMm != wantMm {
@@ -504,7 +504,7 @@ func TestToSemivoiced(t *testing.T) {
 			break
 		}
 
-		have, haveMm = c.toNonspaceSemivoiced()
+		have, haveMm = c.decomposeSemivoiced()
 		want = tt.outNonsChar
 		wantMm = tt.outNonsMark
 		if have != want || haveMm != wantMm {
