@@ -115,13 +115,13 @@ func estimateSize(s string, maxh int) (w, h int) {
 	return
 }
 
-// VertFix returns out that is a vertical conversion of the in.
+// VertFix returns the vertical conversion of the in.
+// The result is word wrapped so that it does not exceed h.
+// If in contains half-width or narrow-width characters,
+// whitespace is added to the left of it.
 // If the converted string fits in a matrix of size w and h,
-// out is a string slice with one element, if not, out is a
-// string slice with multiple elements.
-// If in contains half-width or narrow-width characters, space
-// is added to the left of it.
-// TODO renew comments
+// the result is a string slice with one element, if not,
+// the result is a string slice with multiple elements.
 func VertFix(in string, w int, h int) []string {
 	if w <= 0 || h <= 0 {
 		return []string{}
@@ -130,6 +130,10 @@ func VertFix(in string, w int, h int) []string {
 	return vert(rss, w, h)
 }
 
+// VertShrink returns the vertical conversion of the in.
+// If the text fits in the w and h matrix without word
+// wrapping, the result is laid out so that it fits in the
+// smallest matrix.
 func VertShrink(in string, w, h int) []string {
 	ew, eh := estimateSize(in, h)
 	w = min(w, ew)
@@ -137,6 +141,8 @@ func VertShrink(in string, w, h int) []string {
 	return VertFix(in, w, h)
 }
 
+// Vert returns the vertical conversion of the in.
+// This function is equivalent to VertShrink (s, 40, 25)
 func Vert(s string) string {
 	ss := VertShrink(s, 40, 25)
 	return strings.Join(ss, "\n")
