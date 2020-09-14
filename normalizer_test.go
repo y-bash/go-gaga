@@ -15,7 +15,7 @@ const (
 	excr = maxr + 1
 )
 
-type NormalizeRuneSeqTest struct {
+type Normalizer_normalizeRuneTest struct {
 	name string
 	flag NormFlag
 	lo   rune
@@ -23,7 +23,7 @@ type NormalizeRuneSeqTest struct {
 	diff rune
 }
 
-var normalizeruneseqtests = []NormalizeRuneSeqTest{
+var normalizer_normalizerunetests = []Normalizer_normalizeRuneTest{
 	// latin letter
 	0: {"a-z -> A-Z", AlphaToUpper, 'a', 'z', 'A' - 'a'},
 	1: {"A-Z -> a-ｚ", AlphaToLower, 'A', 'Z', 'a' - 'A'},
@@ -118,8 +118,8 @@ var normalizeruneseqtests = []NormalizeRuneSeqTest{
 	81: {"｡-･ -> ｡-･", LatinToNarrow | AlphaToLower, '｡', '･', 0},
 }
 
-func TestNormalizeRuneSeq(t *testing.T) {
-	for i, tt := range normalizeruneseqtests {
+func TestNormalizer_normalizeRune(t *testing.T) {
+	for i, tt := range normalizer_normalizerunetests {
 		n, err := Norm(tt.flag)
 		if err != nil {
 			t.Errorf("#%d: %s", i, err.Error())
@@ -136,14 +136,14 @@ func TestNormalizeRuneSeq(t *testing.T) {
 	}
 }
 
-type NormalizeTest struct {
+type Normalizer_StringTest struct {
 	flag NormFlag
 	in   string
 	out  string
 }
 
 // TODO User perspective testing
-var normalizetests = []NormalizeTest{
+var normalizer_stringtests = []Normalizer_StringTest{
 	// simple latin conversion <- zero length string
 	0: {AlphaToUpper, "", ""},
 	1: {AlphaToLower, "", ""},
@@ -895,8 +895,8 @@ func hexs(s string) string {
 	}
 }
 
-func TestString(t *testing.T) {
-	for i, tt := range normalizetests {
+func TestNormalizer_String(t *testing.T) {
+	for i, tt := range normalizer_stringtests {
 		n, err := Norm(tt.flag)
 		if err != nil {
 			t.Errorf("#%d: %s", i, err.Error())
@@ -914,8 +914,8 @@ func TestString(t *testing.T) {
 }
 
 func normflags() []int {
-	flags := make([]int, 0, len(normflagNames))
-	for key := range normflagNames {
+	flags := make([]int, 0, len(normflagMap))
+	for key := range normflagMap {
 		flags = append(flags, int(key))
 	}
 	return flags

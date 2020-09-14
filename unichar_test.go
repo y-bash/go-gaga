@@ -318,7 +318,7 @@ func TestUnicharTable(t *testing.T) {
 	testUnicharTable(t, widthTable, widthFirst, widthLast, "widthTable")
 }
 
-type ToVoicedTest struct {
+type Unichar_composeVoicedTest struct {
 	in          rune
 	outTradChar rune
 	outTradMark vom
@@ -326,7 +326,7 @@ type ToVoicedTest struct {
 	outNonsMark vom
 }
 
-var tovoicedtests = []ToVoicedTest{
+var unicharcomposevoicedtests = []Unichar_composeVoicedTest{
 	// vcUnvoiced
 	0: {'か', 'が', vmNone, 'か', '\u3099'}, // compatVoiced is exists, compatSemivoiced is not exists
 	1: {'は', 'ば', vmNone, 'は', '\u3099'}, // compatVoiced is exists, compatSemivoiced is exists
@@ -364,8 +364,8 @@ var tovoicedtests = []ToVoicedTest{
 	26: {'ﾟ', 'ﾟ', 'ﾞ', 'ﾟ', '\u3099'},
 }
 
-func TestToVoiced(t *testing.T) {
-	for n, tt := range tovoicedtests {
+func TestUnichar_composeVoiced(t *testing.T) {
+	for n, tt := range unicharcomposevoicedtests {
 		c, ok := findUnichar(tt.in)
 		if !ok {
 			t.Errorf("%d: %#U is not found by findUnichar()", n, tt.in)
@@ -395,7 +395,7 @@ func TestToVoiced(t *testing.T) {
 	}
 }
 
-type ToSemivoicedTest struct {
+type Unichar_composeSemivoicedTest struct {
 	in          rune
 	outTradChar rune
 	outTradMark vom
@@ -403,7 +403,7 @@ type ToSemivoicedTest struct {
 	outNonsMark vom
 }
 
-var tosemivoicedtests = []ToSemivoicedTest{
+var unicharcomposesemivoicedtests = []Unichar_composeSemivoicedTest{
 	// vcUnvoiced
 	0: {'か', 'か', '゜', 'か', '\u309A'},    // compatVoiced is exists, compatSemivoiced is not exists
 	1: {'は', 'ぱ', vmNone, 'は', '\u309A'}, // compatVoiced is exists, compatSemivoiced is exists
@@ -441,8 +441,8 @@ var tosemivoicedtests = []ToSemivoicedTest{
 	26: {'ﾟ', 'ﾟ', 'ﾟ', 'ﾟ', '\u309A'},
 }
 
-func TestToSemivoiced(t *testing.T) {
-	for n, tt := range tosemivoicedtests {
+func TestUnichar_composeSemivoiced(t *testing.T) {
+	for n, tt := range unicharcomposesemivoicedtests{
 		c, ok := findUnichar(tt.in)
 		if !ok {
 			t.Errorf("%d: %#U is not found by findUnichar()", n, tt.in)
