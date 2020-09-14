@@ -109,24 +109,24 @@ func ExampleVert() {
 	//   る
 }
 
-func ExampleNormalizer_Normalize() {
+func ExampleNormalizer_String() {
 	s := "ＧａGa is not がｶﾞガ"
 	fmt.Println(0, s)
 
-	n, _ := gaga.NewNormalizer(gaga.LatinToNarrow)
-	fmt.Println(1, n.Normalize(s))
+	n, _ := gaga.Norm(gaga.LatinToNarrow)
+	fmt.Println(1, n.String(s))
 
 	n.SetFlag(gaga.KanaToWide)
-	fmt.Println(2, n.Normalize(s))
+	fmt.Println(2, n.String(s))
 
 	n.SetFlag(gaga.KanaToHiragana)
-	fmt.Println(3, n.Normalize(s))
+	fmt.Println(3, n.String(s))
 
 	n.SetFlag(gaga.KanaToNarrowKatakana)
-	fmt.Println(4, n.Normalize(s))
+	fmt.Println(4, n.String(s))
 
 	n.SetFlag(gaga.LatinToNarrow | gaga.AlphaToUpper | gaga.KanaToWideKatakana)
-	fmt.Println(5, n.Normalize(s))
+	fmt.Println(5, n.String(s))
 
 	// Output:
 	// 0 ＧａGa is not がｶﾞガ

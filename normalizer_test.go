@@ -120,16 +120,16 @@ var normalizeruneseqtests = []NormalizeRuneSeqTest{
 
 func TestNormalizeRuneSeq(t *testing.T) {
 	for i, tt := range normalizeruneseqtests {
-		n, err := NewNormalizer(tt.flag)
+		n, err := Norm(tt.flag)
 		if err != nil {
 			t.Errorf("#%d: %s", i, err.Error())
 			continue
 		}
 		for src := tt.lo; src <= tt.hi; src++ {
 			want, wantVm := src+tt.diff, vmNone
-			have, haveVm := n.NormalizeRune(src)
+			have, haveVm := n.normalizeRune(src)
 			if have != want || haveVm != vmNone {
-				t.Errorf("#%d %s, %s\nNormalizeRune(%#U)\nhave:(%#U, %#U), \nwant:(%#U, %#U)",
+				t.Errorf("#%d %s, %s\nnormalizeRune(%#U)\nhave:(%#U, %#U), \nwant:(%#U, %#U)",
 					i, tt.name, tt.flag, src, have, haveVm, want, wantVm)
 			}
 		}
@@ -895,14 +895,14 @@ func hexs(s string) string {
 	}
 }
 
-func TestNormalize(t *testing.T) {
+func TestString(t *testing.T) {
 	for i, tt := range normalizetests {
-		n, err := NewNormalizer(tt.flag)
+		n, err := Norm(tt.flag)
 		if err != nil {
 			t.Errorf("#%d: %s", i, err.Error())
 			continue
 		}
-		out := n.Normalize(tt.in)
+		out := n.String(tt.in)
 		if out != tt.out {
 			t.Errorf("TestNormalize #%d\n\tflag:"+
 				"\t%s, \n\targs:\t%q\n\thave:\t%q\n\twant:\t%q\n"+
@@ -987,7 +987,7 @@ func TestHeavyNormFlags(t *testing.T) {
 	log.Printf("invalid : %7d\n", len(invalid))
 	// testing invalid flags
 	for _, flag := range invalid {
-		_, err := NewNormalizer(flag)
+		_, err := Norm(flag)
 		if err == nil {
 			t.Errorf("TestInvalidFlags: %s is valid, want: invalid", flag)
 		}
@@ -996,34 +996,34 @@ func TestHeavyNormFlags(t *testing.T) {
 	// testing all runes and all flag combinations
 outer:
 	for i, flag := range valid {
-		n, err := NewNormalizer(flag)
+		n, err := Norm(flag)
 		if err != nil {
 			t.Errorf("TestInvalidFlags: %s is invalid, want: valid", flag)
 			continue
 		}
 		for r := rune(0); r < maxr; r++ {
 			c, rOK := findUnichar(r)
-			nr, vm := n.NormalizeRune(r)
+			nr, vm := n.normalizeRune(r)
 			_, nrOK := findUnichar(nr)
 			if rOK != nrOK {
 				// TEST_G9amUMTr
 				if rOK {
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: %#U is not exists in unichars"+
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: %#U is not exists in unichars"+
 						"\n\twant: %#U is exists in unichars", r, flag, nr, nr)
 				} else {
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: %#U is exists in unichars"+
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: %#U is exists in unichars"+
 						"\n\twant: %#U is not exists in unichars", r, flag, nr, nr)
 				}
 				break outer
 			}
 			if !nrOK {
 				if vm != vmNone {
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 						r, flag, nr, vm, vmNone)
 					break outer
 				}
 				if r != nr {
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: nr=%#U",
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: nr=%#U",
 						r, flag, nr, vm, r)
 					break outer
 				}
@@ -1032,7 +1032,7 @@ outer:
 			if c.voicing == vcUndefined || c.voicing == vcUnvoiced {
 				if vm != vmNone {
 					// TEST_nD7FwQUW
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 						r, flag, nr, vm, vmNone)
 					break outer
 				}
@@ -1041,19 +1041,19 @@ outer:
 			if (c.charCase == ccHiragana && flag.has(HiraganaToNarrow) && !flag.has(DecomposeVom)) ||
 				(c.charCase == ccKatakana && flag.has(KatakanaToNarrow) && !flag.has(DecomposeVom)) {
 				if c.voicing == vcVoiced && vm != vmVsmNarrow {
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 						r, flag, nr, vm, vmVsmNarrow)
 					break outer
 				}
 				if c.voicing == vcSemivoiced && vm != vmSsmNarrow {
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 						r, flag, nr, vm, vmSsmNarrow)
 					break outer
 				}
 			}
 			if c.charCase == ccHiragana && flag.has(HiraganaToKatakana) && !flag.has(DecomposeVom) {
 				if vm != vmNone {
-					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+					t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 						r, flag, nr, vm, vmNone)
 					break outer
 				}
@@ -1062,13 +1062,13 @@ outer:
 				switch r {
 				case 'ヷ', 'ヸ', 'ヹ', 'ヺ':
 					if vm != vmVsmWide {
-						t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+						t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 							r, flag, nr, vm, vmVsmWide)
 						break outer
 					}
 				default:
 					if vm != vmNone {
-						t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
+						t.Errorf("normalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 							r, flag, nr, vm, vmNone)
 						break outer
 					}
@@ -1083,12 +1083,12 @@ outer:
 
 const normSTR = "\t Aa#　Ａａ＃あア。ｱ｡”ﾞ漢字ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ\U0010FFFF"
 
-func BenchmarkNormalize(b *testing.B) {
-	n, _ := NewNormalizer(LatinToNarrow | KanaToWide)
+func BenchmarkString(b *testing.B) {
+	n, _ := Norm(LatinToNarrow | KanaToWide)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		s := strings.Repeat(normSTR, 1)
-		n.Normalize(s)
+		n.String(s)
 	}
 	b.StopTimer()
 }

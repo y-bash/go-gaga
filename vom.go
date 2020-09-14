@@ -13,6 +13,10 @@ const (
 	vmSsmNarrow   vom = 0xFF9F // Narrow semi-voiced sound mark
 )
 
+func (m vom) isNone() bool {
+	return m == vmNone
+}
+
 // Vsm (Voiced sound mark)
 func (m vom) isVsm() bool {
 	switch m {

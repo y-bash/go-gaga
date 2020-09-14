@@ -12,7 +12,7 @@ type Normalizer struct {
 
 func (n *Normalizer) maybeComposeVom(r1, r2 rune) (rune, vom, bool) {
 	if !vom(r2).isVom() {
-		r, m := n.NormalizeRune(r1)
+		r, m := n.normalizeRune(r1)
 		return r, m, false
 	}
 
@@ -23,13 +23,13 @@ func (n *Normalizer) maybeComposeVom(r1, r2 rune) (rune, vom, bool) {
 
 	if c1.category != ctKanaLetter ||
 		c1.voicing == vcVoiced || c1.voicing == vcSemivoiced {
-		r, m := n.NormalizeRune(r1)
+		r, m := n.normalizeRune(r1)
 		return r, m, false
 	}
 
-	// TEST_nD7FwQUW knows that NormalizeRune() will definitely return
+	// TEST_nD7FwQUW knows that normalizeRune() will definitely return
 	// a rune and the vmNone.
-	nr1, _ := n.NormalizeRune(r1)
+	nr1, _ := n.normalizeRune(r1)
 
 	// TEST_G9amUMTr knows that findUnichar() definitely return a rune
 	// and the ok value.
@@ -45,7 +45,7 @@ func (n *Normalizer) maybeComposeVom(r1, r2 rune) (rune, vom, bool) {
 			r, m := nc1.decomposeVoiced()
 			return r, m, true
 		default:
-			vsm, _ := n.NormalizeRune(r2)
+			vsm, _ := n.normalizeRune(r2)
 			return nc1.codepoint, vom(vsm), true
 		}
 	case vom(r2).isSsm():
@@ -57,17 +57,17 @@ func (n *Normalizer) maybeComposeVom(r1, r2 rune) (rune, vom, bool) {
 			r, m := nc1.decomposeSemivoiced()
 			return r, m, true
 		default:
-			svsm, _ := n.NormalizeRune(r2)
+			svsm, _ := n.normalizeRune(r2)
 			return nc1.codepoint, vom(svsm), true
 		}
 	}
 	panic("unreachable")
 }
 
-// NewNormalizer creates a new Normalizer with specified flag
+// Norm creates a new Normalizer with specified flag
 // (LatinToNarrow etc.). If successful, methods on the returned
 // Normalizer can be used for normalization.
-func NewNormalizer(flag NormFlag) (*Normalizer, error) {
+func Norm(flag NormFlag) (*Normalizer, error) {
 	err := flag.validate()
 	if err != nil {
 		return nil, err
@@ -87,13 +87,7 @@ func (n *Normalizer) SetFlag(flag NormFlag) error {
 	return nil
 }
 
-// NormalizeRune normalizes the rune according to the current
-// normalization mode. Depending on the mode, the voiced or
-// semi-voiced sound mark may be separated, so it may return
-// multiple runes. but, this function allways returns a rune
-// array with 1 or 2 elements, and never returns an array with
-// any other number of elements.
-func (n *Normalizer) NormalizeRune(r rune) (rune, vom) {
+func (n *Normalizer) normalizeRune(r rune) (rune, vom) {
 	// TEST_Fc68JR9i knows about the number of elements in
 	// the return value of this function
 	c, ok := findUnichar(r)
@@ -227,28 +221,44 @@ func (n *Normalizer) NormalizeRune(r rune) (rune, vom) {
 	}
 }
 
+// TODO renew comments
+// Rune normalizes the rune according to the current
+// normalization mode. Depending on the mode, the voiced or
+// semi-voiced sound mark may be separated, so it may return
+// multiple runes. but, this function allways returns a rune
+// array with 1 or 2 elements, and never returns an array with
+// any other number of elements.
+func (n *Normalizer) Rune(r rune) string {
+	r1, r2 := n.normalizeRune(r)
+	if r2.isNone() {
+		return string(r1)
+	}
+	return string([]rune{r1, rune(r2)})
+
+}
+
 // Normalize normalizes the string according to the current
 // normalization mode.
-func (n *Normalizer) Normalize(s string) string {
+func (n *Normalizer) String(s string) string {
 	rs := []rune(s)
 	var sb strings.Builder
 	sb.Grow(len(rs) * 2)
-	var r rune
-	var m vom
 	for i := 0; i < len(rs); i++ {
+		var r1 rune
+		var r2 vom
 		if i < len(rs)-1 {
 			var ok bool
-			if r, m, ok = n.maybeComposeVom(rs[i], rs[i+1]); ok {
+			r1, r2, ok = n.maybeComposeVom(rs[i], rs[i+1])
+			if ok {
 				i++
 			}
 		} else {
-			r, m = n.NormalizeRune(rs[i])
+			r1, r2 = n.normalizeRune(rs[i])
 		}
-		sb.WriteRune(r)
-		if m.isVom() {
-			sb.WriteRune(rune(m))
+		sb.WriteRune(r1)
+		if !r2.isNone() {
+			sb.WriteRune(rune(r2))
 		}
 	}
-
 	return sb.String()
 }

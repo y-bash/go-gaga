@@ -88,14 +88,16 @@ const (
 	// Example: [､] => [、]
 	KanaSymbolToWide
 
-	// ComposeVom composes the voiced or semi-voiced sound letter.
+	// ComposeVom composes the voiced or semi-voiced sound letters in
+	// the most conventional way.
 	// Examples:
 	//	[が]     => [が],  [か][゛] => [が],    [か][\u3099] => [が],
 	//  [か][ﾞ]  => [が],  [ｶ][゛]  => [ｶ][ﾞ],  [ｶ][ﾞ]       => [ｶ][ﾞ],
 	//  [は][゜] => [ぱ],  [ヰ][゛] => [ヸ],    [ゐ][゛]     => [ゐ][゛]
 	ComposeVom
 
-	// DecomposeVom decomposes the voiced or semi-voiced sound letter.
+	// DecomposeVom decomposes the voiced or semi-voiced sound letters
+	// in a way similar to the Unicode canonical decomposition mappings.
 	// Examples:
 	//	[が]         => [か][\u3099],  [か][゛] => [か][\u3099],
 	//  [か][\u3099] => [か][\u3099],  [か][ﾞ]  => [か][\u3099],
@@ -289,7 +291,7 @@ var invalidFlagsList = []NormFlag{
 	IsolatedKanaVomToWide | IsolatedKanaVomToNonspace,
 }
 
-func (f NormFlag)validate() error {
+func (f NormFlag) validate() error {
 	if f <= normflagUndefined || f >= normflagMax {
 		return fmt.Errorf("invalid normalization flag value: %d", f)
 	}
@@ -301,4 +303,3 @@ func (f NormFlag)validate() error {
 	}
 	return nil
 }
-

@@ -7,16 +7,16 @@ it vertically.
 
 First, import gaga.
 	import "github.com/y-bash/go-gaga"
-Define a normalizer using NewNormalizer() with the normalization flag.
+Define a normalizer using Norm() with the normalization flag.
 This declares a normalizer, that converts Latin characters to
 half-width and Hiragana-Katakana characters to full-width.
-	n, err := gaga.NewNormalizer(gaga.LatinToNarrow | gaga.KanaToWide)
+	n, err := gaga.Norm(gaga.LatinToNarrow | gaga.KanaToWide)
 	if err != nil {
 		log.Fatal(err)
 	}
 After normalizer is defined, call to normalize the string using the
 normalization flags.
-	s := n.Normalize("Ｇａｇａはｶﾞｶﾞｶﾞではありません")
+	s := n.String("Ｇａｇａはｶﾞｶﾞｶﾞではありません")
 	fmt.Println(s)
 Output is:
 	Gagaはガガガではありません
