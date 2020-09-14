@@ -74,7 +74,7 @@ deps:
 
 .PHONY: devdeps
 devdeps: deps
-	go get golang.org/x/lint/golint
+	go get golang.org/x/lint
 	go get golang.org/x/text
 
 #Make directory
