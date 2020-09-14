@@ -58,8 +58,8 @@ test: devdeps dir
 	go test -v -coverprofile=$(OBJDIR)/cover.out -run $(LIGHTW) ./...
 	go tool cover -html=$(OBJDIR)/cover.out -o $(OBJDIR)/cover.html
 
-.PHONY: alltest
-alltest: test
+.PHONY: alltests
+alltests: test
 	go test -v -timeout 20m -run $(HEAVYW)
 
 #Benchmarks
