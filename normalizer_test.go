@@ -138,8 +138,8 @@ func TestNormalizeRuneSeq(t *testing.T) {
 
 type NormalizeTest struct {
 	flag NormFlag
-	in  string
-	out string
+	in   string
+	out  string
 }
 
 // TODO User perspective testing
@@ -871,7 +871,6 @@ var normalizetests = []NormalizeTest{
 	// Wave dash and characters similar to it
 	238: {SymbolToWide, "~\uFF5E\u301C\U0001301C", "\uFF5E\uFF5E\u301C\U0001301C"},
 	239: {SymbolToNarrow, "~\uFF5E\u301C\U0001301C", "~~\u301C\U0001301C"},
-
 }
 
 func hexs(s string) string {
@@ -1004,10 +1003,10 @@ outer:
 				// TEST_G9amUMTr
 				if rOK {
 					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: %#U is not exists in unichars"+
-						"\n\twant: %#U is exists in unichars", r, flag, nr, nr, )
+						"\n\twant: %#U is exists in unichars", r, flag, nr, nr)
 				} else {
 					t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: %#U is exists in unichars"+
-						"\n\twant: %#U is not exists in unichars", r, flag, nr, nr, )
+						"\n\twant: %#U is not exists in unichars", r, flag, nr, nr)
 				}
 				break outer
 			}
@@ -1055,7 +1054,7 @@ outer:
 			}
 			if c.charCase == ccKatakana && flag.has(KatakanaToHiragana) && !flag.has(DecomposeVom) {
 				switch r {
-				case 'ヷ','ヸ', 'ヹ', 'ヺ':
+				case 'ヷ', 'ヸ', 'ヹ', 'ヺ':
 					if vm != vmVsmWide {
 						t.Errorf("NormalizeRune(%#U), flags: %s,\n\thave: nr=%#U, vm=%#U\n\twant: vm=%#U",
 							r, flag, nr, vm, vmVsmWide)
@@ -1132,4 +1131,3 @@ func BenchmarkWidthFold(b *testing.B) {
 	}
 	b.StopTimer()
 }
-
