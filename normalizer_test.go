@@ -1002,9 +1002,9 @@ outer:
 			continue
 		}
 		for r := rune(0); r < maxr; r++ {
-			c, rOK := getUnichar(r)
+			c, rOK := findUnichar(r)
 			nr, vm := n.NormalizeRune(r)
-			_, nrOK := getUnichar(nr)
+			_, nrOK := findUnichar(nr)
 			if rOK != nrOK {
 				// TEST_G9amUMTr
 				if rOK {

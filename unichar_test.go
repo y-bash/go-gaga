@@ -74,8 +74,8 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 		c := &table[i]
 
 		// codepoint
-		if _, ok := getUnichar(c.codepoint); !ok {
-			t.Errorf("%s[%#U] is not found by getUnichar()", name, c.codepoint)
+		if _, ok := findUnichar(c.codepoint); !ok {
+			t.Errorf("%s[%#U] is not found by findUnichar()", name, c.codepoint)
 		}
 
 		// category
@@ -97,8 +97,8 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				name, c.codepoint, c.charCase, c.compatCase, c.codepoint)
 		}
 		if c.compatCase != c.codepoint {
-			if compatCase, ok := getUnichar(c.compatCase); !ok { // TEST_fm8XjZTB
-				t.Errorf("%s[%#U].compatCase %#U is not found by getUnichar()",
+			if compatCase, ok := findUnichar(c.compatCase); !ok { // TEST_fm8XjZTB
+				t.Errorf("%s[%#U].compatCase %#U is not found by findUnichar()",
 					name, c.codepoint, c.compatCase)
 			} else {
 				if compatCase.category != c.category {
@@ -138,8 +138,8 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 		}
 		if c.compatWidth != c.codepoint {
-			if compatWidth, ok := getUnichar(c.compatWidth); !ok { // TEST_T3bc4Nh7
-				t.Errorf("%s[%#U].compatWidth %#U is not found by getUnichar()",
+			if compatWidth, ok := findUnichar(c.compatWidth); !ok { // TEST_T3bc4Nh7
+				t.Errorf("%s[%#U].compatWidth %#U is not found by findUnichar()",
 					name, c.codepoint, c.compatWidth)
 			} else {
 				if compatWidth.category != c.category {
@@ -207,8 +207,8 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 		}
 
 		if c.compatVoiced != c.codepoint {
-			if compatVoiced, ok := getUnichar(c.compatVoiced); !ok { // TEST_Cu8iKMxF
-				t.Errorf("%s[%#U].compatVoiced %#U is not found by getUnichar()", name, c.codepoint, c.compatVoiced)
+			if compatVoiced, ok := findUnichar(c.compatVoiced); !ok { // TEST_Cu8iKMxF
+				t.Errorf("%s[%#U].compatVoiced %#U is not found by findUnichar()", name, c.codepoint, c.compatVoiced)
 			} else {
 				if c.category != compatVoiced.category {
 					t.Errorf("%s[%#U].category is %d and compatVoiced %#U.category is %d, want same value",
@@ -229,8 +229,8 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 			}
 		}
 		if c.compatSemivoiced != c.codepoint {
-			if compatSemivoiced, ok := getUnichar(c.compatSemivoiced); !ok { // TEST_rW4UiNHC
-				t.Errorf("%s[%#U].compatSemivoiced %#U is not found by getUnichar()", name, c.codepoint, c.compatSemivoiced)
+			if compatSemivoiced, ok := findUnichar(c.compatSemivoiced); !ok { // TEST_rW4UiNHC
+				t.Errorf("%s[%#U].compatSemivoiced %#U is not found by findUnichar()", name, c.codepoint, c.compatSemivoiced)
 			} else {
 				if c.category != compatSemivoiced.category {
 					t.Errorf("%s[%#U].category is %d and compatSemivoiced %#U.category is %d, want same value",
@@ -366,9 +366,9 @@ var tovoicedtests = []ToVoicedTest{
 
 func TestToVoiced(t *testing.T) {
 	for n, tt := range tovoicedtests {
-		c, ok := getUnichar(tt.in)
+		c, ok := findUnichar(tt.in)
 		if !ok {
-			t.Errorf("%d: %#U is not found by getUnichar()", n, tt.in)
+			t.Errorf("%d: %#U is not found by findUnichar()", n, tt.in)
 			continue
 		}
 		var have, want rune
@@ -443,9 +443,9 @@ var tosemivoicedtests = []ToSemivoicedTest{
 
 func TestToSemivoiced(t *testing.T) {
 	for n, tt := range tosemivoicedtests {
-		c, ok := getUnichar(tt.in)
+		c, ok := findUnichar(tt.in)
 		if !ok {
-			t.Errorf("%d: %#U is not found by getUnichar()", n, tt.in)
+			t.Errorf("%d: %#U is not found by findUnichar()", n, tt.in)
 			continue
 		}
 		var have, want rune
@@ -478,7 +478,7 @@ func BenchmarkGetUnichar(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, r := range rs {
-			getUnichar(r)
+			findUnichar(r)
 		}
 	}
 	b.StopTimer()
