@@ -138,18 +138,11 @@ func TestNormalizeRuneSeq(t *testing.T) {
 
 type NormalizeTest struct {
 	flag NormFlag
-	//	mods string
 	in  string
 	out string
 }
 
-// TODO benchmark
 // TODO User perspective testing
-// TODO testing of whitespace
-// TODO Consider whether to test the following characters
-//   U+301C  '〜' 1.1 WAVE DASH
-//   U+FF5E  '～' 1.1 FULLWIDTH TILDE
-//   U+1301C '〜' 5.2 EGYPTIAN HIEROGLYPH A024
 var normalizetests = []NormalizeTest{
 	// simple latin conversion <- zero length string
 	0: {AlphaToUpper, "", ""},
@@ -870,6 +863,15 @@ var normalizetests = []NormalizeTest{
 	235: {LatinToNarrow | KanaToWide,
 		string([]rune{-1, '\u0000', maxr, excr}),
 		string([]rune{-1, '\u0000', maxr, excr})},
+
+	// Whitespace
+	236: {SymbolToWide, "\u0020\u3000", "\u3000\u3000"},
+	237: {SymbolToNarrow, "\u0020\u3000", "\u0020\u0020"},
+
+	// Wave dash and characters similar to it
+	238: {SymbolToWide, "~\uFF5E\u301C\U0001301C", "\uFF5E\uFF5E\u301C\U0001301C"},
+	239: {SymbolToNarrow, "~\uFF5E\u301C\U0001301C", "~~\u301C\U0001301C"},
+
 }
 
 func hexs(s string) string {
