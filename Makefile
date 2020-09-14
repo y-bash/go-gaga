@@ -40,10 +40,11 @@ gen:
 
 # Generate CSVs
 .PHONY: csv
-csv: $(OBJDIR)/ucd.csv \
-	 $(OBJDIR)/ucdex.csv
+csv: dir \
+	$(OBJDIR)/ucd.csv \
+	$(OBJDIR)/ucdex.csv
 
-$(OBJDIR)/%.csv: dir $(GENDIR)/gen%csv.go
+$(OBJDIR)/%.csv: $(GENDIR)/gen%csv.go
 	go run $< -output $@
 
 # Lint
