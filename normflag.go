@@ -360,27 +360,24 @@ func ParseNormFlag(names string) (flags NormFlag, err error) {
 		}
 		flag, ok := normflagRevMap[name]
 		if !ok {
-			return flags, fmt.Errorf("invalid NormFlag name: %q", name)
+			return flags, fmt.Errorf("invalid normalization flag: %s", name)
 		}
 		flags |= flag
 	}
-	if flags == normflagUndefined {
-		return flags, fmt.Errorf("no flags: %q", names)
-	}
-	if flags.validate() != nil {
-		panic("unreachable")
+	if err = flags.validate(); err != nil {
+		return flags, err
 	}
 	return flags, nil
 }
 
 func (f NormFlag) validate() error {
 	if f <= normflagUndefined || f >= normflagMax {
-		return fmt.Errorf("invalid normalization flag value: %d", f)
+		return fmt.Errorf("invalid normalization flag: %s", f)
 	}
 	for _, invalid := range invalidFlagsList {
 		if f&invalid == invalid {
 			return fmt.Errorf(
-				"invalid normalization flag: %d, invalid combination: %d",
+				"invalid normalization flag: %s, invalid combination: %s",
 				f, invalid)
 		}
 	}

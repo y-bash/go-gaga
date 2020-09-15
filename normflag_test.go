@@ -32,8 +32,8 @@ type ParseNormFlagTest struct {
 }
 
 var parsenormflagtests = []ParseNormFlagTest{
-	0:  {"", 0, "no flags"},
-	1:  {"<undefined>", 0, "invalid NormFlag"},
+	0:  {"", 0, "invalid normalization flag"},
+	1:  {"<undefined>", 0, "invalid normalization flag"},
 	2:  {"AlphaToNarrow", AlphaToNarrow, ""},
 	3:  {"LatinToNarrow", LatinToNarrow, ""},
 	4:  {"LatinToNarrow", AlphaToNarrow | DigitToNarrow | SymbolToNarrow, ""},
@@ -42,8 +42,8 @@ var parsenormflagtests = []ParseNormFlagTest{
 	7:  {"((((AlphaToNarrow | DigitToNarrow))))", AlphaToNarrow | DigitToNarrow, ""},
 	8:  {"((((AlphaToNarrow))))", AlphaToNarrow, ""},
 	9:  {"))))((((AlphaToNarrow", AlphaToNarrow, ""},
-	10: {"))))((((|||||", 0, "no flags"},
-	11: {"(|)(|)(|)(|)(|)", 0, "no flags"},
+	10: {"))))((((|||||", 0, "invalid normalization flag"},
+	11: {"(|)(|)(|)(|)(|)", 0, "invalid normalization flag"},
 }
 
 func TestParseNormFlag(t *testing.T) {
