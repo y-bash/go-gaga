@@ -30,8 +30,8 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
 ```
 import "github.com/y-bash/go-gaga"
 
-n:= gaga.NewNormalizer(gaga.LatinToNarrow | gaga.KanaToWide)
-s := n.Normalize("ＡＢＣｱｲｳ")
+n:= gaga.Norm(gaga.LatinToNarrow | gaga.KanaToWide)
+s := n.String("ＡＢＣｱｲｳ")
 fmt.Printf("%q", s) // => "ABCアイウ"
 
 ```
