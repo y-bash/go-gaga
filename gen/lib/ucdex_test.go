@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGenUCDEX(t *testing.T) {
+func TestHeavyGenUCDEX(t *testing.T) {
 	var buf bytes.Buffer
 	err := GenUCDEX(&buf)
 	//If it ends normally, the test is OK
@@ -14,7 +14,7 @@ func TestGenUCDEX(t *testing.T) {
 	}
 }
 
-func TestGenerate(t *testing.T) {
+func TestHeavyGenerate(t *testing.T) {
 	var buf bytes.Buffer
 	err := Generate(&buf, "ucdex_test.go")
 	//If it ends normally, the test is OK

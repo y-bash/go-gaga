@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGenUCD(t *testing.T) {
+func TestHeavyGenUCD(t *testing.T) {
 	var buf bytes.Buffer
 	err := GenUCD(&buf)
 	//If it ends normally, the test is OK
