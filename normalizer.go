@@ -221,13 +221,10 @@ func (n *Normalizer) normalizeRune(r rune) (rune, vom) {
 	}
 }
 
-// TODO renew comments
-// Rune normalizes the rune according to the current
-// normalization mode. Depending on the mode, the voiced or
-// semi-voiced sound mark may be separated, so it may return
-// multiple runes. but, this function allways returns a rune
-// array with 1 or 2 elements, and never returns an array with
-// any other number of elements.
+// Runes normalize r according to the current normalization mode.
+// In most cases, this function returns a string of length 1, but
+// in some modes the voicing modifiers may be separated, so it may
+// return a string of length 2.
 func (n *Normalizer) Rune(r rune) string {
 	r1, r2 := n.normalizeRune(r)
 	if r2.isNone() {
@@ -237,8 +234,7 @@ func (n *Normalizer) Rune(r rune) string {
 
 }
 
-// Normalize normalizes the string according to the current
-// normalization mode.
+// String normalizes the s according to the current normalization mode.
 func (n *Normalizer) String(s string) string {
 	rs := []rune(s)
 	var sb strings.Builder

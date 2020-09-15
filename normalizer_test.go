@@ -136,6 +136,31 @@ func TestNormalizer_normalizeRune(t *testing.T) {
 	}
 }
 
+type Normalizer_RuneTest struct {
+	flag NormFlag
+	in   rune
+	out  string
+}
+
+var normalizer_runetests = []Normalizer_RuneTest{
+	0: {AlphaToUpper, 'a', "A"},
+	1: {HiraganaToNarrow, 'が', "ｶﾞ"},
+}
+
+func TestNormalizer_Rune(t *testing.T) {
+	for i, tt := range normalizer_runetests {
+		n, err := Norm(tt.flag)
+		if err != nil {
+			t.Errorf("#%d: %s", i, err.Error())
+			continue
+		}
+		have := n.Rune(tt.in)
+		if have != tt.out {
+			t.Errorf("#%d %s, Rune(%#U) = %q, want: %q", i, tt.flag, tt.in, have, tt.out)
+		}
+	}
+}
+
 type Normalizer_StringTest struct {
 	flag NormFlag
 	in   string
