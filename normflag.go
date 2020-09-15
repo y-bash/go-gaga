@@ -11,7 +11,8 @@ type NormFlag int
 // Constants to identify various normalization flags.
 const (
 	// normflagUndefined indicates that the normalization flag is undefined.
-	normflagUndefined NormFlag = (1 << iota) / 2 // Sequence of 0, 1, 2, 4, 8, etc...
+	// sequence of 0, 1, 2, 4, 8, etc...
+	normflagUndefined NormFlag = (1 << iota) / 2
 
 	// AlphaToNarrow converts all the full-width Latin letters to
 	// their half-width.
@@ -189,7 +190,7 @@ const (
 	KanaToWide = KatakanaToWide | KanaSymbolToWide | IsolatedKanaVomToWide |
 		ComposeVom
 
-	//
+	// TODO add comments
 	//          | CHARACTER                       | CONVERT TO
 	// ---------+---------------------------------+-----------------
 	//          | Hiragana                        | Wide Katakana
@@ -203,21 +204,21 @@ const (
 	KanaToWideKatakana = KatakanaToWide | HiraganaToKatakana | KanaSymbolToWide |
 		IsolatedKanaVomToWide | ComposeVom
 
-	//
+	// TODO add comments
 	//          | CHARACTER                       | CONVERT TO
-	// ---------+---------------------------------+----------------------
+	// ---------+---------------------------------+-------------------
 	//          | Hiragana                        | Narrow Katakana
 	// Category | Wide Katakana                   | Narrow Katakana
 	//          | Wide Kana Symbol                | Narrow Kana Symbol
 	//          | Voiced/Semi-voiced Kana Letter  | Legacy composed
 	//          | Isolated Voicing Modifier (VOM) | Narrow VOM
-	// ---------+---------------------------------+----------------------
+	// ---------+---------------------------------+-------------------
 	// Example  | "あイ、が゛"                    | "ｱｲ､ｶﾞﾞ"
 	//
 	KanaToNarrowKatakana = KatakanaToNarrow | HiraganaToNarrow |
 		KanaSymbolToNarrow | IsolatedKanaVomToNarrow | ComposeVom
 
-	//
+	// TODO add comments
 	//          | CHARACTER                       | CONVERT TO
 	// ---------+---------------------------------+----------------------
 	//          | Wide Katakana                   | Hiragana
@@ -230,11 +231,26 @@ const (
 	//
 	KanaToHiragana = KatakanaToHiragana | KanaSymbolToWide |
 		IsolatedKanaVomToWide | ComposeVom
+
+	// Fold is a combination of normalization flags for converting
+	// Latin and Hiragana-Katakana characters to their canonical width.
+	//
+	//          | CHARACTER                       | CONVERT TO
+	// ---------+---------------------------------+-----------------
+	//          | Wide Alphabet                   | Narrow Alphabet
+	//          | Wide Digit                      | Narrow Digit
+	//          | Wide Symbol                     | Narrow Symbol
+	// Category | Narrow Katakana                 | Wide Katakana
+	//          | Narrow Kana Symbol              | Wide Kana Symbol
+	//          | Voiced/Semi-voiced Kana Letter  | Legacy composed
+	//          | Isolated Voicing Modifier (VOM) | Wide VOM
+	// ---------+---------------------------------+-----------------
+	// Example  | "Ａ１？ｱ､ｶﾞﾞ"                   | "A1?ア、ガ゛"
+	//
+	Fold = LatinToNarrow | KanaToWide
 )
 
-func (f NormFlag) has(f2 NormFlag) bool { return f&f2 != 0 }
-
-var normflagNames = map[NormFlag]string{
+var normflagMap = map[NormFlag]string{
 	AlphaToNarrow:             "AlphaToNarrow",
 	AlphaToWide:               "AlphaToWide",
 	AlphaToUpper:              "AlphaToUpper",
@@ -257,22 +273,32 @@ var normflagNames = map[NormFlag]string{
 	IsolatedKanaVomToNonspace: "IsolatedKanaVomToNonspace",
 }
 
-func (f NormFlag) String() string {
-	var ss []string
-	for f2 := NormFlag(1); f2 < normflagMax; f2 <<= 1 {
-		if f.has(f2) {
-			ss = append(ss, normflagNames[f2])
-		}
-	}
-	switch len(ss) {
-	case 0:
-		return "<undefined>"
-	case 1:
-		return ss[0]
-	default:
-		return "(" + strings.Join(ss, " | ") + ")"
-	}
+var combflagList = []struct {
+	flag NormFlag
+	name string
+}{
+	{LatinToNarrow, "LatinToNarrow"},
+	{LatinToWide, "LatinToWide"},
+	{KanaToNarrow, "KanaToNarrow"},
+	{KanaToWide, "KanaToWide"},
+	{KanaToWideKatakana, "KanaToWideKatakana"},
+	{KanaToNarrowKatakana, "KanaToNarrowKatakana"},
+	{KanaToHiragana, "KanaToHiragana"},
+	{Fold, "Fold"},
 }
+
+var normflagRevMap = func() map[string]NormFlag {
+	l := len(normflagMap) + len(combflagList)
+	revmap := make(map[string]NormFlag, l)
+	for k, v := range normflagMap {
+		revmap[v] = k
+	}
+	for _, combflag := range combflagList {
+		revmap[combflag.name] = combflag.flag
+	}
+	return revmap
+
+}()
 
 // invalid combination of normalization flags.
 var invalidFlagsList = []NormFlag{
@@ -291,6 +317,49 @@ var invalidFlagsList = []NormFlag{
 	IsolatedKanaVomToWide | IsolatedKanaVomToNonspace,
 }
 
+func (f NormFlag) has(f2 NormFlag) bool { return f&f2 != 0 }
+
+// String returns the name of a flag
+func (f NormFlag) String() string {
+	var ss []string
+	for f2 := NormFlag(1); f2 < normflagMax; f2 <<= 1 {
+		if f.has(f2) {
+			ss = append(ss, normflagMap[f2])
+		}
+	}
+	switch len(ss) {
+	case 0:
+		return "<undefined>"
+	case 1:
+		return ss[0]
+	default:
+		return "(" + strings.Join(ss, " | ") + ")"
+	}
+}
+
+//ParseNormflag returns a flags parsed names
+func ParseNormFlag(names string) (flags NormFlag, err error) {
+	ss := strings.Split(names, "|")
+	for _, s := range ss {
+		name := strings.Trim(s, " ()")
+		if len(name) <= 0 {
+			continue
+		}
+		flag, ok := normflagRevMap[name]
+		if !ok {
+			return flags, fmt.Errorf("invalid NormFlag name: %q", name)
+		}
+		flags |= flag
+	}
+	if flags == normflagUndefined {
+		return flags, fmt.Errorf("no flags: %q", names)
+	}
+	if flags.validate() != nil {
+		panic("unreachable")
+	}
+	return flags, nil
+}
+
 func (f NormFlag) validate() error {
 	if f <= normflagUndefined || f >= normflagMax {
 		return fmt.Errorf("invalid normalization flag value: %d", f)
@@ -298,7 +367,8 @@ func (f NormFlag) validate() error {
 	for _, invalid := range invalidFlagsList {
 		if f&invalid == invalid {
 			return fmt.Errorf(
-				"invalid normalization flag: %d, invalid combination: %d", f, invalid)
+				"invalid normalization flag: %d, invalid combination: %d",
+				f, invalid)
 		}
 	}
 	return nil
