@@ -88,8 +88,6 @@ func (n *Normalizer) SetFlag(flag NormFlag) error {
 }
 
 func (n *Normalizer) normalizeRune(r rune) (rune, vom) {
-	// TEST_Fc68JR9i knows about the number of elements in
-	// the return value of this function
 	c, ok := findUnichar(r)
 	if !ok {
 		return r, vmNone
