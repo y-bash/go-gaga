@@ -43,7 +43,7 @@ func TestTableChecksums(t *testing.T) {
 		buf := []byte(sb.String())
 		gotSHA := fmt.Sprintf("%x", sha256.Sum256(buf))
 		if gotN != ti.wantN || gotSHA != ti.wantSHA {
-			t.Errorf("table = %s,\n\tn\t\tsha256\n\tgot:  %d\t%s\n\twant: %d\t%s",
+			t.Errorf("table = %s,\n\tn\t\tsha256\n\tgot: %d\t%s\n\twant: %d\t%s",
 				ti.name, gotN, gotSHA, ti.wantN, ti.wantSHA)
 		}
 	}
