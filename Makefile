@@ -12,7 +12,8 @@ BENCHM  := "Benchmark"
 
 # Build commands
 .PHONY: build
-build: $(OBJDIR)/vert
+build: $(OBJDIR)/vert \
+	   $(OBJDIR)/norm
 
 $(OBJDIR)/%: $(CMDDIR)/%/main.go deps
 	go build -ldflags $(LDFLAGS) -o $@ $<
