@@ -174,8 +174,6 @@ func (c *unichar) composeSemivoiced() (rune, vom) {
 			return unvoiced.compatSemivoiced, vmNone
 		}
 		switch c.charWidth {
-		case cwNarrow:
-			return c.compatVoiced, vmSsmNarrow
 		case cwWide:
 			return c.compatVoiced, vmSsmWide
 		default:
@@ -187,8 +185,6 @@ func (c *unichar) composeSemivoiced() (rune, vom) {
 			return c.compatSemivoiced, vmNone
 		}
 		switch c.charWidth {
-		case cwNarrow:
-			return c.codepoint, vmSsmNarrow
 		case cwWide:
 			return c.codepoint, vmSsmWide
 		default:

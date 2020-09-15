@@ -168,6 +168,7 @@ type Normalizer_StringTest struct {
 }
 
 // TODO User perspective testing
+// TODO renew variable name (got -> have, exp -> want)
 var normalizer_stringtests = []Normalizer_StringTest{
 	// simple latin conversion <- zero length string
 	0: {AlphaToUpper, "", ""},
@@ -902,6 +903,9 @@ var normalizer_stringtests = []Normalizer_StringTest{
 	241: {SymbolToNarrow, "-\uFF0D\uFF70\u30FC", "--\uFF70\u30FC"},
 	242: {KatakanaToWide, "-\uFF0D\uFF70\u30FC", "-\uFF0D\u30FC\u30FC"},
 	243: {KatakanaToNarrow, "-\uFF0D\uFF70\u30FC", "-\uFF0D\uFF70\uFF70"},
+
+	// ctUndefined
+	244: {Fold, "\u3040\u3097\u3098\uFF00", "\u3040\u3097\u3098\uFF00"},
 }
 
 func hexs(s string) string {
@@ -934,6 +938,60 @@ func TestNormalizer_String(t *testing.T) {
 				"\targs16:\t%s\n\thave16:\t%s\n\twant16:\t%s",
 				i, tt.flag, tt.in, out, tt.out,
 				hexs(tt.in), hexs(out), hexs(tt.out))
+		}
+	}
+}
+
+type NormTest struct {
+	flag NormFlag
+	errS string
+}
+
+var normtests = []NormTest{
+	{KatakanaToWide | KatakanaToNarrow, "invalid normalization flag"},
+	{KatakanaToWide, ""},
+}
+
+func TestNorm(t *testing.T) {
+	for i, tt := range normtests {
+		_, err := Norm(tt.flag)
+		if tt.errS == "" && err != nil {
+			t.Errorf("#%d have error: %s, want no error", i, err.Error())
+			continue
+		}
+		if tt.errS != "" {
+			if err == nil {
+				t.Errorf("#%d have no error, want error:%s", i, tt.errS)
+				continue
+			}
+			if !strings.Contains(err.Error(), tt.errS) {
+				t.Errorf("#%d have error: %s, want error: %s", i, err.Error(), tt.errS)
+			}
+		}
+	}
+}
+
+func TestNormalizer_SetFlag(t *testing.T) {
+	for i, tt := range normtests {
+		n, err := Norm(AlphaToNarrow)
+		if err != nil {
+			log.Fatalf("unexpectedly error: %s", err.Error())
+			continue
+		}
+
+		err = n.SetFlag(tt.flag)
+		if tt.errS == "" && err != nil {
+			t.Errorf("#%d have error: %s, want no error", i, err.Error())
+			continue
+		}
+		if tt.errS != "" {
+			if err == nil {
+				t.Errorf("#%d have no error, want error:%s", i, tt.errS)
+				continue
+			}
+			if !strings.Contains(err.Error(), tt.errS) {
+				t.Errorf("#%d have error: %s, want error: %s", i, err.Error(), tt.errS)
+			}
 		}
 	}
 }

@@ -51,6 +51,7 @@ var estimatesizetests = []EstimateSizeTest{
 	34: {"a\n\n\nabc", -1, 6, 1},
 	35: {"a\n\n\nabc", 0, 6, 1},
 	36: {"a\n\n\nabc", 1, 6, 1},
+	37: {"\ta\r\n\r\tb\r\tb\r\t\nc\rc\r\tc\n", 4, 3, 3},
 }
 
 func TestEstimateSize(t *testing.T) {
@@ -59,6 +60,26 @@ func TestEstimateSize(t *testing.T) {
 		if w != tt.w || h != tt.h {
 			t.Errorf("#%d EstimateSize(%q, %d)=(w: %d, h: %d), want(w: %d, h: %d)",
 				i, tt.s, tt.maxh, w, h, tt.w, tt.h)
+		}
+	}
+}
+
+func TestVertCatchesOverflow(t *testing.T) {
+	tests := [...]struct {
+		w int
+		h int
+	}{
+		0: {0, 1},
+		1: {1, 0},
+		2: {-1, 1},
+		3: {1, -1},
+		4: {-2147483647, 1},
+	}
+
+	for i, tt := range tests {
+		ss := vert([][]rune{}, tt.w, tt.h)
+		if len(ss) != 0 {
+			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
 		}
 	}
 }
@@ -538,7 +559,7 @@ func TestVertFixCatchesOverflow(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		ss := VertFix("foo,bar,baz", tt.w, tt.h)
+		ss := VertFix("foo\nbar\nbaz", tt.w, tt.h)
 		if len(ss) != 0 {
 			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
 		}
@@ -589,6 +610,26 @@ func TestVertShrink(t *testing.T) {
 				t.Errorf("#%d VertShrink(%q, %d, %d)[%d],\n\thave:%q,\n\twant:%q",
 					i, tt.s, tt.w, tt.h, j, s, tt.out[j])
 			}
+		}
+	}
+}
+
+func TestVertShrinkCatchesOverflow(t *testing.T) {
+	tests := [...]struct {
+		w int
+		h int
+	}{
+		0: {0, 1},
+		1: {1, 0},
+		2: {-1, 1},
+		3: {1, -1},
+		4: {-2147483647, 1},
+	}
+
+	for i, tt := range tests {
+		ss := VertShrink("foo\nbar\nbaz", tt.w, tt.h)
+		if len(ss) != 0 {
+			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
 		}
 	}
 }

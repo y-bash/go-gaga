@@ -3,6 +3,7 @@ package gaga
 import (
 	"crypto/sha256"
 	"fmt"
+	"log"
 	"strings"
 	"testing"
 )
@@ -175,7 +176,7 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				t.Errorf("%s[%#U].voicing == %d, but compatVoiced == %#U, want another one",
 					name, c.codepoint, c.voicing, c.compatVoiced)
 			}
-			if c.charWidth != cwNarrow && c.charWidth != cwWide { // TEST_Mw87qjkF
+			if c.charWidth != cwWide { // TEST_Mw87qjkF
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
 					name, c.codepoint, c.voicing, c.charWidth, cwNarrow, cwWide)
 			}
@@ -185,7 +186,7 @@ func testUnicharTable(t *testing.T, table []unichar, first, last rune, name stri
 				t.Errorf("%s[%#U].voicing == %d, but compatVoiced == %#U, want another one",
 					name, c.codepoint, c.voicing, c.compatVoiced)
 			}
-			if c.charWidth != cwNarrow && c.charWidth != cwWide { // TEST_T2eKd76G
+			if c.charWidth != cwWide { // TEST_T2eKd76G
 				t.Errorf("%s[%#U].voicing == %d, but charWidth == %d, want %d or %d",
 					name, c.codepoint, c.voicing, c.charWidth, cwNarrow, cwWide)
 			}
@@ -319,11 +320,11 @@ func TestUnicharTable(t *testing.T) {
 }
 
 type Unichar_composeVoicedTest struct {
-	in          rune
-	outTradChar rune
-	outTradMark vom
-	outNonsChar rune
-	outNonsMark vom
+	in                rune
+	outComposedChar   rune
+	outComposedMark   vom
+	outDecomposedChar rune
+	outDecomposedMark vom
 }
 
 var unicharcomposevoicedtests = []Unichar_composeVoicedTest{
@@ -375,20 +376,20 @@ func TestUnichar_composeVoiced(t *testing.T) {
 		var haveMm, wantMm vom
 
 		have, haveMm = c.composeVoiced()
-		want = tt.outTradChar
-		wantMm = tt.outTradMark
+		want = tt.outComposedChar
+		wantMm = tt.outComposedMark
 		if have != want || haveMm != wantMm {
 			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
-				n, have, haveMm, tt.outTradChar, tt.outTradMark)
+				n, have, haveMm, tt.outComposedChar, tt.outComposedMark)
 			break
 		}
 
 		have, haveMm = c.decomposeVoiced()
-		want = tt.outNonsChar
-		wantMm = tt.outNonsMark
+		want = tt.outDecomposedChar
+		wantMm = tt.outDecomposedMark
 		if have != want || haveMm != wantMm {
 			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
-				n, have, haveMm, tt.outNonsChar, tt.outNonsMark)
+				n, have, haveMm, tt.outDecomposedChar, tt.outDecomposedMark)
 			break
 		}
 
@@ -396,11 +397,11 @@ func TestUnichar_composeVoiced(t *testing.T) {
 }
 
 type Unichar_composeSemivoicedTest struct {
-	in          rune
-	outTradChar rune
-	outTradMark vom
-	outNonsChar rune
-	outNonsMark vom
+	in                rune
+	outComposedChar   rune
+	outComposedMark   vom
+	outDecomposedChar rune
+	outDecomposedMark vom
 }
 
 var unicharcomposesemivoicedtests = []Unichar_composeSemivoicedTest{
@@ -452,23 +453,57 @@ func TestUnichar_composeSemivoiced(t *testing.T) {
 		var haveMm, wantMm vom
 
 		have, haveMm = c.composeSemivoiced()
-		want = tt.outTradChar
-		wantMm = tt.outTradMark
+		want = tt.outComposedChar
+		wantMm = tt.outComposedMark
 		if have != want || haveMm != wantMm {
 			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
-				n, have, haveMm, tt.outTradChar, tt.outTradMark)
+				n, have, haveMm, tt.outComposedChar, tt.outComposedMark)
 			break
 		}
 
 		have, haveMm = c.decomposeSemivoiced()
-		want = tt.outNonsChar
-		wantMm = tt.outNonsMark
+		want = tt.outDecomposedChar
+		wantMm = tt.outDecomposedMark
 		if have != want || haveMm != wantMm {
 			t.Errorf("%d: have: (%q, %q), want: (%q, %q)",
-				n, have, haveMm, tt.outNonsChar, tt.outNonsMark)
+				n, have, haveMm, tt.outDecomposedChar, tt.outDecomposedMark)
 			break
 		}
 
+	}
+}
+
+type Unichar_toHiraganaKatakanaCTest struct {
+	in rune
+}
+
+var unichar_tohiraganakatakanactests = []Unichar_toHiraganaKatakanaCTest{
+	{'あ'},
+	{'ん'},
+	{'ア'},
+	{'ン'},
+	{'ｱ'},
+	{'ﾝ'},
+}
+
+func TestUnichar_toHiraganaKatakanaC(t *testing.T) {
+	for i, tt := range unichar_tohiraganakatakanactests {
+		inC, ok := findUnichar(tt.in)
+		if !ok {
+			log.Fatalf("%#U is not found", tt.in)
+		}
+		var haveC *unichar
+		switch inC.charCase {
+		case ccHiragana:
+			haveC = inC.toHiraganaC()
+		case ccKatakana:
+			haveC = inC.toKatakanaC()
+		default:
+			log.Fatalf("#%d %#U test data is invalid", i, tt.in)
+		}
+		if haveC != inC {
+			t.Errorf("have: %#U, want:%#U", haveC.codepoint, inC.codepoint)
+		}
 	}
 }
 
