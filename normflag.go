@@ -92,7 +92,7 @@ const (
 	// ComposeVom composes the voiced or semi-voiced sound letters in
 	// the most conventional way.
 	// Examples:
-	//	[が]     => [が],  [か][゛] => [が],    [か][\u3099] => [が],
+	//  [が]     => [が],  [か][゛] => [が],    [か][\u3099] => [が],
 	//  [か][ﾞ]  => [が],  [ｶ][゛]  => [ｶ][ﾞ],  [ｶ][ﾞ]       => [ｶ][ﾞ],
 	//  [は][゜] => [ぱ],  [ヰ][゛] => [ヸ],    [ゐ][゛]     => [ゐ][゛]
 	ComposeVom
@@ -100,10 +100,10 @@ const (
 	// DecomposeVom decomposes the voiced or semi-voiced sound letters
 	// in a way similar to the Unicode canonical decomposition mappings.
 	// Examples:
-	//	[が]         => [か][\u3099],  [か][゛] => [か][\u3099],
+	//  [が]         => [か][\u3099],  [か][゛] => [か][\u3099],
 	//  [か][\u3099] => [か][\u3099],  [か][ﾞ]  => [か][\u3099],
 	//  [ｶ][゛]      => [ｶ][\u3099],   [ｶ][ﾞ]   => [ｶ][\u3099],
-	//	[ぱ]         => [は][\u309A],  [ヰ][゛] => [ヰ][\u3099],
+	//  [ぱ]         => [は][\u309A],  [ヰ][゛] => [ヰ][\u3099],
 	//  [ゐ][゛]     => [ゐ][\u3099]
 	DecomposeVom
 
@@ -124,6 +124,7 @@ const (
 	// IsolatedKanaVomToCombining converts an isolated voicing
 	// modifier which was not combined into a base letter into a
 	// combining voiced or semi-voiced sound letter.
+	// Examples:
 	//  [゛] => [\u3099],  [ﾞ] => [\u3099],  [゜] = [\u309A],  [ﾟ] => [\u309A]
 	IsolatedKanaVomToNonspace
 
