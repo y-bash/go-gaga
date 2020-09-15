@@ -84,8 +84,8 @@ const (
 	// Example: [、] => [､]
 	KanaSymbolToNarrow
 
-	// KanaSymbolToWide converts all the half-width Hiragana-Katakana
-	// symbols to their full-width.
+	// KanaSymbolToWide converts all the half-width Katakana symbols
+	// to their full-width.
 	// Example: [､] => [、]
 	KanaSymbolToWide
 
@@ -176,7 +176,7 @@ const (
 		IsolatedKanaVomToNarrow | ComposeVom
 
 	// KanaToWide is a combination of normalization flags for converting
-	// all the half-width Hiragana-Katakana characters to their full-width.
+	// all the half-width Katakana characters to their full-width.
 	//
 	//          | CHARACTER                       | CONVERT TO
 	// ---------+---------------------------------+-----------------
@@ -190,7 +190,11 @@ const (
 	KanaToWide = KatakanaToWide | KanaSymbolToWide | IsolatedKanaVomToWide |
 		ComposeVom
 
-	// TODO add comments
+	// KanaToWideKatakana is a combination of normalization flags for
+	// converting all the half-width Katakana characters to their full-width,
+	// and the Hiragana characters to their full-width Katakana as much as
+	// possible..
+	//
 	//          | CHARACTER                       | CONVERT TO
 	// ---------+---------------------------------+-----------------
 	//          | Hiragana                        | Wide Katakana
@@ -204,7 +208,11 @@ const (
 	KanaToWideKatakana = KatakanaToWide | HiraganaToKatakana | KanaSymbolToWide |
 		IsolatedKanaVomToWide | ComposeVom
 
-	// TODO add comments
+	// KanaToNarrowKatakana is a combination of normalization flags for
+	// converting the full-width Katakana characters to their half-width,
+	// and the Hiragana characters to their half-width Katakana as much as
+	// possible.
+	//
 	//          | CHARACTER                       | CONVERT TO
 	// ---------+---------------------------------+-------------------
 	//          | Hiragana                        | Narrow Katakana
@@ -218,7 +226,11 @@ const (
 	KanaToNarrowKatakana = KatakanaToNarrow | HiraganaToNarrow |
 		KanaSymbolToNarrow | IsolatedKanaVomToNarrow | ComposeVom
 
-	// TODO add comments
+	// KanaToHiragana is a combination of normalization flags for
+	// converting the full-width Katakana characters to their Hiragana
+	// as much as possible, and all the half-width Katakana characters
+	// to their Hiragana.
+	//
 	//          | CHARACTER                       | CONVERT TO
 	// ---------+---------------------------------+----------------------
 	//          | Wide Katakana                   | Hiragana
@@ -233,7 +245,8 @@ const (
 		IsolatedKanaVomToWide | ComposeVom
 
 	// Fold is a combination of normalization flags for converting
-	// Latin and Hiragana-Katakana characters to their canonical width.
+	// the Latin characters and the Hiragana-Katakana characters to
+	// their canonical width.
 	//
 	//          | CHARACTER                       | CONVERT TO
 	// ---------+---------------------------------+-----------------
