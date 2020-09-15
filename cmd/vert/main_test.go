@@ -93,7 +93,10 @@ func TestCmdVertReadWrite(t *testing.T) {
 			log.Fatal(err)
 		}
 		var have bytes.Buffer
-		ss := readfiles([]string{tt.in})
+		ss, err := readfiles([]string{tt.in})
+		if err != nil {
+			log.Fatal(err)
+		}
 		vertstrs(&have, ss, 40, 25)
 		if string(have.Bytes()) != string(want) {
 			t.Errorf("#%d\nin:\n%s,\nhave:\n%s,\nwant:\n%s",

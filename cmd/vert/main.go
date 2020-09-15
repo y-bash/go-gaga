@@ -24,15 +24,16 @@ func read(f io.Reader) string {
 	return sb.String()
 }
 
-func readfiles(paths []string) (out []string) {
+func readfiles(paths []string) (out []string, err error) {
 	if len(paths) == 0 {
 		out = []string{read(os.Stdin)}
 		return
 	}
 	for _, path := range paths {
-		f, err := os.Open(path)
+		var f *os.File
+		f, err = os.Open(path)
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 		defer f.Close()
 		out = append(out, read(f))
@@ -81,6 +82,9 @@ func main() {
 		flag.Usage()
 		os.Exit(2)
 	}
-	ss := readfiles(flag.Args())
+	ss, err := readfiles(flag.Args())
+	if err != nil {
+		log.Fatal(err)
+	}
 	vertstrs(os.Stdout, ss, width, height)
 }
