@@ -42,28 +42,28 @@ Vert is a utility to convert text to vertical writing.
 ### To read this file:
 
     $ vert basho.txt
-    芭  蝉岩静
-    蕉  のにか
-        声染さ
-        みや
-        入
-        る
+    芭  蝉岩閑
+    蕉  のにさ
+        声しや
+          み
+          入
+          る
 
 ### To limit the height:
 
     $ vert -height 4 basho.txt
-    芭  蝉入岩静
-    蕉  のるにか
-        声  染さ
-            みや
+    芭  蝉入岩閑
+    蕉  のるにさ
+        声  しや
+            み
 
 ### To limit height and width:
 
     $ vert -width 3 -height 4 basho.txt
-    入岩静
-    るにか
-      染さ
-      みや
+    入岩閑
+    るにさ
+      しや
+      み
 
     芭  蝉
     蕉  の
