@@ -2,7 +2,7 @@ VERSION := $(shell git describe --tags)
 LDFLAGS := "-X main.version=$(VERSION)"
 GENDIR  := ./gen
 CMDDIR  := ./cmd
-OBJDIR  := ./obj
+OBJDIR  := ./output
 
 # Test Function REGEXP
 LIGHTW  := "Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])|Example"
