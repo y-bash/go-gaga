@@ -442,7 +442,7 @@ var unicharcomposesemivoicedtests = []Unichar_composeSemivoicedTest{
 }
 
 func TestUnichar_composeSemivoiced(t *testing.T) {
-	for n, tt := range unicharcomposesemivoicedtests{
+	for n, tt := range unicharcomposesemivoicedtests {
 		c, ok := findUnichar(tt.in)
 		if !ok {
 			t.Errorf("%d: %#U is not found by findUnichar()", n, tt.in)
