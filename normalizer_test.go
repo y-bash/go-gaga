@@ -167,7 +167,6 @@ type Normalizer_StringTest struct {
 	out  string
 }
 
-// TODO User perspective testing
 var normalizer_stringtests = []Normalizer_StringTest{
 	// simple latin conversion <- zero length string
 	0: {AlphaToUpper, "", ""},
@@ -905,6 +904,13 @@ var normalizer_stringtests = []Normalizer_StringTest{
 
 	// ctUndefined
 	244: {Fold, "\u3040\u3097\u3098\uFF00", "\u3040\u3097\u3098\uFF00"},
+
+	// user perspective testing
+	245: {Fold, "Ｇo言語のﾊﾟｯケｰｼﾞ (Ｐａｃｋａｇｅ）", "Go言語のパッケージ (Package)"},
+	246: {KanaToHiragana, "ふりがな | ｽｽﾞｷ イチロウ", "ふりがな | すずき いちろう"},
+	247: {KanaToWideKatakana, "フリガナ | すす゛き ｲﾁﾛｰ", "フリガナ | スズキ イチロー"},
+	248: {KanaToNarrowKatakana, "ﾌﾘｶﾞﾅ | スズキ いちろう", "ﾌﾘｶﾞﾅ | ｽｽﾞｷ ｲﾁﾛｳ"},
+	249: {LatinToNarrow|AlphaToUpper, "ローマ字(半角) | Ｓｕｚｕｋｉ, ichiro", "ローマ字(半角) | SUZUKI, ICHIRO"},
 }
 
 func hexs(s string) string {
