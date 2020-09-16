@@ -1094,7 +1094,6 @@ func printConstList(f io.Writer, c constValues) {
 	fmt.Fprint(f, ")\n\n")
 }
 
-// TODO consider implementation in uint8 (category, charCase, charWidth, voicing)
 func printTypes(f io.Writer) {
 	text := `
 type unichar struct {
