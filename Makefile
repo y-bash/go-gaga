@@ -21,6 +21,7 @@ $(OBJDIR)/%: $(CMDDIR)/%/main.go deps
 # Clean commands/CSVs
 .PHONY: clean
 clean:
+	go mod tidy
 	go clean -testcache
 	rm -rf $(OBJDIR)
 
