@@ -2,16 +2,70 @@
 
 ## Installation
 
+For using the library:
+
 ```
-make install
+$ go get github.com/y-bash/go-gaga
+```
+
+Next, to install the command (execution binary)
+
+```
+$ cd $GOPATH/github.com/y-bash/go-gaga
+$ make install
 ```
 
 ## Usage
 
+### Library
+
+#### Norm
+
+```
+import "github.com/y-bash/go-gaga"
+
+n := gaga.Norm(gaga.LatinToNarrow | gaga.KanaToWide)
+s := n.String("ＡＢＣｱｲｳ")
+fmt.Println(s)
+
+```
+
+Output:
+
+```
+ABCアイウ
+```
+
+### Vert
+
+```
+import "github.com/y-bash/go-gaga"
+
+s := gaga.Vert("閑さや\n岩にしみ入る\n蝉の声")
+fmt.Print(s)
+```
+
+Output:
+
+```
+蝉岩閑
+のにさ
+声しや
+  み  
+  入  
+  る
+```
+
 ### Commands
 
-#### vert
+#### Norm
 
+```
+$ echo "ＡＢＣｱｲｳ" | norm
+ABCアイウ
+```
+
+#### Vert
 
 ```
 $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
@@ -21,19 +75,6 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
   み  
   入  
   る
-```
-
-### Library
-
-#### Normalizer
-
-```
-import "github.com/y-bash/go-gaga"
-
-n:= gaga.Norm(gaga.LatinToNarrow | gaga.KanaToWide)
-s := n.String("ＡＢＣｱｲｳ")
-fmt.Printf("%q", s) // => "ABCアイウ"
-
 ```
 
 ## License

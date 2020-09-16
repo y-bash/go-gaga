@@ -1,6 +1,6 @@
 /*
 
-Vert is a utility to convert text to vertical writing.
+Vert is a utility to convert text files to vertical printing.
 
 Usage:
 	vert [flags] [path ...]
@@ -11,9 +11,9 @@ The flags are:
 	-h
 		Show help
 	-width
-		Maximum width of output
+		Maximum width of output (default: 40)
 	-height
-		Maximum height of output
+		Maximum height of output (default: 25)
 
 Examples:
 

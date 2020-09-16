@@ -1,6 +1,6 @@
 # Vert
 
-Vert is a utility to convert text to vertical writing.
+Vert is a utility to convert text files to vertical printing.
 
 ## Usage:
 
