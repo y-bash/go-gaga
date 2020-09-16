@@ -30,22 +30,22 @@ var tables = []tableInfo{
 
 func TestTableChecksums(t *testing.T) {
 	for _, ti := range tables {
-		gotN := len(ti.table)
-		if gotN <= 0 {
+		haveN := len(ti.table)
+		if haveN <= 0 {
 			t.Errorf("table = %s, length is 0", ti.name)
 			continue
 		}
 		var sb strings.Builder
-		bufSize := len([]byte(ti.table[0].String())) * gotN * 2
+		bufSize := len([]byte(ti.table[0].String())) * haveN * 2
 		sb.Grow(bufSize)
 		for _, c := range ti.table {
 			sb.WriteString(c.String())
 		}
 		buf := []byte(sb.String())
-		gotSHA := fmt.Sprintf("%x", sha256.Sum256(buf))
-		if gotN != ti.wantN || gotSHA != ti.wantSHA {
-			t.Errorf("table = %s,\n\tn\t\tsha256\n\tgot: %d\t%s\n\twant: %d\t%s",
-				ti.name, gotN, gotSHA, ti.wantN, ti.wantSHA)
+		haveSHA := fmt.Sprintf("%x", sha256.Sum256(buf))
+		if haveN != ti.wantN || haveSHA != ti.wantSHA {
+			t.Errorf("table = %s,\n\tn\t\tsha256\n\thave: %d\t%s\n\twant: %d\t%s",
+				ti.name, haveN, haveSHA, ti.wantN, ti.wantSHA)
 		}
 	}
 }

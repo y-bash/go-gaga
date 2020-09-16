@@ -79,7 +79,7 @@ func TestVertCatchesOverflow(t *testing.T) {
 	for i, tt := range tests {
 		ss := vert([][]rune{}, tt.w, tt.h)
 		if len(ss) != 0 {
-			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
+			t.Errorf("#%d have: %q, want: zero length string slice", i, ss)
 		}
 	}
 }
@@ -536,12 +536,12 @@ var vertfixtests = []VertFixTest{
 func TestVertFix(t *testing.T) {
 	for i, tt := range vertfixtests {
 		in := strings.Join(tt.in, "\n")
-		exp := strings.Join(tt.out, "\n")
+		want := strings.Join(tt.out, "\n")
 		ss := VertFix(in, tt.w, tt.h)
-		got := strings.Join(ss, "\n")
-		if got != exp {
-			t.Errorf("#%d VertFix(in,%d,%d):\nin=(\n%s\n),\nexpected=(\n%s\n),\ngot=(\n%s\n)",
-				i, tt.w, tt.h, in, exp, got)
+		have := strings.Join(ss, "\n")
+		if have != want {
+			t.Errorf("#%d VertFix(in,%d,%d):\nin=(\n%s\n),\nwant=(\n%s\n),\nhave=(\n%s\n)",
+				i, tt.w, tt.h, in, want, have)
 		}
 	}
 }
@@ -561,7 +561,7 @@ func TestVertFixCatchesOverflow(t *testing.T) {
 	for i, tt := range tests {
 		ss := VertFix("foo\nbar\nbaz", tt.w, tt.h)
 		if len(ss) != 0 {
-			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
+			t.Errorf("#%d have: %q, want: zero length string slice", i, ss)
 		}
 	}
 }
@@ -607,7 +607,7 @@ func TestVertShrink(t *testing.T) {
 		}
 		for j, s := range ss {
 			if s != tt.out[j] {
-				t.Errorf("#%d VertShrink(%q, %d, %d)[%d],\n\thave:%q,\n\twant:%q",
+				t.Errorf("#%d VertShrink(%q, %d, %d)[%d],\n\thave: %q,\n\twant: %q",
 					i, tt.s, tt.w, tt.h, j, s, tt.out[j])
 			}
 		}
@@ -629,7 +629,7 @@ func TestVertShrinkCatchesOverflow(t *testing.T) {
 	for i, tt := range tests {
 		ss := VertShrink("foo\nbar\nbaz", tt.w, tt.h)
 		if len(ss) != 0 {
-			t.Errorf("#%d expected zero length string slice, got %q", i, ss)
+			t.Errorf("#%d have: %q, want: zero length string slice", i, ss)
 		}
 	}
 }

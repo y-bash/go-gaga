@@ -168,7 +168,6 @@ type Normalizer_StringTest struct {
 }
 
 // TODO User perspective testing
-// TODO renew variable name (got -> have, exp -> want)
 var normalizer_stringtests = []Normalizer_StringTest{
 	// simple latin conversion <- zero length string
 	0: {AlphaToUpper, "", ""},
