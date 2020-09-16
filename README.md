@@ -8,7 +8,7 @@ For using the library:
 $ go get github.com/y-bash/go-gaga
 ```
 
-Next, to install the command (execution binary)
+Next, to install the command (If you use binaries):
 
 ```
 $ cd $GOPATH/src/github.com/y-bash/go-gaga
