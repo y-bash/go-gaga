@@ -141,7 +141,7 @@ LatinToWide
 KanaToNarrow
     Equivalent Combination:
         HiraganaToNarrow | KatakanaToNarrow | KanaSymbolToNarrow |
-        IsolatedKanaVomToNarrow | ComposeVom
+        IsolatedVomToNarrow | ComposeVom
 
     Description:
         KanaToNarrow is a combination of normalization flags for converting
@@ -161,7 +161,7 @@ KanaToNarrow
 
 KanaToWide
     Equivalent Combination:
-        KatakanaToWide | KanaSymbolToWide | IsolatedKanaVomToWide |
+        KatakanaToWide | KanaSymbolToWide | IsolatedVomToWide |
 		ComposeVom
 
     Description:
@@ -181,7 +181,7 @@ KanaToWide
 KanaToWideKatakana
     Equivalent Combination:
         KatakanaToWide | HiraganaToKatakana | KanaSymbolToWide |
-        IsolatedKanaVomToWide | ComposeVom
+        IsolatedVomToWide | ComposeVom
 
     Description:
         KanaToWideKatakana is a combination of normalization flags for
@@ -203,7 +203,7 @@ KanaToWideKatakana
 KanaToNarrowKatakana
     Equivalent Combination:
         KatakanaToNarrow | HiraganaToNarrow | KanaSymbolToNarrow |
-		IsolatedKanaVomToNarrow | ComposeVom
+		IsolatedVomToNarrow | ComposeVom
 
     Description:
         KanaToNarrowKatakana is a combination of normalization flags for
@@ -224,7 +224,7 @@ KanaToNarrowKatakana
 
 KanaToHiragana
     Equivalent Combination:
-        KatakanaToHiragana | KanaSymbolToWide | IsolatedKanaVomToWide |
+        KatakanaToHiragana | KanaSymbolToWide | IsolatedVomToWide |
         ComposeVom
 
     Description:
@@ -408,27 +408,27 @@ DecomposeVom
         [ぱ]         => [は][U+309A],  [ヰ][゛] => [ヰ][U+3099],
         [ゐ][゛]     => [ゐ][U+3099]
 
-IsolatedKanaVomToNarrow
+IsolatedVomToNarrow
     Description:
-        IsolatedKanaVomToNarrow converts an isolated voicing modifier
+        IsolatedVomToNarrow converts an isolated voicing modifier
         which was not combined into a base letter into a half-width
         voiced or semi-voiced sound letter.
 
     Examples:
         [゛] => [ﾞ],  [U+3099] => [ﾞ],  [゜] => [ﾟ],  [U+309A] => [ﾟ]
 
-IsolatedKanaVomToWide
+IsolatedVomToWide
     Description:
-        IsolatedKanaVomToWide converts an isolated voicing modifier
+        IsolatedVomToWide converts an isolated voicing modifier
         which was not combined into a base letter into a full-width
         voiced or semi-voiced sound letter.
 
     Examples:
         [U+3099] => [゛],  [ﾞ] => [゛],  [U+309A] => [゜],  [ﾟ] => [゜]
 
-IsolatedKanaVomToNonspace
+IsolatedVomToNonspace
     Description:
-        IsolatedKanaVomToCombining converts an isolated voicing
+        IsolatedVomToCombining converts an isolated voicing
         modifier which was not combined into a base letter into a
         combining voiced or semi-voiced sound letter.
 

@@ -107,26 +107,26 @@ const (
 	//  [ゐ][゛]     => [ゐ][\u3099]
 	DecomposeVom
 
-	// IsolatedKanaVomToNarrow converts an isolated voicing modifier
+	// IsolatedVomToNarrow converts an isolated voicing modifier
 	// which was not combined into a base letter into a half-width
 	// voiced or semi-voiced sound letter.
 	// Examples:
 	//  [゛] => [ﾞ],  [\u3099] => [ﾞ],  [゜] => [ﾟ],  [\u309A] => [ﾟ]
-	IsolatedKanaVomToNarrow
+	IsolatedVomToNarrow
 
-	// IsolatedKanaVomToWide converts an isolated voicing modifier
+	// IsolatedVomToWide converts an isolated voicing modifier
 	// which was not combined into a base letter into a full-width
 	// voiced or semi-voiced sound letter.
 	// Examples:
 	//  [\u3099] => [゛],  [ﾞ] => [゛],  [\u309A] => [゜],  [ﾟ] => [゜]
-	IsolatedKanaVomToWide
+	IsolatedVomToWide
 
-	// IsolatedKanaVomToCombining converts an isolated voicing
+	// IsolatedVomToCombining converts an isolated voicing
 	// modifier which was not combined into a base letter into a
 	// combining voiced or semi-voiced sound letter.
 	// Examples:
 	//  [゛] => [\u3099],  [ﾞ] => [\u3099],  [゜] = [\u309A],  [ﾟ] => [\u309A]
-	IsolatedKanaVomToNonspace
+	IsolatedVomToNonspace
 
 	normflagMax
 )
@@ -174,7 +174,7 @@ const (
 	// Example  | "あイ、が゛"                    | "ｱｲ､ｶﾞﾞ"
 	//
 	KanaToNarrow = HiraganaToNarrow | KatakanaToNarrow | KanaSymbolToNarrow |
-		IsolatedKanaVomToNarrow | ComposeVom
+		IsolatedVomToNarrow | ComposeVom
 
 	// KanaToWide is a combination of normalization flags for converting
 	// all the half-width Katakana characters to their full-width.
@@ -188,7 +188,7 @@ const (
 	// ---------+---------------------------------+-----------------
 	// Example  | "ｱ､ｶﾞﾞ"                         | "ア、ガ゛"
 	//
-	KanaToWide = KatakanaToWide | KanaSymbolToWide | IsolatedKanaVomToWide |
+	KanaToWide = KatakanaToWide | KanaSymbolToWide | IsolatedVomToWide |
 		ComposeVom
 
 	// KanaToWideKatakana is a combination of normalization flags for
@@ -207,7 +207,7 @@ const (
 	// Example  | "あｲ､ｶﾞﾞ"                       | "アイ、ガ゛"
 	//
 	KanaToWideKatakana = KatakanaToWide | HiraganaToKatakana | KanaSymbolToWide |
-		IsolatedKanaVomToWide | ComposeVom
+		IsolatedVomToWide | ComposeVom
 
 	// KanaToNarrowKatakana is a combination of normalization flags for
 	// converting the full-width Katakana characters to their half-width,
@@ -225,7 +225,7 @@ const (
 	// Example  | "あイ、が゛"                    | "ｱｲ､ｶﾞﾞ"
 	//
 	KanaToNarrowKatakana = KatakanaToNarrow | HiraganaToNarrow |
-		KanaSymbolToNarrow | IsolatedKanaVomToNarrow | ComposeVom
+		KanaSymbolToNarrow | IsolatedVomToNarrow | ComposeVom
 
 	// KanaToHiragana is a combination of normalization flags for
 	// converting the full-width Katakana characters to their Hiragana
@@ -243,7 +243,7 @@ const (
 	// Example  | "アｲ､ガ゛"                      | "あい、が゛"
 	//
 	KanaToHiragana = KatakanaToHiragana | KanaSymbolToWide |
-		IsolatedKanaVomToWide | ComposeVom
+		IsolatedVomToWide | ComposeVom
 
 	// Fold is a combination of normalization flags for converting
 	// the Latin characters and the Hiragana-Katakana characters to
@@ -282,9 +282,9 @@ var normflagMap = map[NormFlag]string{
 	KanaSymbolToWide:          "KanaSymbolToWide",
 	ComposeVom:                "ComposeVom",
 	DecomposeVom:              "DecomposeVom",
-	IsolatedKanaVomToNarrow:   "IsolatedKanaVomToNarrow",
-	IsolatedKanaVomToWide:     "IsolatedKanaVomToWide",
-	IsolatedKanaVomToNonspace: "IsolatedKanaVomToNonspace",
+	IsolatedVomToNarrow:   "IsolatedVomToNarrow",
+	IsolatedVomToWide:     "IsolatedVomToWide",
+	IsolatedVomToNonspace: "IsolatedVomToNonspace",
 }
 
 var combflagList = []struct {
@@ -326,9 +326,9 @@ var invalidFlagsList = []NormFlag{
 	HiraganaToNarrow | HiraganaToKatakana,
 	KanaSymbolToNarrow | KanaSymbolToWide,
 	ComposeVom | DecomposeVom,
-	IsolatedKanaVomToNarrow | IsolatedKanaVomToWide,
-	IsolatedKanaVomToNarrow | IsolatedKanaVomToNonspace,
-	IsolatedKanaVomToWide | IsolatedKanaVomToNonspace,
+	IsolatedVomToNarrow | IsolatedVomToWide,
+	IsolatedVomToNarrow | IsolatedVomToNonspace,
+	IsolatedVomToWide | IsolatedVomToNonspace,
 }
 
 func (f NormFlag) has(f2 NormFlag) bool { return f&f2 != 0 }

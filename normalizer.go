@@ -203,11 +203,11 @@ func (n *Normalizer) normalizeRune(r rune) (rune, vom) {
 
 	case ctKanaVom:
 		switch {
-		case n.flag.has(IsolatedKanaVomToNarrow):
+		case n.flag.has(IsolatedVomToNarrow):
 			return c.toNarrowR(), vmNone
-		case n.flag.has(IsolatedKanaVomToWide):
+		case n.flag.has(IsolatedVomToWide):
 			return c.toLegacyC().toWideR(), vmNone
-		case n.flag.has(IsolatedKanaVomToNonspace):
+		case n.flag.has(IsolatedVomToNonspace):
 			return c.toCombiningR(), vmNone
 		default:
 			return c.codepoint, vmNone
