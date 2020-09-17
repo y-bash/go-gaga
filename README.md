@@ -147,8 +147,10 @@ Windows:
 ```
 
 ## License
-MIT
+
+This software is released under the MIT License, see LICENSE.
 
 ## Author
+
 y-bash
 
