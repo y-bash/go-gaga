@@ -92,7 +92,7 @@ $ echo "ＡＢＣｱｲｳ" | norm
 ABCアイウ
 ```
 
-Windows:
+Windows:<br>
 (with wecho comand in the gaga)
 
 ```
@@ -115,7 +115,7 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
   る
 ```
 
-Windows:
+Windows:<br>
 (with wecho comand in the gaga)
 
 ```
@@ -142,7 +142,7 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | norm -flag KanaToWideKata
   ル
 ```
 
-Windows:
+Windows:<br>
 (with wecho comand in the gaga)
 
 ```
