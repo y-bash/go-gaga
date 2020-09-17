@@ -1,6 +1,7 @@
 # go-gaga (Japanese language utility)
 
 <img width="300" src="https://raw.githubusercontent.com/y-bash/go-gaga/master/gaga.png">
+
 ## Installation
 
 ### For using the library:
