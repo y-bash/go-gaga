@@ -9,7 +9,6 @@ LIGHTW  := "Test([^H]|H[^e]|He[^a]|Hea[^v]|Heav[^y])|Example"
 HEAVYW  := "Heavy"
 BENCHM  := "Benchmark"
 
-
 # Build commands
 .PHONY: build
 build: $(OBJDIR)/vert \
