@@ -2,17 +2,34 @@
 
 ## Installation
 
-For using the library:
+### For using the library:
+
+Linux:
 
 ```
 $ go get github.com/y-bash/go-gaga
 ```
 
-Next, to install the command (If you use binaries):
+Windows:
+
+```
+>go get github.com/y-bash/go-gaga
+```
+
+### Next, to install the command (If you use binaries):
+
+Linux:
 
 ```
 $ cd $GOPATH/src/github.com/y-bash/go-gaga
 $ make install
+```
+
+Windows:
+
+```
+>cd %GOPATH%\src\github.com\y-bash\go-gaga
+>go install ./...
 ```
 
 ## Usage
@@ -66,12 +83,25 @@ Output:
 
 #### Norm
 
+Linux:
+
 ```
 $ echo "ＡＢＣｱｲｳ" | norm
 ABCアイウ
 ```
 
+Windows:
+
+```
+>wecho ＡＢＣｱｲｳ | norm
+ABCアイウ
+
+```
+
+
 #### Vert
+
+Linux:
 
 ```
 $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
@@ -83,7 +113,22 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
   る
 ```
 
+Windows:
+
+```
+>wecho 閑さや\n岩にしみ入る\n蝉の声 | vert
+蝉岩閑
+のにさ
+声しや
+  み
+  入
+  る
+```
+
+
 #### Norm & Vert
+
+Linux:
 
 ```
 $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | norm -flag KanaToWideKatakana | vert
@@ -93,6 +138,12 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | norm -flag KanaToWideKata
   ミ
   入
   ル
+```
+
+Windows:
+
+```
+>wecho 閑さや\n岩にしみ入る\n蝉の声 | norm -flag KanaToWideKatakana | vert
 ```
 
 ## License

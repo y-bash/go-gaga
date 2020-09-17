@@ -11,8 +11,9 @@ BENCHM  := "Benchmark"
 
 # Build commands
 .PHONY: build
-build: $(OBJDIR)/vert \
-	   $(OBJDIR)/norm
+build: $(OBJDIR)/norm \
+	   $(OBJDIR)/vert \
+	   $(OBJDIR)/wecho
 
 $(OBJDIR)/%: $(CMDDIR)/%/main.go deps
 	go build -ldflags $(LDFLAGS) -o $@ $<
@@ -42,8 +43,8 @@ gen:
 # Generate CSVs
 .PHONY: csv
 csv: dir \
-	$(OBJDIR)/ucd.csv \
-	$(OBJDIR)/ucdex.csv
+	 $(OBJDIR)/ucd.csv \
+	 $(OBJDIR)/ucdex.csv
 
 $(OBJDIR)/%.csv: $(GENDIR)/gen%csv.go
 	go run $< -output $@
