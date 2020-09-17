@@ -1,5 +1,6 @@
 # go-gaga (Japanese language utility)
 
+<img width="300" src="https://raw.githubusercontent.com/y-bash/go-gaga/master/gaga.png">
 ## Installation
 
 ### For using the library:
@@ -91,11 +92,11 @@ ABCアイウ
 ```
 
 Windows:
+(with wecho comand in the gaga)
 
 ```
 >wecho ＡＢＣｱｲｳ | norm
 ABCアイウ
-
 ```
 
 
@@ -114,6 +115,7 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | vert
 ```
 
 Windows:
+(with wecho comand in the gaga)
 
 ```
 >wecho 閑さや\n岩にしみ入る\n蝉の声 | vert
@@ -124,7 +126,6 @@ Windows:
   入
   る
 ```
-
 
 #### Norm & Vert
 
@@ -141,9 +142,16 @@ $ echo -e "閑さや\n岩にしみ入る\n蝉の声" | norm -flag KanaToWideKata
 ```
 
 Windows:
+(with wecho comand in the gaga)
 
 ```
 >wecho 閑さや\n岩にしみ入る\n蝉の声 | norm -flag KanaToWideKatakana | vert
+蝉岩閑
+ノニサ
+声シヤ
+  ミ
+  入
+  ル
 ```
 
 ## License
