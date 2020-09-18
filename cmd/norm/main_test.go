@@ -5,6 +5,7 @@ import (
 	"github.com/y-bash/go-gaga"
 	"io/ioutil"
 	"log"
+	"strings"
 	"testing"
 )
 
@@ -25,18 +26,24 @@ func TestCmdNormReadWrite(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var have bytes.Buffer
+		// Supports Windows environment where git config core.autocrlf = true
+		wantS := strings.Replace(string(want), "\r", "", -1)
+
+		var buf bytes.Buffer
 		ss, err := readfiles([]string{tt.in})
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = normstrs(&have, ss, tt.flag)
+		err = normstrs(&buf, ss, tt.flag)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if string(have.Bytes()) != string(want) {
-			t.Errorf("#%d\nin:\n%s,\nhave:\n%s,\nwant:\n%s",
-				i, ss[0], have.Bytes(), want)
+		have := buf.Bytes()
+		haveS := string(have)
+
+		if haveS != wantS {
+			t.Errorf("#%d\nin(len=%d):\n%s,\nhave(len=%d):\n%s,\nwant(len=%d):\n%s",
+				i, len([]rune(ss[0])), ss[0], len([]rune(haveS)), haveS, len([]rune(wantS)), wantS)
 		}
 	}
 }
