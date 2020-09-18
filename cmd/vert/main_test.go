@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"strings"
 	"testing"
 )
 
@@ -92,6 +93,8 @@ func TestCmdVertReadWrite(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		wantS := string(want)
+
 		var buf bytes.Buffer
 		ss, err := readfiles([]string{tt.in})
 		if err != nil {
@@ -99,8 +102,9 @@ func TestCmdVertReadWrite(t *testing.T) {
 		}
 		vertstrs(&buf, ss, 40, 25)
 		have := buf.Bytes()
-		wantS := string(want)
-		haveS := string(have)
+		// Supports Windows environment where git config core.autocrlf = true
+		haveS := strings.Replace(string(have), "\r", "", -1)
+
 		if haveS != wantS {
 			t.Errorf("#%d\nin(len=%d):\n%s,\nhave(len=%d):\n%s,\nwant(len=%d):\n%s",
 				i, len([]rune(ss[0])), ss[0], len([]rune(haveS)), haveS, len([]rune(wantS)), wantS)
