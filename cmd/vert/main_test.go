@@ -92,15 +92,18 @@ func TestCmdVertReadWrite(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var have bytes.Buffer
+		var buf bytes.Buffer
 		ss, err := readfiles([]string{tt.in})
 		if err != nil {
 			log.Fatal(err)
 		}
-		vertstrs(&have, ss, 40, 25)
-		if string(have.Bytes()) != string(want) {
-			t.Errorf("#%d\nin:\n%s,\nhave:\n%s,\nwant:\n%s",
-				i, ss[0], have.Bytes(), want)
+		vertstrs(&buf, ss, 40, 25)
+		have := buf.Bytes()
+		wantS := string(want)
+		haveS := string(have)
+		if haveS != wantS {
+			t.Errorf("#%d\nin(len=%d):\n%s,\nhave(len=%d):\n%s,\nwant(len=%d):\n%s",
+				i, len([]rune(ss[0])), ss[0], len([]rune(haveS)), haveS, len([]rune(wantS)), wantS)
 		}
 	}
 }
