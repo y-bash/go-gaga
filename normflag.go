@@ -265,23 +265,23 @@ const (
 )
 
 var normflagMap = map[NormFlag]string{
-	AlphaToNarrow:             "AlphaToNarrow",
-	AlphaToWide:               "AlphaToWide",
-	AlphaToUpper:              "AlphaToUpper",
-	AlphaToLower:              "AlphaToLower",
-	DigitToNarrow:             "DigitToNarrow",
-	DigitToWide:               "DigitToWide",
-	SymbolToNarrow:            "SymbolToNarrow",
-	SymbolToWide:              "SymbolToWide",
-	HiraganaToNarrow:          "HiraganaToNarrow",
-	HiraganaToKatakana:        "HiraganaToKatakana",
-	KatakanaToNarrow:          "KatakanaToNarrow",
-	KatakanaToWide:            "KatakanaToWide",
-	KatakanaToHiragana:        "KatakanaToHiragana",
-	KanaSymbolToNarrow:        "KanaSymbolToNarrow",
-	KanaSymbolToWide:          "KanaSymbolToWide",
-	ComposeVom:                "ComposeVom",
-	DecomposeVom:              "DecomposeVom",
+	AlphaToNarrow:         "AlphaToNarrow",
+	AlphaToWide:           "AlphaToWide",
+	AlphaToUpper:          "AlphaToUpper",
+	AlphaToLower:          "AlphaToLower",
+	DigitToNarrow:         "DigitToNarrow",
+	DigitToWide:           "DigitToWide",
+	SymbolToNarrow:        "SymbolToNarrow",
+	SymbolToWide:          "SymbolToWide",
+	HiraganaToNarrow:      "HiraganaToNarrow",
+	HiraganaToKatakana:    "HiraganaToKatakana",
+	KatakanaToNarrow:      "KatakanaToNarrow",
+	KatakanaToWide:        "KatakanaToWide",
+	KatakanaToHiragana:    "KatakanaToHiragana",
+	KanaSymbolToNarrow:    "KanaSymbolToNarrow",
+	KanaSymbolToWide:      "KanaSymbolToWide",
+	ComposeVom:            "ComposeVom",
+	DecomposeVom:          "DecomposeVom",
 	IsolatedVomToNarrow:   "IsolatedVomToNarrow",
 	IsolatedVomToWide:     "IsolatedVomToWide",
 	IsolatedVomToNonspace: "IsolatedVomToNonspace",
@@ -351,7 +351,7 @@ func (f NormFlag) String() string {
 	}
 }
 
-//ParseNormflag returns a flags parsed names
+// ParseNormFlag returns a flags parsed names
 func ParseNormFlag(names string) (flags NormFlag, err error) {
 	ss := strings.Split(names, "|")
 	for _, s := range ss {

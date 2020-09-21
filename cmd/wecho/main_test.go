@@ -9,7 +9,7 @@ type FilterTest struct {
 	out string
 }
 
-var filtertests = []FilterTest {
+var filtertests = []FilterTest{
 	0: {[]string{"aaa", "bb", "c"}, "aaa bb c"},
 	1: {[]string{"aaa\\nbb\\nc"}, "aaa\nbb\nc"},
 }

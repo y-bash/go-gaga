@@ -219,7 +219,7 @@ func (n *Normalizer) normalizeRune(r rune) (rune, vom) {
 	}
 }
 
-// Runes normalize r according to the current normalization mode.
+// Rune normalize r according to the current normalization mode.
 // In most cases, this function returns a string of length 1, but
 // in some modes the voicing modifiers may be separated, so it may
 // return a string of length 2.

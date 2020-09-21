@@ -126,11 +126,11 @@ func TestNormalizer_normalizeRune(t *testing.T) {
 			continue
 		}
 		for src := tt.lo; src <= tt.hi; src++ {
-			want, wantVm := src+tt.diff, vmNone
-			have, haveVm := n.normalizeRune(src)
-			if have != want || haveVm != vmNone {
+			want, wantVM := src+tt.diff, vmNone
+			have, haveVM := n.normalizeRune(src)
+			if have != want || haveVM != vmNone {
 				t.Errorf("#%d %s, %s\nnormalizeRune(%#U)\nhave:(%#U, %#U), \nwant:(%#U, %#U)",
-					i, tt.name, tt.flag, src, have, haveVm, want, wantVm)
+					i, tt.name, tt.flag, src, have, haveVM, want, wantVM)
 			}
 		}
 	}
@@ -910,7 +910,7 @@ var normalizer_stringtests = []Normalizer_StringTest{
 	246: {KanaToHiragana, "ふりがな | ｽｽﾞｷ イチロウ", "ふりがな | すずき いちろう"},
 	247: {KanaToWideKatakana, "フリガナ | すす゛き ｲﾁﾛｰ", "フリガナ | スズキ イチロー"},
 	248: {KanaToNarrowKatakana, "ﾌﾘｶﾞﾅ | スズキ いちろう", "ﾌﾘｶﾞﾅ | ｽｽﾞｷ ｲﾁﾛｳ"},
-	249: {LatinToNarrow|AlphaToUpper, "ローマ字(半角) | Ｓｕｚｕｋｉ, ichiro", "ローマ字(半角) | SUZUKI, ICHIRO"},
+	249: {LatinToNarrow | AlphaToUpper, "ローマ字(半角) | Ｓｕｚｕｋｉ, ichiro", "ローマ字(半角) | SUZUKI, ICHIRO"},
 }
 
 func hexs(s string) string {
