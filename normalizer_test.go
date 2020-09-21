@@ -1169,14 +1169,13 @@ outer:
 	}
 }
 
-const normSTR = "\t Aa#　Ａａ＃あア。ｱ｡”ﾞ漢字ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ\U0010FFFF"
+const normSTR = "Aa#　Ａａ＃あア。ｱ｡”ﾞ漢字ｶﾞｷﾞｸﾞｹﾞｺﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ"
 
 func BenchmarkString(b *testing.B) {
-	n, _ := Norm(LatinToNarrow | KanaToWide)
 	b.ResetTimer()
+	n, _ := Norm(LatinToNarrow | KanaToWide)
 	for i := 0; i < b.N; i++ {
-		s := strings.Repeat(normSTR, 1)
-		n.String(s)
+		n.String(normSTR)
 	}
 	b.StopTimer()
 }
@@ -1184,8 +1183,7 @@ func BenchmarkString(b *testing.B) {
 func BenchmarkNormNFKD(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s := strings.Repeat(normSTR, 1)
-		norm.NFKD.String(s)
+		norm.NFKD.String(normSTR)
 	}
 	b.StopTimer()
 }
@@ -1193,8 +1191,7 @@ func BenchmarkNormNFKD(b *testing.B) {
 func BenchmarkNormNFKC(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s := strings.Repeat(normSTR, 1)
-		norm.NFKC.String(s)
+		norm.NFKC.String(normSTR)
 	}
 	b.StopTimer()
 }
@@ -1202,8 +1199,7 @@ func BenchmarkNormNFKC(b *testing.B) {
 func BenchmarkWidthNarrow(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s := strings.Repeat(normSTR, 1)
-		width.Narrow.String(s)
+		width.Narrow.String(normSTR)
 	}
 	b.StopTimer()
 }
@@ -1211,8 +1207,7 @@ func BenchmarkWidthNarrow(b *testing.B) {
 func BenchmarkWidthWiden(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s := strings.Repeat(normSTR, 1)
-		width.Widen.String(s)
+		width.Widen.String(normSTR)
 	}
 	b.StopTimer()
 }
@@ -1220,8 +1215,7 @@ func BenchmarkWidthWiden(b *testing.B) {
 func BenchmarkWidthFold(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s := strings.Repeat(normSTR, 1)
-		width.Fold.String(s)
+		width.Fold.String(normSTR)
 	}
 	b.StopTimer()
 }
